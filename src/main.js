@@ -1,0 +1,1315 @@
+import * as d3 from 'd3';
+import * as maplibregl from 'maplibre-gl';
+import 'maplibre-gl/dist/maplibre-gl.css';
+import './styles.css';
+import './compact.css';
+
+const PARAMETER_COLOURS = {
+  DO: '#168aad',
+  TN: '#e08b2c',
+  TP: '#9b5de5',
+  TURB: '#d95d68',
+  PH: '#2f9e67',
+};
+
+const state = {
+  hoveredSite: null,
+  selectedSite: null,
+  selectedParameter: 'DO',
+  detailMode: 'site',
+  selectedResolution: 'daily',
+  siteSort: 'south-north',
+  rangeStart: new Date('2024-01-01T00:00:00'),
+  rangeEnd: new Date('2024-12-31T23:59:59'),
+  selectedSites: new Set(),
+};
+
+const STATUS_COLOURS = {
+  within: '#2c9b67',
+  outside: '#df5d61',
+  unavailable: '#9ca9a4',
+};
+
+const app = document.querySelector('#app');
+const number = (value) => {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+const boolean = (value) => value === true || value === 'true';
+const cellKey = (siteId, parameterCode) => `${siteId}|${parameterCode}`;
+const dateInputFormat = d3.timeFormat('%Y-%m-%d');
+const displayDateFormat = d3.timeFormat('%d %b %Y');
+
+function formatValue(value) {
+  if (!Number.isFinite(value)) return 'No data';
+  if (Math.abs(value) < 0.1) return d3.format('.3f')(value);
+  if (Math.abs(value) < 10) return d3.format('.2f')(value);
+  return d3.format(',.1f')(value);
+}
+
+function formatObservationTime(observation) {
+  if (!observation?.date || Number.isNaN(observation.date.getTime())) return 'Timestamp unavailable';
+  const formatter = observation.precision === 'time'
+    ? d3.timeFormat('%d %b %Y · %H:%M')
+    : observation.precision === 'month'
+      ? d3.timeFormat('%B %Y')
+      : d3.timeFormat('%d %b %Y');
+  return `${observation.source} · ${formatter(observation.date)}`;
+}
+
+function formatStatus(status) {
+  if (status === 'within') return 'Within ERS objective';
+  if (status === 'outside') return 'Outside ERS objective';
+  return 'ERS unavailable';
+}
+
+function formatObjective(parameter, objective) {
+  if (!objective) return 'Objective unavailable';
+  const unit = parameter.unit;
+  if (Number.isFinite(objective.lower) && Number.isFinite(objective.upper)) {
+    return `${formatValue(objective.lower)}–${formatValue(objective.upper)} ${unit}`;
+  }
+  if (Number.isFinite(objective.upper)) return `≤ ${formatValue(objective.upper)} ${unit}`;
+  if (Number.isFinite(objective.lower)) return `≥ ${formatValue(objective.lower)} ${unit}`;
+  return 'Objective unavailable';
+}
+
+async function loadData() {
+  const [sitesRaw, spotRaw, dailyRaw, availability, boundary, validation] = await Promise.all([
+    d3.csv('/data/sites.csv'),
+    d3.csv('/data/spot_observations.csv'),
+    d3.csv('/data/continuous_daily.csv'),
+    d3.json('/data/availability.json'),
+    d3.json('/data/goulburn_boundary.geojson'),
+    d3.json('/data/validation.json'),
+  ]);
+  if (!sitesRaw.length || !availability?.parameters?.length) {
+    throw new Error('The generated site or availability data is empty.');
+  }
+  const sites = sitesRaw.map((row) => ({
+    ...row,
+    latitude: number(row.latitude),
+    longitude: number(row.longitude),
+    active: boolean(row.active),
+    hasData: boolean(row.has_target_data_2024),
+    elevation: number(row.elevation_m),
+  }));
+  const spot = spotRaw.map((row) => ({
+    ...row,
+    value: number(row.value),
+    rawValue: number(row.raw_value),
+    temperature: number(row.temperature_c),
+    datetimeValue: new Date(row.datetime),
+  }));
+  const daily = dailyRaw.map((row) => ({
+    ...row,
+    value: number(row.value_mean),
+    min: number(row.value_min),
+    max: number(row.value_max),
+    rawValue: number(row.raw_value_mean),
+    temperature: number(row.temperature_c),
+    dateValue: new Date(`${row.date}T12:00:00`),
+    nTotal: number(row.n_total),
+    nUsable: number(row.n_usable),
+    temporalResolution: 'daily',
+  }));
+  const latestByCell = new Map();
+  daily.forEach((row) => {
+    if (!Number.isFinite(row.value)) return;
+    const key = cellKey(row.site_id, row.parameter_code);
+    const observation = {
+      value: row.value,
+      unit: row.unit,
+      date: row.dateValue,
+      source: 'Daily sensor mean',
+      precision: 'day',
+      status: row.ers_point_status,
+    };
+    if (!latestByCell.has(key) || observation.date > latestByCell.get(key).date) latestByCell.set(key, observation);
+  });
+  spot.forEach((row) => {
+    if (!Number.isFinite(row.value)) return;
+    const key = cellKey(row.site_id, row.parameter_code);
+    const observation = {
+      value: row.value,
+      unit: row.unit,
+      date: row.datetimeValue,
+      source: 'Spot observation',
+      precision: 'time',
+      status: row.ers_point_status,
+    };
+    if (!latestByCell.has(key) || observation.date > latestByCell.get(key).date) latestByCell.set(key, observation);
+  });
+  return { sites, spot, daily, hourly: null, latestByCell, availability, boundary, validation };
+}
+
+async function loadHourlyData(data) {
+  if (data.hourly) return;
+  const hourlyRaw = await d3.csv('/data/continuous_hourly.csv');
+  data.hourly = hourlyRaw.map((row) => ({
+    ...row,
+    value: number(row.value_mean),
+    min: number(row.value_min),
+    max: number(row.value_max),
+    rawValue: number(row.raw_value_mean),
+    temperature: number(row.temperature_c),
+    dateValue: new Date(row.datetime),
+    nTotal: number(row.n_total),
+    nUsable: number(row.n_usable),
+    temporalResolution: 'hourly',
+  }));
+}
+
+function dateInSelectedRange(date) {
+  return date >= state.rangeStart && date <= state.rangeEnd;
+}
+
+function meanFinite(rows, accessor) {
+  const values = rows.map(accessor).filter(Number.isFinite);
+  return values.length ? d3.mean(values) : null;
+}
+
+function classifyTemporalValue(data, siteId, parameterCode, value) {
+  if (!Number.isFinite(value)) return 'unavailable';
+  const site = data.sites.find((item) => item.site_id === siteId);
+  const objective = data.availability.ers.thresholds[site?.ers_segment]?.[parameterCode];
+  if (!objective) return 'unavailable';
+  if (Number.isFinite(objective.lower) && value < objective.lower) return 'outside';
+  if (Number.isFinite(objective.upper) && value > objective.upper) return 'outside';
+  return 'within';
+}
+
+function monthlyContinuous(data, rows) {
+  return d3.rollups(
+    rows,
+    (values) => {
+      const sample = values[0];
+      const usable = d3.sum(values, (row) => row.nUsable || 0);
+      const weighted = usable
+        ? d3.sum(values, (row) => Number.isFinite(row.value) ? row.value * (row.nUsable || 0) : 0) / usable
+        : meanFinite(values, (row) => row.value);
+      return {
+        ...sample,
+        dateValue: d3.timeMonth.floor(sample.dateValue),
+        value: weighted,
+        min: d3.min(values, (row) => row.min),
+        max: d3.max(values, (row) => row.max),
+        rawValue: meanFinite(values, (row) => row.rawValue),
+        temperature: meanFinite(values, (row) => row.temperature),
+        nTotal: d3.sum(values, (row) => row.nTotal || 0),
+        nUsable: usable,
+        daysAggregated: values.length,
+        temporalResolution: 'monthly',
+        ers_point_status: classifyTemporalValue(data, sample.site_id, sample.parameter_code, weighted),
+      };
+    },
+    (row) => row.site_id,
+    (row) => row.parameter_code,
+    (row) => d3.timeMonth.floor(row.dateValue),
+  ).flatMap(([, parameters]) => parameters.flatMap(([, months]) => months.map(([, row]) => row)));
+}
+
+function monthlySpot(data, rows) {
+  return d3.rollups(
+    rows,
+    (values) => {
+      const sample = values[0];
+      const value = meanFinite(values, (row) => row.value);
+      return {
+        ...sample,
+        datetimeValue: d3.timeMonth.floor(sample.datetimeValue),
+        value,
+        rawValue: meanFinite(values, (row) => row.rawValue),
+        temperature: meanFinite(values, (row) => row.temperature),
+        observationCount: values.length,
+        quality_code: 'multiple',
+        quality_text: `${values.length} spot observations aggregated`,
+        temporalResolution: 'monthly-spot',
+        ers_point_status: classifyTemporalValue(data, sample.site_id, sample.parameter_code, value),
+      };
+    },
+    (row) => row.site_id,
+    (row) => row.parameter_code,
+    (row) => d3.timeMonth.floor(row.datetimeValue),
+  ).flatMap(([, parameters]) => parameters.flatMap(([, months]) => months.map(([, row]) => row)));
+}
+
+function buildTemporalView(data) {
+  const continuousSource = state.selectedResolution === 'hourly' ? (data.hourly || []) : data.daily;
+  let continuous = continuousSource.filter((row) => state.selectedSites.has(row.site_id) && dateInSelectedRange(row.dateValue));
+  let spot = data.spot.filter((row) => state.selectedSites.has(row.site_id) && dateInSelectedRange(row.datetimeValue));
+  if (state.selectedResolution === 'monthly') {
+    continuous = monthlyContinuous(data, continuous);
+    spot = monthlySpot(data, spot);
+  }
+  const latestByCell = new Map();
+  [...continuous.map((row) => ({ ...row, date: row.dateValue, source: `${state.selectedResolution} sensor summary`, precision: state.selectedResolution === 'hourly' ? 'time' : 'day' })),
+    ...spot.map((row) => ({ ...row, date: row.datetimeValue, source: state.selectedResolution === 'monthly' ? 'Monthly spot mean' : 'Spot observation', precision: state.selectedResolution === 'monthly' ? 'month' : 'time' }))]
+    .forEach((row) => {
+      if (!Number.isFinite(row.value)) return;
+      const key = cellKey(row.site_id, row.parameter_code);
+      if (!latestByCell.has(key) || row.date > latestByCell.get(key).date) latestByCell.set(key, row);
+    });
+  return { continuous, spot, latestByCell };
+}
+
+function renderShell(data) {
+  const targetSites = data.sites.filter((site) => site.hasData);
+  const activeCount = targetSites.filter((site) => site.active).length;
+  const parameters = data.availability.parameters;
+  const segmentOrder = [
+    'Highlands',
+    'Uplands A',
+    'Uplands B',
+    'Central Foothills and Coastal Plains',
+    'Urban',
+    'Murray and Western Plains',
+  ];
+  const segmentCounts = d3.rollup(targetSites, (sites) => sites.length, (site) => site.ers_segment);
+  const displayedSegmentSummary = segmentOrder
+    .filter((segment) => segmentCounts.has(segment))
+    .map((segment) => `${segment} (${segmentCounts.get(segment)})`)
+    .join(' · ');
+  const basinGroups = d3.groups(targetSites, (site) => site.basin || 'Unassigned')
+    .sort(([a], [b]) => d3.ascending(a, b));
+  const basinFilterMarkup = basinGroups.map(([basin, sites]) => {
+    const sortedSites = sites.sort((a, b) => d3.ascending(a.short_name, b.short_name));
+    return `<fieldset class="site-filter-group" data-basin="${basin}">
+      <legend>
+        <label><input type="checkbox" class="basin-checkbox" data-basin="${basin}" checked> <strong>${basin}</strong> <span>${sites.length} sites</span></label>
+      </legend>
+      <div class="site-checkbox-list">
+        ${sortedSites.map((site) => `<label><input type="checkbox" class="site-checkbox" value="${site.site_id}" data-basin="${basin}" checked><span><b>${site.short_name}</b><small>${site.site_id} · ${site.ers_segment}</small></span></label>`).join('')}
+      </div>
+    </fieldset>`;
+  }).join('');
+
+  app.innerHTML = `
+    <header class="masthead">
+      <div>
+        <p class="eyebrow">Thesis prototype · Goulburn basin · 2024</p>
+        <h1>Water Quality Explorer</h1>
+        <p class="subtitle">Linked spatial overview and site-by-parameter time series</p>
+      </div>
+      <div class="summary-chips" aria-label="Dataset summary">
+        <div class="site-filter-control" data-open="false">
+          <button type="button" class="summary-chip-button site-filter-trigger" aria-expanded="false" aria-controls="site-filter-popover"><strong>${targetSites.length}</strong> sites</button>
+          <section class="site-filter-popover" id="site-filter-popover" aria-label="Filter monitoring sites">
+            <div class="site-filter-heading"><div><strong>Monitoring sites</strong><span>Grouped by basin</span></div><button type="button" class="site-filter-done">Done</button></div>
+            ${basinFilterMarkup}
+            <p class="site-filter-summary" aria-live="polite">Showing all ${targetSites.length} sites</p>
+          </section>
+        </div>
+        <span><strong>${parameters.length}</strong> parameters</span>
+        <span><strong>${data.validation.spot_rows.toLocaleString()}</strong> spot samples</span>
+        <span><strong>${data.validation.daily_rows.toLocaleString()}</strong> daily summaries</span>
+      </div>
+    </header>
+
+    <section class="temporal-controls" aria-labelledby="temporal-heading">
+      <div class="temporal-title">
+        <p class="section-kicker">Time period</p>
+        <h2 id="temporal-heading">Temporal view</h2>
+      </div>
+      <div class="resolution-buttons" role="group" aria-label="Temporal resolution">
+        <button type="button" data-resolution="daily" aria-pressed="true">Daily</button>
+        <button type="button" data-resolution="monthly" aria-pressed="false">Monthly</button>
+        <button type="button" data-resolution="hourly" aria-pressed="false">Hourly</button>
+      </div>
+      <div class="date-range-controls">
+        <label>From<input type="date" id="range-start" min="2024-01-01" max="2024-12-31" value="${dateInputFormat(state.rangeStart)}"></label>
+        <span aria-hidden="true">→</span>
+        <label>To<input type="date" id="range-end" min="2024-01-01" max="2024-12-31" value="${dateInputFormat(state.rangeEnd)}"></label>
+        <button type="button" class="range-reset">Full year</button>
+      </div>
+      <p class="temporal-summary" aria-live="polite">Daily · full year 2024</p>
+    </section>
+
+    <section class="parameter-bar" aria-labelledby="parameter-heading">
+      <div>
+        <p class="section-kicker">Map colour</p>
+        <h2 id="parameter-heading">Select a parameter</h2>
+      </div>
+      <div class="parameter-buttons" role="group" aria-label="Water-quality parameter"></div>
+      <div class="ers-legend-group">
+        <div class="ers-legend" aria-label="Provisional ERS condition legend">
+          <span><i class="within"></i>Within</span>
+          <span><i class="outside"></i>Outside</span>
+          <span><i class="unavailable"></i>Unavailable</span>
+        </div>
+        <div class="ers-info" data-open="false" data-pinned="false">
+          <button class="ers-info-button" type="button" aria-expanded="false" aria-controls="ers-info-popover" aria-label="About ERS condition and river segments">i</button>
+          <section class="ers-info-popover" id="ers-info-popover" aria-label="ERS legend explanation">
+            <div class="ers-info-section">
+              <strong>Condition shown on the map</strong>
+              <dl class="ers-info-definitions">
+                <div><dt><i class="within"></i>Within</dt><dd>The required 2024 statistic meets the objective for that site's ERS segment.</dd></div>
+                <div><dt><i class="outside"></i>Outside</dt><dd>At least one required statistic falls beyond the segment objective. This is not an official risk grade.</dd></div>
+                <div><dt><i class="unavailable"></i>Unavailable</dt><dd>No applicable objective or not enough valid observations to make the comparison.</dd></div>
+              </dl>
+            </div>
+            <div class="ers-info-section">
+              <strong>ERS river and stream segments</strong>
+              <ul class="ers-segment-list">
+                <li><b>Highlands</b><span>Alpine and sub-alpine reaches, generally above 1,000 m.</span></li>
+                <li><b>Uplands A</b><span>Generally above 400 m; includes part of the Upper Goulburn and Broken basins.</span></li>
+                <li><b>Uplands B</b><span>Also generally above 400 m, but covers a different set of regions, including northern-draining Goulburn uplands.</span></li>
+                <li><b>Central Foothills &amp; Coastal Plains</b><span>Goulburn foothills; central foothills are generally above 200 m.</span></li>
+                <li><b>Urban</b><span>Defined metropolitan urban waterways; not a general label for every modified river.</span></li>
+                <li><b>Murray &amp; Western Plains</b><span>Lowland reaches, generally below 200 m, including the Goulburn lowlands.</span></li>
+              </ul>
+              <p class="ers-segment-note"><b>A and B are geographic groups, not better/worse grades.</b> Each segment has its own parameter objectives.</p>
+              <p class="ers-current-segments"><b>Sites in this view:</b> ${displayedSegmentSummary}.</p>
+              <a href="${data.availability.ers.source_url}" target="_blank" rel="noreferrer">EPA ERS clauses 17 and Table 5.8 ↗</a>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="analysis-workspace" aria-label="Linked spatial and temporal workspace">
+      <article class="panel map-panel">
+        <div class="panel-heading">
+          <div>
+            <p class="section-kicker">Spatial overview</p>
+            <h2>Goulburn River basin</h2>
+          </div>
+          <p class="map-note">Colour compares the selected parameter with its site-specific ERS objective.</p>
+        </div>
+        <div class="map-stage">
+          <div id="map" role="application" aria-label="Interactive map of monitoring sites in the Goulburn River basin"></div>
+          <div class="map-controls" aria-label="Map zoom controls">
+            <button type="button" data-map-zoom="in" aria-label="Zoom in">+</button>
+            <button type="button" data-map-zoom="out" aria-label="Zoom out">−</button>
+            <button type="button" data-map-zoom="reset" aria-label="Reset map view">Reset</button>
+          </div>
+          <div class="map-tooltip" role="status"></div>
+          <div class="map-key">Marker outline: <span class="active-dot"></span>Active <span class="inactive-dot"></span>Inactive</div>
+        </div>
+      </article>
+
+      <section class="panel matrix-panel" aria-labelledby="matrix-title">
+        <div class="panel-heading matrix-title-row">
+          <div>
+            <p class="section-kicker">Temporal comparison</p>
+            <h2 id="matrix-title">Sites × water-quality parameters</h2>
+          </div>
+          <div class="chart-key"><span class="line-key"></span>Daily sensor summary <span class="point-key"></span>Spot observation</div>
+        </div>
+        <div class="matrix-scroll" tabindex="0" aria-label="Scrollable small-multiple matrix">
+          <div id="matrix"></div>
+        </div>
+      </section>
+
+      <aside class="panel detail-panel" aria-live="polite">
+        <p class="section-kicker">Detailed inspection</p>
+        <div id="site-detail"></div>
+        <div class="method-note">
+          <strong>How to read this</strong>
+          <p>Click a temporal plot to open its detailed axes. Hover the detailed chart to inspect individual observations.</p>
+          <p>Annual ERS status uses the required percentile statistic; DO saturation is estimated from paired temperature and site elevation.</p>
+          <p>The time controls filter the plots. Map colour remains the full-year provisional ERS comparison.</p>
+        </div>
+      </aside>
+    </section>
+
+    <footer>
+      <span>Source: Goulburn 2024 downloaded observations</span>
+      <span>${activeCount} active · ${targetSites.length - activeCount} inactive site in this extract</span>
+    </footer>
+
+    <section class="dataset-ribbon" aria-label="Dataset information">
+      <div class="ribbon-title">
+        <p class="section-kicker">Dataset snapshot</p>
+        <strong>Goulburn · 2024</strong>
+      </div>
+      <dl class="ribbon-facts">
+        <div><dt>Coverage</dt><dd>1 Jan–31 Dec 2024</dd></div>
+        <div><dt>Monitoring sites</dt><dd>${targetSites.length} (${activeCount} active)</dd></div>
+        <div><dt>Source measurements</dt><dd>${data.validation.source_measurement_rows.toLocaleString()} rows</dd></div>
+        <div><dt>Prototype extracts</dt><dd>${data.validation.spot_rows.toLocaleString()} spot · ${data.validation.daily_rows.toLocaleString()} daily · ${data.validation.hourly_rows.toLocaleString()} hourly</dd></div>
+      </dl>
+      <p class="ribbon-note">Provisional comparison with <a href="${data.availability.ers.source_url}" target="_blank" rel="noreferrer">ERS Table 5.8</a> · all ${data.validation.ers_sites_assigned} displayed sites spatially assigned · DO saturation estimated where temperature is paired · Not a final WQI</p>
+    </section>
+  `;
+
+  const buttons = d3.select('.parameter-buttons')
+    .selectAll('button')
+    .data(parameters)
+    .join('button')
+    .attr('type', 'button')
+    .attr('class', (parameter) => `parameter-button param-${parameter.code.toLowerCase()}`)
+    .attr('aria-pressed', (parameter) => parameter.code === state.selectedParameter)
+    .style('--parameter-colour', (parameter) => PARAMETER_COLOURS[parameter.code])
+    .html((parameter) => `<span>${parameter.short_label}</span><small>${parameter.unit}</small>`)
+    .on('click', (_, parameter) => {
+      state.selectedParameter = parameter.code;
+      buttons.attr('aria-pressed', (item) => item.code === state.selectedParameter);
+      updateLinkedViews(data);
+    });
+
+  const ersInfo = document.querySelector('.ers-info');
+  const ersInfoButton = document.querySelector('.ers-info-button');
+  const setErsInfoOpen = (open) => {
+    ersInfo.dataset.open = String(open);
+    ersInfoButton.setAttribute('aria-expanded', String(open));
+  };
+  ersInfo.addEventListener('pointerenter', () => setErsInfoOpen(true));
+  ersInfo.addEventListener('pointerleave', () => {
+    if (ersInfo.dataset.pinned !== 'true') setErsInfoOpen(false);
+  });
+  ersInfoButton.addEventListener('click', (event) => {
+    event.stopPropagation();
+    const pinned = ersInfo.dataset.pinned !== 'true';
+    ersInfo.dataset.pinned = String(pinned);
+    setErsInfoOpen(pinned);
+  });
+  document.addEventListener('click', (event) => {
+    if (!ersInfo.contains(event.target)) {
+      ersInfo.dataset.pinned = 'false';
+      setErsInfoOpen(false);
+    }
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      ersInfo.dataset.pinned = 'false';
+      setErsInfoOpen(false);
+      ersInfoButton.focus();
+    }
+  });
+  setupCompactWorkspace(data);
+  setupTemporalControls(data);
+  setupSiteFilter(data);
+}
+
+function setupCompactWorkspace(data) {
+  const toolbar = document.createElement('nav');
+  toolbar.className = 'compact-toolbar';
+  toolbar.setAttribute('aria-label', 'Exploration controls');
+  document.querySelector('.masthead').after(toolbar);
+  function menu(label, contents, className) {
+    const wrapper = document.createElement('details');
+    wrapper.className = `compact-menu ${className}`;
+    const trigger = document.createElement('summary');
+    trigger.innerHTML = label;
+    const popover = document.createElement('div');
+    popover.className = 'compact-popover';
+    popover.append(contents);
+    wrapper.append(trigger, popover);
+    toolbar.append(wrapper);
+    return wrapper;
+  }
+  menu('<span id="compact-period">Daily · 2024</span> ▾', document.querySelector('.temporal-controls'), 'time-menu');
+  toolbar.append(document.querySelector('.site-filter-control'));
+  const parameterMenu = menu('<span id="compact-parameter">DO · Map</span> ▾', document.querySelector('.parameter-buttons'), 'parameter-menu');
+  parameterMenu.addEventListener('click', (event) => {
+    if (event.target.closest('.parameter-button')) parameterMenu.open = false;
+  });
+  toolbar.append(document.querySelector('.ers-legend-group'));
+  document.querySelector('.parameter-bar').remove();
+  document.querySelector('.masthead .eyebrow').remove();
+  document.querySelector('.subtitle').textContent = 'Goulburn basin · 2024';
+  const snapshot = document.createElement('details');
+  snapshot.className = 'compact-dataset';
+  snapshot.innerHTML = '<summary>Dataset and methodology</summary>';
+  snapshot.append(document.querySelector('.summary-chips'), document.querySelector('.dataset-ribbon'));
+  app.append(snapshot);
+  const sortControl = document.createElement('label');
+  sortControl.className = 'site-sort-control';
+  sortControl.innerHTML = `Order sites <select id="site-sort">
+    <option value="south-north">Position: south → north</option>
+    <option value="north-south">Position: north → south</option>
+    <option value="elevation">Elevation: high → low</option>
+    <option value="name">Site name: A → Z</option>
+  </select>`;
+  const matrixPanel = document.querySelector('.matrix-panel');
+  matrixPanel.querySelector('.matrix-title-row').append(sortControl);
+  const sortNote = document.createElement('p');
+  sortNote.className = 'site-sort-note';
+  sortNote.id = 'site-sort-note';
+  sortNote.textContent = 'Position and elevation orders do not establish upstream–downstream connections.';
+  matrixPanel.querySelector('.matrix-title-row').after(sortNote);
+  const select = sortControl.querySelector('select');
+  select.value = state.siteSort;
+  select.setAttribute('aria-describedby', 'site-sort-note');
+  select.addEventListener('change', () => {
+    state.siteSort = select.value;
+    createMatrix(data);
+    updateLinkedViews(data, { detail: false });
+    document.querySelector('.matrix-scroll').scrollTop = 0;
+  });
+  const detail = document.querySelector('.detail-panel');
+  const heading = document.createElement('div');
+  heading.className = 'compact-detail-heading';
+  heading.innerHTML = '<strong>Detailed inspection</strong><div><button type="button" data-detail="dock" aria-label="Move detail above map">↥</button><button type="button" data-detail="expand" aria-label="Expand detail panel">↔</button><button type="button" data-detail="close" aria-label="Close detail panel">×</button></div>';
+  detail.querySelector('.section-kicker').replaceWith(heading);
+  heading.addEventListener('click', (event) => {
+    const action = event.target.dataset.detail;
+    const workspace = document.querySelector('.analysis-workspace');
+    if (action === 'close') { state.selectedSite = null; updateLinkedViews(data); }
+    if (action === 'expand') {
+      const expanded = workspace.classList.toggle('detail-expanded');
+      event.target.setAttribute('aria-label', expanded ? 'Reduce detail panel' : 'Expand detail panel');
+    }
+    if (action === 'dock') {
+      const above = workspace.classList.toggle('detail-above');
+      event.target.setAttribute('aria-label', above ? 'Dock detail to the right' : 'Move detail above map');
+    }
+    if (action) requestAnimationFrame(() => { data.map?.map.resize(); updateDetail(data); });
+  });
+  const closeMenus = (event) => {
+    document.querySelectorAll('.compact-menu[open]').forEach((item) => {
+      if (event.type === 'keydown' || !item.contains(event.target)) {
+        item.open = false;
+        if (event.type === 'keydown') item.querySelector('summary').focus();
+      }
+    });
+  };
+  document.addEventListener('click', closeMenus);
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeMenus(event); });
+}
+
+function updateTemporalSummary(data, message = null) {
+  const summary = document.querySelector('.temporal-summary');
+  if (!summary) return;
+  if (message) {
+    summary.textContent = message;
+    return;
+  }
+  const resolution = state.selectedResolution[0].toUpperCase() + state.selectedResolution.slice(1);
+  const fullYear = dateInputFormat(state.rangeStart) === '2024-01-01' && dateInputFormat(state.rangeEnd) === '2024-12-31';
+  const range = fullYear ? 'full year 2024' : `${displayDateFormat(state.rangeStart)}–${displayDateFormat(state.rangeEnd)}`;
+  const period = document.querySelector('#compact-period');
+  if (period) period.textContent = `${resolution} · ${range}`;
+  const selectedCount = state.selectedSites.size;
+  summary.textContent = `${resolution} · ${range} · ${selectedCount} site${selectedCount === 1 ? '' : 's'}`;
+  document.querySelectorAll('[data-resolution]').forEach((button) => {
+    button.setAttribute('aria-pressed', String(button.dataset.resolution === state.selectedResolution));
+  });
+  const chartKey = document.querySelector('.chart-key');
+  if (chartKey) {
+    const sensorLabel = state.selectedResolution === 'monthly' ? 'Monthly sensor mean' : `${resolution} sensor summary`;
+    const spotLabel = state.selectedResolution === 'monthly' ? 'Monthly spot mean' : 'Spot observation';
+    chartKey.innerHTML = `<span class="line-key"></span>${sensorLabel} <span class="point-key"></span>${spotLabel}`;
+  }
+}
+
+function refreshTemporalViews(data) {
+  data.temporalView = buildTemporalView(data);
+  createMatrix(data);
+  updateTemporalSummary(data);
+  updateLinkedViews(data);
+}
+
+function setupTemporalControls(data) {
+  const resolutionButtons = document.querySelectorAll('[data-resolution]');
+  resolutionButtons.forEach((button) => button.addEventListener('click', async () => {
+    const nextResolution = button.dataset.resolution;
+    if (nextResolution === state.selectedResolution) return;
+    if (nextResolution === 'hourly' && !data.hourly) {
+      resolutionButtons.forEach((item) => { item.disabled = true; });
+      updateTemporalSummary(data, 'Loading the hourly extract…');
+      try {
+        await loadHourlyData(data);
+      } catch (error) {
+        console.error(error);
+        updateTemporalSummary(data, 'Hourly data could not be loaded. Daily view retained.');
+        resolutionButtons.forEach((item) => { item.disabled = false; });
+        return;
+      }
+      resolutionButtons.forEach((item) => { item.disabled = false; });
+    }
+    state.selectedResolution = nextResolution;
+    refreshTemporalViews(data);
+  }));
+
+  const startInput = document.querySelector('#range-start');
+  const endInput = document.querySelector('#range-end');
+  const applyRange = (changed) => {
+    let start = new Date(`${startInput.value}T00:00:00`);
+    let end = new Date(`${endInput.value}T23:59:59`);
+    if (start > end) {
+      if (changed === 'start') {
+        end = new Date(start);
+        end.setHours(23, 59, 59, 999);
+        endInput.value = startInput.value;
+      } else {
+        start = new Date(end);
+        start.setHours(0, 0, 0, 0);
+        startInput.value = endInput.value;
+      }
+    }
+    state.rangeStart = start;
+    state.rangeEnd = end;
+    refreshTemporalViews(data);
+  };
+  startInput.addEventListener('change', () => applyRange('start'));
+  endInput.addEventListener('change', () => applyRange('end'));
+  document.querySelector('.range-reset').addEventListener('click', () => {
+    startInput.value = '2024-01-01';
+    endInput.value = '2024-12-31';
+    applyRange('reset');
+  });
+}
+
+function setupSiteFilter(data) {
+  const control = document.querySelector('.site-filter-control');
+  const trigger = document.querySelector('.site-filter-trigger');
+  const checkboxes = [...document.querySelectorAll('.site-checkbox')];
+  const basinCheckboxes = [...document.querySelectorAll('.basin-checkbox')];
+  const totalSites = checkboxes.length;
+  const setOpen = (open) => {
+    control.dataset.open = String(open);
+    trigger.setAttribute('aria-expanded', String(open));
+  };
+  const updateFilter = () => {
+    state.selectedSites = new Set(checkboxes.filter((checkbox) => checkbox.checked).map((checkbox) => checkbox.value));
+    basinCheckboxes.forEach((basinCheckbox) => {
+      const basinSites = checkboxes.filter((checkbox) => checkbox.dataset.basin === basinCheckbox.dataset.basin);
+      const checked = basinSites.filter((checkbox) => checkbox.checked).length;
+      basinCheckbox.checked = checked === basinSites.length;
+      basinCheckbox.indeterminate = checked > 0 && checked < basinSites.length;
+    });
+    const selectedCount = state.selectedSites.size;
+    trigger.innerHTML = `<strong>${selectedCount}</strong> / ${totalSites} sites`;
+    document.querySelector('.site-filter-summary').textContent = selectedCount === totalSites
+      ? `Showing all ${totalSites} sites`
+      : `Showing ${selectedCount} of ${totalSites} sites`;
+    if (state.selectedSite && !state.selectedSites.has(state.selectedSite)) state.selectedSite = null;
+    refreshTemporalViews(data);
+  };
+  trigger.addEventListener('click', (event) => {
+    event.stopPropagation();
+    setOpen(control.dataset.open !== 'true');
+  });
+  document.querySelector('.site-filter-done').addEventListener('click', () => {
+    setOpen(false);
+    trigger.focus();
+  });
+  checkboxes.forEach((checkbox) => checkbox.addEventListener('change', updateFilter));
+  basinCheckboxes.forEach((basinCheckbox) => basinCheckbox.addEventListener('change', () => {
+    checkboxes
+      .filter((checkbox) => checkbox.dataset.basin === basinCheckbox.dataset.basin)
+      .forEach((checkbox) => { checkbox.checked = basinCheckbox.checked; });
+    updateFilter();
+  }));
+  document.addEventListener('click', (event) => {
+    if (!control.contains(event.target)) setOpen(false);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && control.dataset.open === 'true') {
+      setOpen(false);
+      trigger.focus();
+    }
+  });
+}
+
+function createMap(data) {
+  const watercourseBounds = {
+    west: 144.6594971209363,
+    south: -37.67907102202982,
+    east: 146.6590695918188,
+    north: -35.96275386870387,
+  };
+  const bounds = [
+    [watercourseBounds.west, watercourseBounds.south],
+    [watercourseBounds.east, watercourseBounds.north],
+  ];
+  const map = new maplibregl.Map({
+    container: 'map',
+    style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+    center: [145.66, -36.82],
+    zoom: 6.4,
+    minZoom: 5,
+    maxZoom: 14,
+    maxPitch: 0,
+    dragRotate: false,
+    pitchWithRotate: false,
+    touchPitch: false,
+  });
+
+  const resetView = (duration = 0) => map.fitBounds(bounds, { padding: 38, duration });
+  map.on('load', () => {
+    map.getStyle().layers
+      .filter((layer) => layer.source === 'carto' && layer['source-layer'] === 'waterway')
+      .forEach((layer) => map.setLayoutProperty(layer.id, 'visibility', 'none'));
+    map.addSource('goulburn-basin', { type: 'geojson', data: data.boundary });
+    map.addLayer({
+      id: 'goulburn-basin-fill',
+      type: 'fill',
+      source: 'goulburn-basin',
+      paint: { 'fill-color': '#b8dbc7', 'fill-opacity': 0.16 },
+    });
+    map.addSource('goulburn-watercourses', {
+      type: 'image',
+      url: '/data/goulburn_watercourses.png',
+      coordinates: [
+        [watercourseBounds.west, watercourseBounds.north],
+        [watercourseBounds.east, watercourseBounds.north],
+        [watercourseBounds.east, watercourseBounds.south],
+        [watercourseBounds.west, watercourseBounds.south],
+      ],
+    });
+    map.addLayer({
+      id: 'goulburn-watercourses',
+      type: 'raster',
+      source: 'goulburn-watercourses',
+      paint: { 'raster-opacity': 0.46 },
+    });
+    map.addLayer({
+      id: 'goulburn-basin-outline',
+      type: 'line',
+      source: 'goulburn-basin',
+      paint: { 'line-color': '#3e704f', 'line-width': 1.6, 'line-opacity': 0.82 },
+    });
+    resetView();
+  });
+
+  const targetSites = data.sites.filter((site) => site.hasData);
+  const markerEntries = targetSites.map((site) => {
+    const element = document.createElement('button');
+    element.type = 'button';
+    element.className = 'site-marker';
+    element.dataset.siteId = site.site_id;
+    element.setAttribute('aria-label', `${site.short_name}, site ${site.site_id}`);
+    element.innerHTML = `<svg viewBox="0 0 30 30" aria-hidden="true"><circle class="site-halo" cx="15" cy="15" r="10"></circle><circle class="site-dot${site.active ? '' : ' inactive'}" cx="15" cy="15" r="5.5"></circle></svg>`;
+    new maplibregl.Marker({ element, anchor: 'center' })
+      .setLngLat([site.longitude, site.latitude])
+      .addTo(map);
+    d3.select(element)
+      .on('pointerenter focus', (event) => setHoveredSite(data, site.site_id, event))
+      .on('pointermove', (event) => positionTooltip(data, site, event))
+      .on('pointerleave blur', () => setHoveredSite(data, null))
+      .on('click', (event) => selectSite(data, site.site_id, event, 'site'))
+      .on('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') selectSite(data, site.site_id, event, 'site');
+      });
+    return { element, site };
+  });
+
+  d3.selectAll('[data-map-zoom]').on('click', function changeMapZoom() {
+    const action = this.dataset.mapZoom;
+    if (action === 'reset') {
+      resetView(260);
+    } else {
+      map[action === 'in' ? 'zoomIn' : 'zoomOut']({ duration: 220 });
+    }
+  });
+
+  data.map = { map, markerEntries, resetView };
+}
+
+function compareSites(a, b) {
+  const byName = () => d3.ascending(a.short_name, b.short_name) || d3.ascending(a.site_id, b.site_id);
+  if (state.siteSort === 'name') return byName();
+  const field = state.siteSort === 'elevation' ? 'elevation' : 'latitude';
+  const aValid = Number.isFinite(a[field]);
+  const bValid = Number.isFinite(b[field]);
+  if (aValid !== bValid) return aValid ? -1 : 1;
+  if (!aValid) return byName();
+  const direction = state.siteSort === 'south-north' ? 1 : -1;
+  return direction * (a[field] - b[field]) || byName();
+}
+
+function createMatrix(data) {
+  const temporalView = data.temporalView || buildTemporalView(data);
+  const sites = data.sites
+    .filter((site) => site.hasData && state.selectedSites.has(site.site_id))
+    .sort(compareSites);
+  const parameters = data.availability.parameters;
+  const dailyByCell = d3.group(temporalView.continuous, (row) => cellKey(row.site_id, row.parameter_code));
+  const spotByCell = d3.group(temporalView.spot, (row) => cellKey(row.site_id, row.parameter_code));
+  const yearDomain = [state.rangeStart, state.rangeEnd];
+
+  const yDomains = new Map(parameters.map((parameter) => {
+    const values = [
+      ...temporalView.continuous.filter((row) => row.parameter_code === parameter.code).map((row) => row.value),
+      ...temporalView.spot.filter((row) => row.parameter_code === parameter.code).map((row) => row.value),
+    ].filter(Number.isFinite).sort(d3.ascending);
+    let low = d3.quantileSorted(values, 0.02);
+    let high = d3.quantileSorted(values, 0.98);
+    if (!Number.isFinite(low) || !Number.isFinite(high)) [low, high] = [0, 1];
+    const objectiveValues = Object.values(data.availability.ers.thresholds)
+      .flatMap((segment) => [segment[parameter.code]?.lower, segment[parameter.code]?.upper])
+      .filter(Number.isFinite);
+    if (objectiveValues.length) {
+      low = Math.min(low, d3.min(objectiveValues));
+      high = Math.max(high, d3.max(objectiveValues));
+    }
+    if (low === high) high = low + 1;
+    return [parameter.code, [low, high]];
+  }));
+
+  const matrix = d3.select('#matrix');
+  matrix.selectAll('*').remove();
+  matrix.style('--parameter-count', parameters.length);
+  const header = matrix.append('div').attr('class', 'matrix-header matrix-grid');
+  header.append('div').attr('class', 'corner-label').text('Monitoring site');
+  header.selectAll('.column-heading')
+    .data(parameters)
+    .join('button')
+    .attr('type', 'button')
+    .attr('class', 'column-heading')
+    .attr('data-parameter', (parameter) => parameter.code)
+    .style('--parameter-colour', (parameter) => PARAMETER_COLOURS[parameter.code])
+    .html((parameter) => `<strong>${parameter.short_label}</strong><span>${parameter.unit}</span>`)
+    .on('click', (_, parameter) => {
+      state.selectedParameter = parameter.code;
+      d3.selectAll('.parameter-button').attr('aria-pressed', (item) => item.code === state.selectedParameter);
+      updateLinkedViews(data);
+    });
+
+  const rows = matrix.selectAll('.matrix-row')
+    .data(sites, (site) => site.site_id)
+    .join('div')
+    .attr('class', 'matrix-row matrix-grid')
+    .attr('data-site-id', (site) => site.site_id);
+  rows.append('button')
+    .attr('type', 'button')
+    .attr('class', 'row-label')
+    .on('pointerenter focus', (event, site) => setHoveredSite(data, site.site_id, event))
+    .on('pointerleave blur', () => setHoveredSite(data, null))
+    .on('click', (event, site) => selectSite(data, site.site_id, event, 'site'))
+    .html((site) => `<strong>${site.short_name}</strong><span>${site.site_id}${site.active ? '' : ' · inactive'}</span>`);
+
+  if (!sites.length) {
+    matrix.append('div').attr('class', 'matrix-empty').text('Select at least one monitoring site to show temporal plots.');
+  }
+
+  rows.each(function drawRow(site) {
+    const row = d3.select(this);
+    const cells = row.selectAll('.chart-cell')
+      .data(parameters.map((parameter) => ({ site, parameter })))
+      .join('button')
+      .attr('type', 'button')
+      .attr('class', 'chart-cell')
+      .attr('data-parameter', ({ parameter }) => parameter.code)
+      .style('--parameter-colour', ({ parameter }) => PARAMETER_COLOURS[parameter.code])
+      .attr('aria-label', ({ site: itemSite, parameter }) => `Inspect ${parameter.label} at ${itemSite.short_name}`)
+      .on('pointerenter focus', (event, item) => setHoveredSite(data, item.site.site_id, event))
+      .on('pointerleave blur', () => setHoveredSite(data, null))
+      .on('click', (event, item) => selectPlot(data, item.site.site_id, item.parameter.code, event));
+
+    cells.each(function drawCell({ site: currentSite, parameter }) {
+      const key = cellKey(currentSite.site_id, parameter.code);
+      const daily = (dailyByCell.get(key) || []).filter((item) => Number.isFinite(item.value));
+      const spot = (spotByCell.get(key) || []).filter((item) => Number.isFinite(item.value));
+      const cell = d3.select(this);
+      if (!daily.length && !spot.length) {
+        cell.classed('no-data', true).append('span').text('No data');
+        return;
+      }
+
+      const width = 184;
+      const height = 72;
+      const margin = { top: 8, right: 8, bottom: 14, left: 8 };
+      const x = d3.scaleTime().domain(yearDomain).range([margin.left, width - margin.right]);
+      const y = d3.scaleLinear().domain(yDomains.get(parameter.code)).nice().range([height - margin.bottom, margin.top]).clamp(true);
+      const svg = cell.append('svg').attr('viewBox', `0 0 ${width} ${height}`).attr('aria-hidden', 'true');
+
+      const objective = data.availability.sites[currentSite.site_id]?.parameters?.[parameter.code]?.ers_assessment?.objective;
+      if (objective) {
+        if (Number.isFinite(objective.lower) && Number.isFinite(objective.upper)) {
+          const top = y(objective.upper);
+          const bottom = y(objective.lower);
+          svg.append('rect')
+            .attr('class', 'ers-objective-band')
+            .attr('x', margin.left)
+            .attr('width', width - margin.left - margin.right)
+            .attr('y', Math.min(top, bottom))
+            .attr('height', Math.abs(bottom - top));
+        } else if (Number.isFinite(objective.upper)) {
+          svg.append('line')
+            .attr('class', 'ers-objective-line')
+            .attr('x1', margin.left).attr('x2', width - margin.right)
+            .attr('y1', y(objective.upper)).attr('y2', y(objective.upper));
+        }
+      }
+      svg.append('line')
+        .attr('class', 'cell-baseline')
+        .attr('x1', margin.left).attr('x2', width - margin.right)
+        .attr('y1', height - margin.bottom).attr('y2', height - margin.bottom);
+      const midpoint = new Date((state.rangeStart.getTime() + state.rangeEnd.getTime()) / 2);
+      svg.append('line')
+        .attr('class', 'midyear-tick')
+        .attr('x1', x(midpoint)).attr('x2', x(midpoint))
+        .attr('y1', height - margin.bottom).attr('y2', height - margin.bottom + 3);
+
+      if (daily.length) {
+        const area = d3.area()
+          .defined((item) => Number.isFinite(item.min) && Number.isFinite(item.max))
+          .x((item) => x(item.dateValue))
+          .y0((item) => y(item.min))
+          .y1((item) => y(item.max));
+        const line = d3.line()
+          .x((item) => x(item.dateValue))
+          .y((item) => y(item.value));
+        svg.append('path').datum(daily).attr('class', 'daily-range').attr('d', area);
+        svg.append('path').datum(daily).attr('class', 'daily-line').attr('d', line);
+      }
+      if (spot.length) {
+        svg.append('g').selectAll('circle')
+          .data(spot)
+          .join('circle')
+          .attr('class', 'spot-point')
+          .attr('cx', (item) => x(item.datetimeValue))
+          .attr('cy', (item) => y(item.value))
+          .attr('r', 2.2);
+      }
+    });
+  });
+  data.matrix = { rows, parameters };
+}
+
+function getParameter(data, code) {
+  return data.availability.parameters.find((parameter) => parameter.code === code);
+}
+
+function getFocusSite(data) {
+  const id = state.selectedSite;
+  return data.sites.find((site) => site.site_id === id) || null;
+}
+
+function getCellSeries(data, siteId, parameterCode) {
+  const temporalView = data.temporalView || buildTemporalView(data);
+  const daily = temporalView.continuous
+    .filter((row) => row.site_id === siteId && row.parameter_code === parameterCode && Number.isFinite(row.value))
+    .sort((a, b) => d3.ascending(a.dateValue, b.dateValue));
+  const spot = temporalView.spot
+    .filter((row) => row.site_id === siteId && row.parameter_code === parameterCode && Number.isFinite(row.value))
+    .sort((a, b) => d3.ascending(a.datetimeValue, b.datetimeValue));
+  return { daily, spot };
+}
+
+function assessmentText(parameter, assessment) {
+  if (!assessment?.statistics) return 'No usable observations';
+  const stats = assessment.statistics;
+  if (parameter.code === 'DO') return `P25 ${formatValue(stats.p25)} · max ${formatValue(stats.max)}`;
+  if (parameter.code === 'PH') return `P25 ${formatValue(stats.p25)} · P75 ${formatValue(stats.p75)}`;
+  return `P75 ${formatValue(stats.p75)}`;
+}
+
+function detailPointHtml(observation, parameter) {
+  const date = observation.dateValue || observation.datetimeValue;
+  const resolution = observation.temporalResolution;
+  const source = observation.dateValue
+    ? `${resolution === 'monthly' ? 'Monthly' : resolution === 'hourly' ? 'Hourly' : 'Daily'} sensor summary`
+    : resolution === 'monthly-spot' ? 'Monthly spot mean' : 'Spot observation';
+  const dateText = resolution === 'monthly' || resolution === 'monthly-spot'
+    ? d3.timeFormat('%B %Y')(date)
+    : resolution === 'hourly' || !observation.dateValue
+      ? d3.timeFormat('%d %b %Y · %H:%M')(date)
+      : d3.timeFormat('%d %b %Y')(date);
+  const raw = parameter.code === 'DO' && Number.isFinite(observation.rawValue)
+    ? `<span>Measured ${formatValue(observation.rawValue)} ${observation.raw_unit}${Number.isFinite(observation.temperature) ? ` · ${formatValue(observation.temperature)} °C` : ''}</span>`
+    : '';
+  const sample = observation.dateValue
+    ? `<span>${observation.nUsable.toLocaleString()} usable sensor records${observation.daysAggregated ? ` across ${observation.daysAggregated} days` : ''}</span>`
+    : observation.temporalResolution === 'monthly-spot'
+      ? `<span>${observation.observationCount} spot observations aggregated</span>`
+      : `<span>Quality ${observation.quality_code}: ${observation.quality_text}</span>`;
+  return `<strong>${formatValue(observation.value)} ${parameter.unit}</strong><time>${dateText}</time><span>${source}</span>${raw}${sample}<em class="${observation.ers_point_status}">${formatStatus(observation.ers_point_status)}</em>`;
+}
+
+function drawDetailChart(data, site, parameter, record) {
+  const container = document.querySelector('#detail-chart');
+  if (!container) return;
+  const { daily, spot } = getCellSeries(data, site.site_id, parameter.code);
+  const observations = [
+    ...daily.map((row) => ({ ...row, date: row.dateValue })),
+    ...spot.map((row) => ({ ...row, date: row.datetimeValue })),
+  ].sort((a, b) => d3.ascending(a.date, b.date));
+  if (!observations.length) {
+    container.innerHTML = '<p class="detail-no-data">No usable observations are available for this plot.</p>';
+    return;
+  }
+
+  const width = Math.max(248, Math.round(container.getBoundingClientRect().width || 280));
+  const height = 250;
+  const margin = { top: 15, right: 14, bottom: 48, left: 58 };
+  const x = d3.scaleTime()
+    .domain([state.rangeStart, state.rangeEnd])
+    .range([margin.left, width - margin.right]);
+  const objective = record?.ers_assessment?.objective;
+  const values = observations.flatMap((row) => [row.value, row.min, row.max]).filter(Number.isFinite);
+  if (Number.isFinite(objective?.lower)) values.push(objective.lower);
+  if (Number.isFinite(objective?.upper)) values.push(objective.upper);
+  let [low, high] = d3.extent(values);
+  if (low === high) [low, high] = [low - 1, high + 1];
+  const padding = (high - low) * 0.08;
+  const y = d3.scaleLinear().domain([low - padding, high + padding]).nice().range([height - margin.bottom, margin.top]);
+
+  const svg = d3.select(container).append('svg')
+    .attr('class', 'detail-chart-svg')
+    .attr('viewBox', `0 0 ${width} ${height}`)
+    .attr('role', 'img')
+    .attr('aria-label', `${parameter.label} observations at ${site.short_name} from ${displayDateFormat(state.rangeStart)} to ${displayDateFormat(state.rangeEnd)}`);
+  svg.append('title').text(`${parameter.label} at ${site.short_name}`);
+  svg.append('desc').text('Daily sensor summaries and spot observations compared with the applicable ERS objective.');
+
+  if (Number.isFinite(objective?.lower) && Number.isFinite(objective?.upper)) {
+    svg.append('rect')
+      .attr('class', 'detail-objective-band')
+      .attr('x', margin.left)
+      .attr('width', width - margin.left - margin.right)
+      .attr('y', y(objective.upper))
+      .attr('height', Math.max(0, y(objective.lower) - y(objective.upper)));
+  } else if (Number.isFinite(objective?.upper)) {
+    svg.append('line')
+      .attr('class', 'detail-objective-line')
+      .attr('x1', margin.left).attr('x2', width - margin.right)
+      .attr('y1', y(objective.upper)).attr('y2', y(objective.upper));
+  }
+
+  svg.append('g')
+    .attr('class', 'detail-grid')
+    .attr('transform', `translate(${margin.left},0)`)
+    .call(d3.axisLeft(y).ticks(4).tickSize(-(width - margin.left - margin.right)).tickFormat(''));
+  svg.append('g')
+    .attr('class', 'detail-axis')
+    .attr('transform', `translate(0,${height - margin.bottom})`)
+    .call(d3.axisBottom(x).ticks(width < 310 ? 3 : 4).tickFormat(
+      state.selectedResolution === 'hourly' && state.rangeEnd - state.rangeStart <= 1000 * 60 * 60 * 24 * 10
+        ? d3.timeFormat('%d %b %H:%M')
+        : d3.timeFormat('%b'),
+    ));
+  svg.append('g')
+    .attr('class', 'detail-axis')
+    .attr('transform', `translate(${margin.left},0)`)
+    .call(d3.axisLeft(y).ticks(4));
+  svg.append('text')
+    .attr('class', 'axis-title')
+    .attr('data-axis', 'x')
+    .attr('x', (margin.left + width - margin.right) / 2)
+    .attr('y', height - 8)
+    .attr('text-anchor', 'middle')
+    .text(`Date · ${state.selectedResolution}`);
+  svg.append('text')
+    .attr('class', 'axis-title')
+    .attr('data-axis', 'y')
+    .attr('transform', 'rotate(-90)')
+    .attr('x', -(margin.top + height - margin.bottom) / 2)
+    .attr('y', 13)
+    .attr('text-anchor', 'middle')
+    .text(`${parameter.short_label} (${parameter.unit})`);
+
+  if (daily.length) {
+    svg.append('path').datum(daily).attr('class', 'detail-daily-range').attr('d', d3.area()
+      .defined((row) => Number.isFinite(row.min) && Number.isFinite(row.max))
+      .x((row) => x(row.dateValue)).y0((row) => y(row.min)).y1((row) => y(row.max)));
+    svg.append('path').datum(daily).attr('class', 'detail-daily-line').attr('d', d3.line()
+      .x((row) => x(row.dateValue)).y((row) => y(row.value)));
+    svg.append('g').selectAll('circle')
+      .data(daily).join('circle')
+      .attr('class', (row) => `detail-point daily ${row.ers_point_status}`)
+      .attr('cx', (row) => x(row.dateValue)).attr('cy', (row) => y(row.value)).attr('r', 2.2);
+  }
+  svg.append('g').selectAll('circle')
+    .data(spot).join('circle')
+    .attr('class', (row) => `detail-point spot ${row.ers_point_status}`)
+    .attr('cx', (row) => x(row.datetimeValue)).attr('cy', (row) => y(row.value)).attr('r', 3.4);
+
+  const guide = svg.append('line').attr('class', 'detail-hover-guide').attr('y1', margin.top).attr('y2', height - margin.bottom).style('display', 'none');
+  const marker = svg.append('circle').attr('class', 'detail-hover-marker').attr('r', 4.5).style('display', 'none');
+  const tooltip = d3.select(container).append('div').attr('class', 'detail-chart-tooltip').attr('role', 'tooltip');
+  const bisector = d3.bisector((row) => row.date).center;
+  svg.append('rect')
+    .attr('class', 'detail-hit-area')
+    .attr('x', margin.left).attr('y', margin.top)
+    .attr('width', width - margin.left - margin.right)
+    .attr('height', height - margin.top - margin.bottom)
+    .on('pointermove', (event) => {
+      const [pointerX] = d3.pointer(event);
+      const index = bisector(observations, x.invert(pointerX));
+      const observation = observations[Math.max(0, Math.min(observations.length - 1, index))];
+      const cx = x(observation.date);
+      const cy = y(observation.value);
+      guide.attr('x1', cx).attr('x2', cx).style('display', null);
+      marker.attr('cx', cx).attr('cy', cy).attr('class', `detail-hover-marker ${observation.ers_point_status}`).style('display', null);
+      tooltip.html(detailPointHtml(observation, parameter))
+        .style('left', `${Math.min(Math.max(cx + 8, 8), width - 190)}px`)
+        .style('top', `${Math.max(8, cy - 88)}px`)
+        .classed('visible', true);
+    })
+    .on('pointerleave', () => {
+      guide.style('display', 'none');
+      marker.style('display', 'none');
+      tooltip.classed('visible', false);
+    });
+}
+
+function updateDetail(data) {
+  const site = getFocusSite(data);
+  const parameter = getParameter(data, state.selectedParameter);
+  const detail = document.querySelector('#site-detail');
+  const workspace = document.querySelector('.analysis-workspace');
+  const closed = !site;
+  if (workspace.classList.contains('no-detail') !== closed) {
+    workspace.classList.toggle('no-detail', closed);
+    requestAnimationFrame(() => data.map?.map.resize());
+  }
+  document.querySelector('.detail-panel').hidden = closed;
+  if (!site) {
+    detail.innerHTML = `
+      <div class="empty-detail">
+        <span class="detail-marker"></span>
+        <h3>No site selected</h3>
+        <p>Click a site to inspect its ${parameter.label.toLowerCase()} observations.</p>
+      </div>`;
+    return;
+  }
+  const siteRecord = data.availability.sites[site.site_id];
+  const record = siteRecord?.parameters?.[state.selectedParameter];
+  const assessment = record?.ers_assessment;
+  const status = assessment?.status || 'unavailable';
+  const showPlot = state.detailMode === 'plot';
+  detail.innerHTML = `
+    <div class="detail-status"><span class="condition-pill ${status}">${formatStatus(status)}</span><span>Site ${site.site_id}</span></div>
+    <h3>${site.short_name}</h3>
+    <p class="detail-coordinate">${site.ers_segment} · ${site.latitude.toFixed(4)}°, ${site.longitude.toFixed(4)}°</p>
+    <div class="detail-reading">
+      <span>${parameter.label}</span>
+      <strong>${record ? formatValue(record.summary_value) : 'No data'} <small>${record?.unit || parameter.unit}</small></strong>
+      <em>${record ? `Median of ${record.summary_source}` : 'Not measured in this extract'}</em>
+    </div>
+    ${record ? `<dl class="availability-list">
+      <div><dt>ERS objective</dt><dd>${formatObjective(parameter, assessment.objective)}</dd></div>
+      <div><dt>Annual statistic</dt><dd>${assessmentText(parameter, assessment)}</dd></div>
+      <div><dt>Spot samples</dt><dd>${record.spot_count.toLocaleString()}</dd></div>
+      <div><dt>Sensor records</dt><dd>${record.continuous_count.toLocaleString()}</dd></div>
+      <div><dt>Daily summaries</dt><dd>${record.daily_count.toLocaleString()}</dd></div>
+    </dl>` : ''}
+    ${showPlot ? `<section class="detail-plot-section">
+      <div class="detail-plot-heading"><strong>Temporal detail</strong><span>${displayDateFormat(state.rangeStart)}–${displayDateFormat(state.rangeEnd)} · hover to inspect</span></div>
+      <div id="detail-chart"></div>
+      <div class="detail-chart-key"><span><i class="daily"></i>${state.selectedResolution === 'monthly' ? 'Monthly mean' : state.selectedResolution === 'hourly' ? 'Hourly mean' : 'Daily mean'}</span><span><i class="spot"></i>${state.selectedResolution === 'monthly' ? 'Monthly spot mean' : 'Spot'}</span><span><i class="objective"></i>ERS objective</span></div>
+    </section>` : '<p class="detail-action-hint">Click a matrix plot to open its detailed temporal inspection here.</p>'}
+  `;
+  if (showPlot) requestAnimationFrame(() => drawDetailChart(data, site, parameter, record));
+}
+
+function updateLinkedViews(data, { detail = true } = {}) {
+  const parameter = state.selectedParameter;
+  const currentParameter = getParameter(data, parameter);
+  document.querySelector('#compact-parameter').textContent = `${currentParameter.short_label} · ${currentParameter.unit} · Map`;
+  app.style.setProperty('--current-parameter', PARAMETER_COLOURS[parameter]);
+  d3.selectAll('.parameter-button').attr('aria-pressed', (item) => item.code === parameter);
+  d3.selectAll('.column-heading').classed('selected-parameter', (item) => item.code === parameter);
+  d3.selectAll('.chart-cell').classed('selected-parameter', function selectedColumn() {
+    return this.dataset.parameter === parameter;
+  }).classed('selected-cell', function selectedCell(item) {
+    return state.detailMode === 'plot'
+      && item?.site?.site_id === state.selectedSite
+      && item?.parameter?.code === parameter;
+  });
+  data.map.markerEntries.forEach(({ element, site }) => {
+    element.hidden = !state.selectedSites.has(site.site_id);
+    const group = d3.select(element);
+    const record = data.availability.sites[site.site_id]?.parameters?.[parameter];
+    group
+      .classed('hovered', site.site_id === state.hoveredSite)
+      .classed('selected', site.site_id === state.selectedSite)
+      .classed('unavailable', !record || record.ers_assessment?.status === 'unavailable');
+    group.select('.site-dot')
+      .attr('fill', STATUS_COLOURS[record?.ers_assessment?.status || 'unavailable']);
+  });
+  data.matrix.rows
+    .classed('hovered', (site) => site.site_id === state.hoveredSite)
+    .classed('selected', (site) => site.site_id === state.selectedSite);
+  if (detail) updateDetail(data);
+}
+
+function setHoveredSite(data, siteId, event = null) {
+  state.hoveredSite = siteId;
+  updateLinkedViews(data, { detail: false });
+  const tooltip = document.querySelector('.map-tooltip');
+  if (!siteId) tooltip.classList.remove('visible');
+  if (siteId && event?.currentTarget?.classList?.contains('site-marker')) {
+    const site = data.sites.find((item) => item.site_id === siteId);
+    positionTooltip(data, site, event);
+  }
+}
+
+function focusMapOnSite(data, siteId) {
+  const site = data.sites.find((item) => item.site_id === siteId);
+  if (!site || !Number.isFinite(site.longitude) || !Number.isFinite(site.latitude)) return;
+  // Wait for the detail panel to resize the map before centring the selection.
+  requestAnimationFrame(() => {
+    if (state.selectedSite !== siteId) return;
+    const map = data.map.map;
+    map.resize();
+    map.easeTo({
+      center: [site.longitude, site.latitude],
+      zoom: Math.max(map.getZoom(), 10),
+      duration: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 650,
+    });
+  });
+}
+
+function selectSite(data, siteId, event, mode = 'site') {
+  event?.preventDefault();
+  const togglingOff = state.selectedSite === siteId && state.detailMode === mode;
+  state.selectedSite = togglingOff ? null : siteId;
+  state.detailMode = mode;
+  updateLinkedViews(data);
+  if (state.selectedSite) focusMapOnSite(data, state.selectedSite);
+  if (event?.currentTarget?.classList?.contains('site-marker') && state.selectedSite) {
+    document.querySelector(`.matrix-row[data-site-id="${siteId}"]`)?.scrollIntoView({ block: 'nearest' });
+  }
+}
+
+function selectPlot(data, siteId, parameterCode, event) {
+  event?.preventDefault();
+  const togglingOff = state.selectedSite === siteId
+    && state.selectedParameter === parameterCode
+    && state.detailMode === 'plot';
+  state.selectedSite = togglingOff ? null : siteId;
+  state.selectedParameter = parameterCode;
+  state.detailMode = 'plot';
+  updateLinkedViews(data);
+  if (state.selectedSite) focusMapOnSite(data, state.selectedSite);
+}
+
+function positionTooltip(data, site, event) {
+  if (!site || !event) return;
+  const tooltip = document.querySelector('.map-tooltip');
+  const mapStage = document.querySelector('.map-stage');
+  const bounds = mapStage.getBoundingClientRect();
+  const latest = (data.temporalView?.latestByCell || data.latestByCell).get(cellKey(site.site_id, state.selectedParameter));
+  const parameter = getParameter(data, state.selectedParameter);
+  const record = data.availability.sites[site.site_id]?.parameters?.[state.selectedParameter];
+  const status = record?.ers_assessment?.status || 'unavailable';
+  tooltip.innerHTML = `
+    <strong>${site.short_name}</strong>
+    <span>${parameter.short_label}: ${latest ? `${formatValue(latest.value)} ${latest.unit}` : 'No data'}</span>
+    <time>${latest ? formatObservationTime(latest) : 'No observation timestamp'}</time>
+    <span>${site.ers_segment}</span>
+    <em class="${status}">${formatStatus(status)}</em>`;
+  const x = Math.min(event.clientX - bounds.left + 14, bounds.width - 210);
+  const y = Math.max(event.clientY - bounds.top - 16, 16);
+  tooltip.style.transform = `translate(${x}px, ${y}px)`;
+  tooltip.classList.add('visible');
+}
+
+async function init() {
+  try {
+    const data = await loadData();
+    state.selectedSites = new Set(data.sites.filter((site) => site.hasData).map((site) => site.site_id));
+    data.temporalView = buildTemporalView(data);
+    renderShell(data);
+    createMap(data);
+    createMatrix(data);
+    updateLinkedViews(data);
+  } catch (error) {
+    console.error(error);
+    app.innerHTML = `
+      <section class="error-state">
+        <p class="eyebrow">Data loading problem</p>
+        <h1>The prototype could not start.</h1>
+        <p>${error.message}</p>
+        <p>Run the preprocessing script, then reload this page.</p>
+      </section>`;
+  }
+}
+
+init();

@@ -1,0 +1,968 @@
+site_id,site_name,datetime,parameter_code,parameter_name,value,unit,raw_value,raw_unit,temperature_c,ers_point_status,qualifier,quality_code,quality_text
+405200,GOULBURN @ MURCHISON,2024-01-23T10:52:00,DO,Dissolved oxygen saturation,92.0658,% saturation (estimated),8.08,ppm,21,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-02-20T09:42:00,DO,Dissolved oxygen saturation,87.635,% saturation (estimated),7.47,ppm,22.5,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-03-26T09:58:00,DO,Dissolved oxygen saturation,88.1299,% saturation (estimated),8.05,ppm,19,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-04-16T10:27:00,DO,Dissolved oxygen saturation,91.5516,% saturation (estimated),8.92,ppm,15.9,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-05-22T12:18:00,DO,Dissolved oxygen saturation,94.5301,% saturation (estimated),10.2,ppm,11.3,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-06-19T11:55:00,DO,Dissolved oxygen saturation,92.588,% saturation (estimated),10.7,ppm,8.4,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-07-17T10:49:00,DO,Dissolved oxygen saturation,96.7322,% saturation (estimated),10.81,ppm,9.8,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-08-21T13:20:00,DO,Dissolved oxygen saturation,99.061,% saturation (estimated),10.4,ppm,12.5,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-09-24T12:00:00,DO,Dissolved oxygen saturation,102.015,% saturation (estimated),10.2,ppm,14.7,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-10-23T08:30:00,DO,Dissolved oxygen saturation,91.2755,% saturation (estimated),8.44,ppm,18.4,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-11-11T10:50:00,DO,Dissolved oxygen saturation,100.213,% saturation (estimated),8.9,ppm,20.4,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-12-17T10:00:00,DO,Dissolved oxygen saturation,88.1179,% saturation (estimated),7.3,ppm,24,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-01-23T10:52:00,PH,pH,7.04,pH units,7.04,pH,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-02-20T09:42:00,PH,pH,7.3,pH units,7.3,pH,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-03-26T09:58:00,PH,pH,7.11,pH units,7.11,pH,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-04-16T10:27:00,PH,pH,7.21,pH units,7.21,pH,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-05-22T12:18:00,PH,pH,7.62,pH units,7.62,pH,,outside,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-06-19T11:55:00,PH,pH,7.46,pH units,7.46,pH,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-07-17T10:49:00,PH,pH,7.27,pH units,7.27,pH,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-08-21T13:20:00,PH,pH,7.3,pH units,7.3,pH,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-09-24T12:00:00,PH,pH,7.3,pH units,7.3,pH,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-10-23T08:30:00,PH,pH,7.3,pH units,7.3,pH,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-11-11T10:50:00,PH,pH,6.9,pH units,6.9,pH,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-12-17T10:00:00,PH,pH,7.2,pH units,7.2,pH,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-01-23T10:52:00,TP,Total phosphorus,0.09,mg/L,0.09,mg/L,,outside,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-02-20T09:42:00,TP,Total phosphorus,0.041,mg/L,0.041,mg/L,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-03-26T09:58:00,TP,Total phosphorus,0.033,mg/L,0.033,mg/L,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-04-16T10:27:00,TP,Total phosphorus,0.037,mg/L,0.037,mg/L,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-05-22T12:18:00,TP,Total phosphorus,0.019,mg/L,0.019,mg/L,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-06-19T11:55:00,TP,Total phosphorus,0.024,mg/L,0.024,mg/L,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-07-17T10:49:00,TP,Total phosphorus,0.017,mg/L,0.017,mg/L,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-08-21T13:20:00,TP,Total phosphorus,0.031,mg/L,0.031,mg/L,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-09-24T12:00:00,TP,Total phosphorus,0.017,mg/L,0.017,mg/L,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-10-23T08:30:00,TP,Total phosphorus,0.015,mg/L,0.015,mg/L,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-11-11T10:50:00,TP,Total phosphorus,0.026,mg/L,0.026,mg/L,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-12-17T10:00:00,TP,Total phosphorus,0.038,mg/L,0.038,mg/L,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-01-23T10:52:00,TURB,Turbidity,36.5,NTU,36.5,NTU,,outside,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-02-20T09:42:00,TURB,Turbidity,11.9,NTU,11.9,NTU,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-03-26T09:58:00,TURB,Turbidity,6.7,NTU,6.7,NTU,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-04-16T10:27:00,TURB,Turbidity,8.4,NTU,8.4,NTU,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-05-22T12:18:00,TURB,Turbidity,6.4,NTU,6.4,NTU,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-06-19T11:55:00,TURB,Turbidity,11.6,NTU,11.6,NTU,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-07-17T10:49:00,TURB,Turbidity,7.1,NTU,7.1,NTU,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-08-21T13:20:00,TURB,Turbidity,10.6,NTU,10.6,NTU,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-09-24T12:00:00,TURB,Turbidity,13.4,NTU,13.4,NTU,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-10-23T08:30:00,TURB,Turbidity,8.3,NTU,8.3,NTU,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-11-11T10:50:00,TURB,Turbidity,9.2,NTU,9.2,NTU,,within,,1,Unedited data
+405200,GOULBURN @ MURCHISON,2024-12-17T10:00:00,TURB,Turbidity,14.1,NTU,14.1,NTU,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-01-15T08:40:00,DO,Dissolved oxygen saturation,82.1212,% saturation (estimated),7.76,ppm,17.2,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-02-06T14:30:00,DO,Dissolved oxygen saturation,96.795,% saturation (estimated),8.69,ppm,19.7,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-03-06T12:00:00,DO,Dissolved oxygen saturation,98.7084,% saturation (estimated),9.25,ppm,17.6,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-04-09T07:00:00,DO,Dissolved oxygen saturation,91.8986,% saturation (estimated),9.24,ppm,14.3,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-05-07T08:20:00,DO,Dissolved oxygen saturation,96.8187,% saturation (estimated),10.56,ppm,10.7,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-06-05T12:10:00,DO,Dissolved oxygen saturation,97.2168,% saturation (estimated),10.83,ppm,9.8,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-06-18T07:30:00,DO,Dissolved oxygen saturation,94.8221,% saturation (estimated),11.25,ppm,7.2,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-07-04T06:45:00,DO,Dissolved oxygen saturation,96.5113,% saturation (estimated),10.88,ppm,9.3,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-07-10T09:10:00,DO,Dissolved oxygen saturation,96.2334,% saturation (estimated),10.57,ppm,10.4,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-08-07T11:00:00,DO,Dissolved oxygen saturation,97.9147,% saturation (estimated),11.28,ppm,8.4,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-09-04T08:15:00,DO,Dissolved oxygen saturation,94.1956,% saturation (estimated),10.25,ppm,10.8,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-10-09T12:00:00,DO,Dissolved oxygen saturation,98.9246,% saturation (estimated),10.4,ppm,12.3,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-11-06T06:25:00,DO,Dissolved oxygen saturation,86.9131,% saturation (estimated),8.23,ppm,17.1,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-12-04T07:45:00,DO,Dissolved oxygen saturation,84.1512,% saturation (estimated),7.45,ppm,20.4,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-12-10T11:00:00,DO,Dissolved oxygen saturation,93.4022,% saturation (estimated),8.22,ppm,20.7,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-01-15T08:40:00,PH,pH,6.2,pH units,6.2,pH,,outside,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-02-06T14:30:00,PH,pH,7.5,pH units,7.5,pH,,outside,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-03-06T12:00:00,PH,pH,6.8,pH units,6.8,pH,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-04-09T07:00:00,PH,pH,6.85,pH units,6.85,pH,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-05-07T08:20:00,PH,pH,7.38,pH units,7.38,pH,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-06-05T12:10:00,PH,pH,6.45,pH units,6.45,pH,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-06-18T07:30:00,PH,pH,7.61,pH units,7.61,pH,,outside,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-07-04T06:45:00,PH,pH,7.68,pH units,7.68,pH,,outside,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-07-10T09:10:00,PH,pH,7.52,pH units,7.52,pH,,outside,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-08-07T11:00:00,PH,pH,6.96,pH units,6.96,pH,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-09-04T08:15:00,PH,pH,7.5,pH units,7.5,pH,,outside,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-10-09T12:00:00,PH,pH,7.47,pH units,7.47,pH,,outside,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-11-06T06:25:00,PH,pH,7.52,pH units,7.52,pH,,outside,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-12-04T07:45:00,PH,pH,7.44,pH units,7.44,pH,,outside,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-12-10T11:00:00,PH,pH,7.43,pH units,7.43,pH,,outside,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-01-15T08:40:00,TP,Total phosphorus,0.051,mg/L,0.051,mg/L,,outside,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-02-06T14:30:00,TP,Total phosphorus,0.025,mg/L,0.025,mg/L,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-03-06T12:00:00,TP,Total phosphorus,0.017,mg/L,0.017,mg/L,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-04-09T07:00:00,TP,Total phosphorus,0.15,mg/L,0.15,mg/L,,outside,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-05-07T08:20:00,TP,Total phosphorus,0.02,mg/L,0.02,mg/L,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-06-18T07:30:00,TP,Total phosphorus,0.014,mg/L,0.014,mg/L,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-07-10T09:10:00,TP,Total phosphorus,0.021,mg/L,0.021,mg/L,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-08-07T11:00:00,TP,Total phosphorus,0.022,mg/L,0.022,mg/L,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-09-04T08:15:00,TP,Total phosphorus,0.016,mg/L,0.016,mg/L,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-10-09T12:00:00,TP,Total phosphorus,0.015,mg/L,0.015,mg/L,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-11-06T06:25:00,TP,Total phosphorus,0.018,mg/L,0.018,mg/L,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-12-10T11:00:00,TP,Total phosphorus,0.024,mg/L,0.024,mg/L,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-01-15T08:40:00,TURB,Turbidity,18.8,NTU,18.8,NTU,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-02-06T14:30:00,TURB,Turbidity,10.4,NTU,10.4,NTU,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-03-06T12:00:00,TURB,Turbidity,5.7,NTU,5.7,NTU,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-04-09T07:00:00,TURB,Turbidity,7.8,NTU,7.8,NTU,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-05-07T08:20:00,TURB,Turbidity,6.5,NTU,6.5,NTU,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-06-05T12:10:00,TURB,Turbidity,11.2,NTU,11.2,NTU,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-06-18T07:30:00,TURB,Turbidity,8.3,NTU,8.3,NTU,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-07-04T06:45:00,TURB,Turbidity,10.2,NTU,10.2,NTU,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-07-10T09:10:00,TURB,Turbidity,9.3,NTU,9.3,NTU,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-08-07T11:00:00,TURB,Turbidity,11.8,NTU,11.8,NTU,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-09-04T08:15:00,TURB,Turbidity,10.3,NTU,10.3,NTU,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-10-09T12:00:00,TURB,Turbidity,8.8,NTU,8.8,NTU,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-11-06T06:25:00,TURB,Turbidity,8,NTU,8,NTU,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-12-04T07:45:00,TURB,Turbidity,18,NTU,18,NTU,,within,,1,Unedited data
+405201,GOULBURN @ TRAWOOL,2024-12-10T11:00:00,TURB,Turbidity,14.1,NTU,14.1,NTU,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-01-10T08:12:00,DO,Dissolved oxygen saturation,80.8369,% saturation (estimated),7.53,ppm,17.5,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-02-06T09:33:00,DO,Dissolved oxygen saturation,75.9112,% saturation (estimated),7.81,ppm,12.9,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-03-07T08:23:00,DO,Dissolved oxygen saturation,69.885,% saturation (estimated),7.19,ppm,12.9,outside,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-04-04T07:20:00,DO,Dissolved oxygen saturation,97.6824,% saturation (estimated),10.28,ppm,11.9,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-05-08T12:00:00,DO,Dissolved oxygen saturation,100.317,% saturation (estimated),10.63,ppm,11.6,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-06-06T11:30:00,DO,Dissolved oxygen saturation,98.096,% saturation (estimated),10.3,ppm,12,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-07-03T10:53:00,DO,Dissolved oxygen saturation,91.2532,% saturation (estimated),9.85,ppm,10.8,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-08-08T08:00:00,DO,Dissolved oxygen saturation,98.0144,% saturation (estimated),10.78,ppm,10,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-09-11T07:52:00,DO,Dissolved oxygen saturation,101.414,% saturation (estimated),10.6,ppm,12.2,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-10-09T07:15:00,DO,Dissolved oxygen saturation,97.0487,% saturation (estimated),10.5,ppm,10.7,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-11-07T08:10:00,DO,Dissolved oxygen saturation,88.2193,% saturation (estimated),9.2,ppm,12.3,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-12-03T07:58:00,DO,Dissolved oxygen saturation,98.5086,% saturation (estimated),10,ppm,13.5,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-01-10T08:12:00,PH,pH,7.54,pH units,7.54,pH,,outside,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-02-06T09:33:00,PH,pH,6.98,pH units,6.98,pH,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-03-07T08:23:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-04-04T07:20:00,PH,pH,7.35,pH units,7.35,pH,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-05-08T12:00:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-06-06T11:30:00,PH,pH,7.75,pH units,7.75,pH,,outside,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-07-03T10:53:00,PH,pH,7.34,pH units,7.34,pH,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-08-08T08:00:00,PH,pH,7.47,pH units,7.47,pH,,outside,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-09-11T07:52:00,PH,pH,7.35,pH units,7.35,pH,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-10-09T07:15:00,PH,pH,7.2,pH units,7.2,pH,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-11-07T08:10:00,PH,pH,6.6,pH units,6.6,pH,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-12-03T07:58:00,PH,pH,7.1,pH units,7.1,pH,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-01-10T08:12:00,TP,Total phosphorus,0.026,mg/L,0.026,mg/L,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-02-06T09:33:00,TP,Total phosphorus,0.006,mg/L,0.006,mg/L,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-03-07T08:23:00,TP,Total phosphorus,0.015,mg/L,0.015,mg/L,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-04-04T07:20:00,TP,Total phosphorus,0.018,mg/L,0.018,mg/L,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-05-08T12:00:00,TP,Total phosphorus,0.011,mg/L,0.011,mg/L,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-06-06T11:30:00,TP,Total phosphorus,0.017,mg/L,0.017,mg/L,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-07-03T10:53:00,TP,Total phosphorus,0.007,mg/L,0.007,mg/L,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-08-08T08:00:00,TP,Total phosphorus,0.011,mg/L,0.011,mg/L,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-09-11T07:52:00,TP,Total phosphorus,0.005,mg/L,0.005,mg/L,,within,LT,1,Unedited data
+405203,GOULBURN @ EILDON,2024-10-09T07:15:00,TP,Total phosphorus,0.005,mg/L,0.005,mg/L,,within,LT,1,Unedited data
+405203,GOULBURN @ EILDON,2024-11-07T08:10:00,TP,Total phosphorus,0.006,mg/L,0.006,mg/L,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-12-03T07:58:00,TP,Total phosphorus,0.006,mg/L,0.006,mg/L,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-01-10T08:12:00,TURB,Turbidity,22.9,NTU,22.9,NTU,,outside,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-02-06T09:33:00,TURB,Turbidity,3,NTU,3,NTU,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-03-07T08:23:00,TURB,Turbidity,1.3,NTU,1.3,NTU,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-04-04T07:20:00,TURB,Turbidity,1.5,NTU,1.5,NTU,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-05-08T12:00:00,TURB,Turbidity,1.6,NTU,1.6,NTU,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-06-06T11:30:00,TURB,Turbidity,1.7,NTU,1.7,NTU,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-07-03T10:53:00,TURB,Turbidity,3.4,NTU,3.4,NTU,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-08-08T08:00:00,TURB,Turbidity,1.6,NTU,1.6,NTU,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-09-11T07:52:00,TURB,Turbidity,6.4,NTU,6.4,NTU,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-10-09T07:15:00,TURB,Turbidity,1.7,NTU,1.7,NTU,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-11-07T08:10:00,TURB,Turbidity,5,NTU,5,NTU,,within,,1,Unedited data
+405203,GOULBURN @ EILDON,2024-12-03T07:58:00,TURB,Turbidity,1.5,NTU,1.5,NTU,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-01-23T14:09:00,DO,Dissolved oxygen saturation,76.8306,% saturation (estimated),6.56,ppm,22.5,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-02-20T11:08:00,DO,Dissolved oxygen saturation,87.9088,% saturation (estimated),7.16,ppm,25,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-03-26T13:00:00,DO,Dissolved oxygen saturation,90.4677,% saturation (estimated),8.08,ppm,20.2,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-04-16T14:52:00,DO,Dissolved oxygen saturation,91.3986,% saturation (estimated),8.92,ppm,15.9,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-05-22T15:08:00,DO,Dissolved oxygen saturation,100.6,% saturation (estimated),10.7,ppm,12,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-06-19T14:57:00,DO,Dissolved oxygen saturation,94.1611,% saturation (estimated),10.9,ppm,8.4,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-07-17T14:11:00,DO,Dissolved oxygen saturation,93.8905,% saturation (estimated),10.51,ppm,9.8,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-08-21T15:10:00,DO,Dissolved oxygen saturation,93.2909,% saturation (estimated),9.9,ppm,12.1,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-09-24T08:40:00,DO,Dissolved oxygen saturation,94.7761,% saturation (estimated),9.66,ppm,13.9,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-10-23T12:40:00,DO,Dissolved oxygen saturation,90.0414,% saturation (estimated),8.01,ppm,20.4,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-11-11T14:15:00,DO,Dissolved oxygen saturation,101.68,% saturation (estimated),8.8,ppm,21.8,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-12-17T14:00:00,DO,Dissolved oxygen saturation,87.2176,% saturation (estimated),6.8,ppm,27.4,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-01-23T14:09:00,PH,pH,7.01,pH units,7.01,pH,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-02-20T11:08:00,PH,pH,7.24,pH units,7.24,pH,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-03-26T13:00:00,PH,pH,7.6,pH units,7.6,pH,,outside,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-04-16T14:52:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-05-22T15:08:00,PH,pH,7.55,pH units,7.55,pH,,outside,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-06-19T14:57:00,PH,pH,7.94,pH units,7.94,pH,,outside,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-07-17T14:11:00,PH,pH,7.65,pH units,7.65,pH,,outside,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-08-21T15:10:00,PH,pH,7.6,pH units,7.6,pH,,outside,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-09-24T08:40:00,PH,pH,7.15,pH units,7.15,pH,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-10-23T12:40:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-11-11T14:15:00,PH,pH,7.1,pH units,7.1,pH,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-12-17T14:00:00,PH,pH,7.2,pH units,7.2,pH,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-01-23T14:09:00,TP,Total phosphorus,0.11,mg/L,0.11,mg/L,,outside,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-02-20T11:08:00,TP,Total phosphorus,0.1,mg/L,0.1,mg/L,,outside,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-03-26T13:00:00,TP,Total phosphorus,0.056,mg/L,0.056,mg/L,,outside,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-04-16T14:52:00,TP,Total phosphorus,0.042,mg/L,0.042,mg/L,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-05-22T15:08:00,TP,Total phosphorus,0.035,mg/L,0.035,mg/L,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-06-19T14:57:00,TP,Total phosphorus,0.033,mg/L,0.033,mg/L,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-07-17T14:11:00,TP,Total phosphorus,0.027,mg/L,0.027,mg/L,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-08-21T15:10:00,TP,Total phosphorus,0.062,mg/L,0.062,mg/L,,outside,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-09-24T08:40:00,TP,Total phosphorus,0.031,mg/L,0.031,mg/L,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-10-23T12:40:00,TP,Total phosphorus,0.058,mg/L,0.058,mg/L,,outside,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-11-11T14:15:00,TP,Total phosphorus,0.051,mg/L,0.051,mg/L,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-12-17T14:00:00,TP,Total phosphorus,0.075,mg/L,0.075,mg/L,,outside,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-01-23T14:09:00,TURB,Turbidity,45.4,NTU,45.4,NTU,,outside,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-02-20T11:08:00,TURB,Turbidity,29.8,NTU,29.8,NTU,,outside,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-03-26T13:00:00,TURB,Turbidity,13.9,NTU,13.9,NTU,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-04-16T14:52:00,TURB,Turbidity,13,NTU,13,NTU,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-05-22T15:08:00,TURB,Turbidity,16.5,NTU,16.5,NTU,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-06-19T14:57:00,TURB,Turbidity,23,NTU,23,NTU,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-07-17T14:11:00,TURB,Turbidity,18.8,NTU,18.8,NTU,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-08-21T15:10:00,TURB,Turbidity,23,NTU,23,NTU,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-09-24T08:40:00,TURB,Turbidity,21.2,NTU,21.2,NTU,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-10-23T12:40:00,TURB,Turbidity,29,NTU,29,NTU,,outside,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-11-11T14:15:00,TURB,Turbidity,19.3,NTU,19.3,NTU,,within,,1,Unedited data
+405204,GOULBURN SHEPPARTON,2024-12-17T14:00:00,TURB,Turbidity,32.8,NTU,32.8,NTU,,outside,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-01-22T09:45:00,DO,Dissolved oxygen saturation,94.8508,% saturation (estimated),9.56,ppm,13.3,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-02-12T06:20:00,DO,Dissolved oxygen saturation,97.651,% saturation (estimated),9.42,ppm,15.3,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-03-12T10:10:00,DO,Dissolved oxygen saturation,98.9168,% saturation (estimated),9.4,ppm,16,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-04-18T08:45:00,DO,Dissolved oxygen saturation,96.0283,% saturation (estimated),10.64,ppm,9.2,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-05-15T10:10:00,DO,Dissolved oxygen saturation,100.692,% saturation (estimated),11.57,ppm,7.7,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-06-12T09:40:00,DO,Dissolved oxygen saturation,98.8478,% saturation (estimated),11.22,ppm,8.2,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-07-10T11:00:00,DO,Dissolved oxygen saturation,100.231,% saturation (estimated),11.66,ppm,7.2,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-08-12T11:45:00,DO,Dissolved oxygen saturation,101.767,% saturation (estimated),12.2,ppm,6,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-09-11T10:15:00,DO,Dissolved oxygen saturation,100.569,% saturation (estimated),11.36,ppm,8.4,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-10-09T13:25:00,DO,Dissolved oxygen saturation,101.97,% saturation (estimated),11.38,ppm,8.9,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-11-12T13:30:00,DO,Dissolved oxygen saturation,100.466,% saturation (estimated),10.24,ppm,12.8,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-12-10T07:00:00,DO,Dissolved oxygen saturation,98.308,% saturation (estimated),10.02,ppm,12.8,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-01-22T09:45:00,PH,pH,6.81,pH units,6.81,pH,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-02-12T06:20:00,PH,pH,6.96,pH units,6.96,pH,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-03-12T10:10:00,PH,pH,7.05,pH units,7.05,pH,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-04-18T08:45:00,PH,pH,6.64,pH units,6.64,pH,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-05-15T10:10:00,PH,pH,6.3,pH units,6.3,pH,,outside,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-06-12T09:40:00,PH,pH,7.09,pH units,7.09,pH,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-07-10T11:00:00,PH,pH,7.02,pH units,7.02,pH,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-08-12T11:45:00,PH,pH,6.98,pH units,6.98,pH,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-09-11T10:15:00,PH,pH,7.8,pH units,7.8,pH,,outside,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-10-09T13:25:00,PH,pH,6.98,pH units,6.98,pH,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-11-12T13:30:00,PH,pH,7.01,pH units,7.01,pH,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-12-10T07:00:00,PH,pH,6.47,pH units,6.47,pH,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-01-22T09:45:00,TP,Total phosphorus,0.022,mg/L,0.022,mg/L,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-02-12T06:20:00,TP,Total phosphorus,0.022,mg/L,0.022,mg/L,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-03-12T10:10:00,TP,Total phosphorus,0.033,mg/L,0.033,mg/L,,outside,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-05-15T10:10:00,TP,Total phosphorus,0.016,mg/L,0.016,mg/L,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-06-12T09:40:00,TP,Total phosphorus,0.069,mg/L,0.069,mg/L,,outside,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-07-10T11:00:00,TP,Total phosphorus,0.12,mg/L,0.12,mg/L,,outside,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-08-12T11:45:00,TP,Total phosphorus,0.008,mg/L,0.008,mg/L,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-09-11T10:15:00,TP,Total phosphorus,0.011,mg/L,0.011,mg/L,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-10-09T13:25:00,TP,Total phosphorus,0.018,mg/L,0.018,mg/L,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-11-12T13:30:00,TP,Total phosphorus,0.014,mg/L,0.014,mg/L,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-12-10T07:00:00,TP,Total phosphorus,0.019,mg/L,0.019,mg/L,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-01-22T09:45:00,TURB,Turbidity,7.6,NTU,7.6,NTU,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-02-12T06:20:00,TURB,Turbidity,7.4,NTU,7.4,NTU,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-03-12T10:10:00,TURB,Turbidity,7.9,NTU,7.9,NTU,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-04-18T08:45:00,TURB,Turbidity,10.4,NTU,10.4,NTU,,outside,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-05-15T10:10:00,TURB,Turbidity,5.6,NTU,5.6,NTU,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-06-12T09:40:00,TURB,Turbidity,44.7,NTU,44.7,NTU,,outside,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-07-10T11:00:00,TURB,Turbidity,64.1,NTU,64.1,NTU,,outside,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-08-12T11:45:00,TURB,Turbidity,5.7,NTU,5.7,NTU,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-09-11T10:15:00,TURB,Turbidity,7.5,NTU,7.5,NTU,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-10-09T13:25:00,TURB,Turbidity,7,NTU,7,NTU,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-11-12T13:30:00,TURB,Turbidity,5.9,NTU,5.9,NTU,,within,,1,Unedited data
+405205,MURRINDINDI COLWELLS,2024-12-10T07:00:00,TURB,Turbidity,8.1,NTU,8.1,NTU,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-01-10T09:00:00,DO,Dissolved oxygen saturation,98.3256,% saturation (estimated),9.25,ppm,17.1,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-02-06T11:47:00,DO,Dissolved oxygen saturation,100.436,% saturation (estimated),9.37,ppm,17.5,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-03-07T09:40:00,DO,Dissolved oxygen saturation,97.0748,% saturation (estimated),9.19,ppm,16.8,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-04-04T10:00:00,DO,Dissolved oxygen saturation,97.0963,% saturation (estimated),10.05,ppm,12.7,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-05-08T14:00:00,DO,Dissolved oxygen saturation,101.609,% saturation (estimated),11.38,ppm,9.3,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-06-06T14:01:00,DO,Dissolved oxygen saturation,100.723,% saturation (estimated),11.5,ppm,8.5,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-07-03T13:01:00,DO,Dissolved oxygen saturation,101.894,% saturation (estimated),12.93,ppm,4.3,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-08-08T09:50:00,DO,Dissolved oxygen saturation,99.4985,% saturation (estimated),11.67,ppm,7.4,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-09-11T13:20:00,DO,Dissolved oxygen saturation,100.592,% saturation (estimated),10.9,ppm,10.7,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-10-09T10:53:00,DO,Dissolved oxygen saturation,99.1873,% saturation (estimated),10.9,ppm,10.1,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-11-07T12:40:00,DO,Dissolved oxygen saturation,100.129,% saturation (estimated),9.4,ppm,17.2,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-12-03T09:50:00,DO,Dissolved oxygen saturation,93.4886,% saturation (estimated),8.44,ppm,19.1,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-01-10T09:00:00,PH,pH,6.84,pH units,6.84,pH,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-02-06T11:47:00,PH,pH,7.03,pH units,7.03,pH,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-03-07T09:40:00,PH,pH,7.31,pH units,7.31,pH,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-04-04T10:00:00,PH,pH,7.44,pH units,7.44,pH,,outside,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-05-08T14:00:00,PH,pH,7.79,pH units,7.79,pH,,outside,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-06-06T14:01:00,PH,pH,7.75,pH units,7.75,pH,,outside,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-07-03T13:01:00,PH,pH,7.67,pH units,7.67,pH,,outside,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-08-08T09:50:00,PH,pH,7.43,pH units,7.43,pH,,outside,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-09-11T13:20:00,PH,pH,7,pH units,7,pH,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-10-09T10:53:00,PH,pH,7,pH units,7,pH,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-11-07T12:40:00,PH,pH,6.6,pH units,6.6,pH,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-12-03T09:50:00,PH,pH,6.7,pH units,6.7,pH,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-01-10T09:00:00,TP,Total phosphorus,0.036,mg/L,0.036,mg/L,,outside,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-02-06T11:47:00,TP,Total phosphorus,0.016,mg/L,0.016,mg/L,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-03-07T09:40:00,TP,Total phosphorus,0.022,mg/L,0.022,mg/L,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-04-04T10:00:00,TP,Total phosphorus,0.02,mg/L,0.02,mg/L,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-05-08T14:00:00,TP,Total phosphorus,0.016,mg/L,0.016,mg/L,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-06-06T14:01:00,TP,Total phosphorus,0.012,mg/L,0.012,mg/L,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-07-03T13:01:00,TP,Total phosphorus,0.02,mg/L,0.02,mg/L,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-08-08T09:50:00,TP,Total phosphorus,0.017,mg/L,0.017,mg/L,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-09-11T13:20:00,TP,Total phosphorus,0.008,mg/L,0.008,mg/L,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-10-09T10:53:00,TP,Total phosphorus,0.011,mg/L,0.011,mg/L,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-11-07T12:40:00,TP,Total phosphorus,0.015,mg/L,0.015,mg/L,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-12-03T09:50:00,TP,Total phosphorus,0.021,mg/L,0.021,mg/L,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-01-10T09:00:00,TURB,Turbidity,16.9,NTU,16.9,NTU,,outside,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-02-06T11:47:00,TURB,Turbidity,5.3,NTU,5.3,NTU,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-03-07T09:40:00,TURB,Turbidity,3.8,NTU,3.8,NTU,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-04-04T10:00:00,TURB,Turbidity,8.3,NTU,8.3,NTU,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-05-08T14:00:00,TURB,Turbidity,2.7,NTU,2.7,NTU,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-06-06T14:01:00,TURB,Turbidity,2.8,NTU,2.8,NTU,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-07-03T13:01:00,TURB,Turbidity,3.3,NTU,3.3,NTU,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-08-08T09:50:00,TURB,Turbidity,5,NTU,5,NTU,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-09-11T13:20:00,TURB,Turbidity,8.3,NTU,8.3,NTU,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-10-09T10:53:00,TURB,Turbidity,5.2,NTU,5.2,NTU,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-11-07T12:40:00,TURB,Turbidity,10,NTU,10,NTU,,within,,1,Unedited data
+405209,ACHERON @ TAGGERTY,2024-12-03T09:50:00,TURB,Turbidity,7.1,NTU,7.1,NTU,,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-01-15T09:40:00,DO,Dissolved oxygen saturation,71.7553,% saturation (estimated),6.22,ppm,21.4,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-02-06T13:00:00,DO,Dissolved oxygen saturation,48.0176,% saturation (estimated),4.13,ppm,21.8,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-03-06T10:10:00,DO,Dissolved oxygen saturation,13.4447,% saturation (estimated),1.23,ppm,18.7,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-04-09T15:00:00,DO,Dissolved oxygen saturation,53.1794,% saturation (estimated),5.18,ppm,15.7,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-05-07T09:40:00,DO,Dissolved oxygen saturation,38.8095,% saturation (estimated),4.14,ppm,11.6,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-06-05T14:10:00,DO,Dissolved oxygen saturation,87.2869,% saturation (estimated),9.85,ppm,9.2,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-06-18T08:20:00,DO,Dissolved oxygen saturation,80.8353,% saturation (estimated),9.53,ppm,7.4,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-07-04T14:40:00,DO,Dissolved oxygen saturation,93.3929,% saturation (estimated),11.26,ppm,6.5,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-07-10T08:30:00,DO,Dissolved oxygen saturation,87.8032,% saturation (estimated),10.2,ppm,8,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-08-07T13:30:00,DO,Dissolved oxygen saturation,96.3889,% saturation (estimated),11.28,ppm,7.7,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-09-04T09:50:00,DO,Dissolved oxygen saturation,84.2559,% saturation (estimated),9.22,ppm,10.5,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-10-09T09:10:00,DO,Dissolved oxygen saturation,85.1521,% saturation (estimated),8.96,ppm,12.2,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-11-06T08:00:00,DO,Dissolved oxygen saturation,56.3893,% saturation (estimated),5.31,ppm,17.3,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-12-04T09:50:00,DO,Dissolved oxygen saturation,75.7812,% saturation (estimated),6.66,ppm,20.7,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-12-10T11:50:00,DO,Dissolved oxygen saturation,58.1459,% saturation (estimated),5.09,ppm,20.9,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-01-15T09:40:00,PH,pH,7.3,pH units,7.3,pH,,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-02-06T13:00:00,PH,pH,6.87,pH units,6.87,pH,,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-03-06T10:10:00,PH,pH,7.3,pH units,7.3,pH,,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-04-09T15:00:00,PH,pH,7.18,pH units,7.18,pH,,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-05-07T09:40:00,PH,pH,7.04,pH units,7.04,pH,,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-06-05T14:10:00,PH,pH,7.37,pH units,7.37,pH,,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-06-18T08:20:00,PH,pH,7.75,pH units,7.75,pH,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-07-04T14:40:00,PH,pH,7.8,pH units,7.8,pH,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-07-10T08:30:00,PH,pH,7.83,pH units,7.83,pH,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-08-07T13:30:00,PH,pH,7.6,pH units,7.6,pH,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-09-04T09:50:00,PH,pH,8,pH units,8,pH,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-10-09T09:10:00,PH,pH,7.7,pH units,7.7,pH,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-11-06T08:00:00,PH,pH,7.53,pH units,7.53,pH,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-12-04T09:50:00,PH,pH,7.27,pH units,7.27,pH,,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-12-10T11:50:00,PH,pH,7.35,pH units,7.35,pH,,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-01-15T09:40:00,TP,Total phosphorus,0.58,mg/L,0.58,mg/L,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-02-06T13:00:00,TP,Total phosphorus,0.18,mg/L,0.18,mg/L,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-03-06T10:10:00,TP,Total phosphorus,0.26,mg/L,0.26,mg/L,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-04-09T15:00:00,TP,Total phosphorus,0.019,mg/L,0.019,mg/L,,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-05-07T09:40:00,TP,Total phosphorus,0.072,mg/L,0.072,mg/L,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-06-18T08:20:00,TP,Total phosphorus,0.061,mg/L,0.061,mg/L,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-07-10T08:30:00,TP,Total phosphorus,0.029,mg/L,0.029,mg/L,,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-08-07T13:30:00,TP,Total phosphorus,0.055,mg/L,0.055,mg/L,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-09-04T09:50:00,TP,Total phosphorus,0.69,mg/L,0.69,mg/L,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-10-09T09:10:00,TP,Total phosphorus,0.067,mg/L,0.067,mg/L,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-11-06T08:00:00,TP,Total phosphorus,0.081,mg/L,0.081,mg/L,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-12-10T11:50:00,TP,Total phosphorus,0.13,mg/L,0.13,mg/L,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-01-15T09:40:00,TURB,Turbidity,57.2,NTU,57.2,NTU,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-02-06T13:00:00,TURB,Turbidity,20.3,NTU,20.3,NTU,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-03-06T10:10:00,TURB,Turbidity,5.7,NTU,5.7,NTU,,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-04-09T15:00:00,TURB,Turbidity,131,NTU,131,NTU,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-05-07T09:40:00,TURB,Turbidity,26.1,NTU,26.1,NTU,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-06-05T14:10:00,TURB,Turbidity,26.2,NTU,26.2,NTU,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-06-18T08:20:00,TURB,Turbidity,50.7,NTU,50.7,NTU,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-07-04T14:40:00,TURB,Turbidity,17.6,NTU,17.6,NTU,,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-07-10T08:30:00,TURB,Turbidity,19.7,NTU,19.7,NTU,,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-08-07T13:30:00,TURB,Turbidity,37.3,NTU,37.3,NTU,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-09-04T09:50:00,TURB,Turbidity,49.9,NTU,49.9,NTU,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-10-09T09:10:00,TURB,Turbidity,17.8,NTU,17.8,NTU,,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-11-06T08:00:00,TURB,Turbidity,8,NTU,8,NTU,,within,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-12-04T09:50:00,TURB,Turbidity,116,NTU,116,NTU,,outside,,1,Unedited data
+405212,SUNDAY @ TALLAROOK,2024-12-10T11:50:00,TURB,Turbidity,49.3,NTU,49.3,NTU,,outside,,1,Unedited data
+405214,DELATITE @ TONGA,2024-01-18T10:10:00,DO,Dissolved oxygen saturation,99.7623,% saturation (estimated),9.2,ppm,17.4,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-02-15T12:30:00,DO,Dissolved oxygen saturation,103.805,% saturation (estimated),8.9,ppm,21,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-03-21T12:25:00,DO,Dissolved oxygen saturation,102.152,% saturation (estimated),9.6,ppm,16.5,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-04-18T12:05:00,DO,Dissolved oxygen saturation,103.469,% saturation (estimated),10.4,ppm,13.4,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-05-23T12:00:00,DO,Dissolved oxygen saturation,106.312,% saturation (estimated),12.3,ppm,7.4,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-06-27T13:00:00,DO,Dissolved oxygen saturation,106.396,% saturation (estimated),12.1,ppm,8.1,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-07-24T12:55:00,DO,Dissolved oxygen saturation,104.128,% saturation (estimated),11.9,ppm,7.9,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-08-14T12:20:00,DO,Dissolved oxygen saturation,109.138,% saturation (estimated),12,ppm,9.5,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-09-25T12:25:00,DO,Dissolved oxygen saturation,102.779,% saturation (estimated),10.4,ppm,13.1,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-10-23T12:15:00,DO,Dissolved oxygen saturation,96.7812,% saturation (estimated),9,ppm,17,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-11-20T11:00:00,DO,Dissolved oxygen saturation,110.021,% saturation (estimated),10,ppm,18.1,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-12-11T10:20:00,DO,Dissolved oxygen saturation,104.1,% saturation (estimated),9.6,ppm,17.4,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-01-18T10:10:00,PH,pH,7,pH units,7,pH,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-02-15T12:30:00,PH,pH,7.2,pH units,7.2,pH,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-03-21T12:25:00,PH,pH,7.2,pH units,7.2,pH,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-04-18T12:05:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-05-23T12:00:00,PH,pH,7.7,pH units,7.7,pH,,outside,,1,Unedited data
+405214,DELATITE @ TONGA,2024-06-27T13:00:00,PH,pH,7.6,pH units,7.6,pH,,outside,,1,Unedited data
+405214,DELATITE @ TONGA,2024-07-24T12:55:00,PH,pH,7.2,pH units,7.2,pH,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-08-14T12:20:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-09-25T12:25:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-10-23T12:15:00,PH,pH,7.8,pH units,7.8,pH,,outside,,1,Unedited data
+405214,DELATITE @ TONGA,2024-11-20T11:00:00,PH,pH,7.6,pH units,7.6,pH,,outside,,1,Unedited data
+405214,DELATITE @ TONGA,2024-12-11T10:20:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-01-18T10:10:00,TP,Total phosphorus,0.044,mg/L,0.044,mg/L,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-02-15T12:30:00,TP,Total phosphorus,0.024,mg/L,0.024,mg/L,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-03-21T12:25:00,TP,Total phosphorus,0.032,mg/L,0.032,mg/L,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-04-18T12:05:00,TP,Total phosphorus,0.019,mg/L,0.019,mg/L,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-05-23T12:00:00,TP,Total phosphorus,0.005,mg/L,0.005,mg/L,,within,LT,1,Unedited data
+405214,DELATITE @ TONGA,2024-06-27T13:00:00,TP,Total phosphorus,0.012,mg/L,0.012,mg/L,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-07-24T12:55:00,TP,Total phosphorus,0.036,mg/L,0.036,mg/L,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-08-14T12:20:00,TP,Total phosphorus,0.008,mg/L,0.008,mg/L,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-09-25T12:25:00,TP,Total phosphorus,0.013,mg/L,0.013,mg/L,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-10-23T12:15:00,TP,Total phosphorus,0.013,mg/L,0.013,mg/L,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-11-20T11:00:00,TP,Total phosphorus,0.022,mg/L,0.022,mg/L,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-12-11T10:20:00,TP,Total phosphorus,0.015,mg/L,0.015,mg/L,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-01-18T10:10:00,TURB,Turbidity,13.6,NTU,13.6,NTU,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-02-15T12:30:00,TURB,Turbidity,3,NTU,3,NTU,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-03-21T12:25:00,TURB,Turbidity,4.9,NTU,4.9,NTU,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-04-18T12:05:00,TURB,Turbidity,2,NTU,2,NTU,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-05-23T12:00:00,TURB,Turbidity,0.9,NTU,0.9,NTU,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-06-27T13:00:00,TURB,Turbidity,2.6,NTU,2.6,NTU,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-07-24T12:55:00,TURB,Turbidity,9.9,NTU,9.9,NTU,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-08-14T12:20:00,TURB,Turbidity,3.1,NTU,3.1,NTU,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-09-25T12:25:00,TURB,Turbidity,5.2,NTU,5.2,NTU,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-10-23T12:15:00,TURB,Turbidity,8,NTU,8,NTU,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-11-20T11:00:00,TURB,Turbidity,5.4,NTU,5.4,NTU,,within,,1,Unedited data
+405214,DELATITE @ TONGA,2024-12-11T10:20:00,TURB,Turbidity,5.1,NTU,5.1,NTU,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-01-18T08:00:00,DO,Dissolved oxygen saturation,96.6386,% saturation (estimated),9,ppm,17,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-02-15T08:15:00,DO,Dissolved oxygen saturation,94.5642,% saturation (estimated),8.9,ppm,16.5,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-03-21T08:55:00,DO,Dissolved oxygen saturation,97.0063,% saturation (estimated),9.7,ppm,13.7,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-04-18T10:30:00,DO,Dissolved oxygen saturation,100.642,% saturation (estimated),10.6,ppm,11.4,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-05-23T10:25:00,DO,Dissolved oxygen saturation,101.67,% saturation (estimated),12.2,ppm,6,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-06-27T11:05:00,DO,Dissolved oxygen saturation,101.78,% saturation (estimated),12,ppm,6.7,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-07-24T08:50:00,DO,Dissolved oxygen saturation,98.4902,% saturation (estimated),11.3,ppm,7.8,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-08-14T08:35:00,DO,Dissolved oxygen saturation,99.2514,% saturation (estimated),11.5,ppm,7.4,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-09-25T08:30:00,DO,Dissolved oxygen saturation,98.7427,% saturation (estimated),10.4,ppm,11.4,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-10-23T09:30:00,DO,Dissolved oxygen saturation,99.2258,% saturation (estimated),9.9,ppm,13.8,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-11-20T09:00:00,DO,Dissolved oxygen saturation,99.6364,% saturation (estimated),9.6,ppm,15.4,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-12-11T08:40:00,DO,Dissolved oxygen saturation,98.3516,% saturation (estimated),9.6,ppm,14.8,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-01-18T08:00:00,PH,pH,7,pH units,7,pH,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-02-15T08:15:00,PH,pH,7,pH units,7,pH,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-03-21T08:55:00,PH,pH,7.2,pH units,7.2,pH,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-04-18T10:30:00,PH,pH,7.2,pH units,7.2,pH,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-05-23T10:25:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-06-27T11:05:00,PH,pH,7.2,pH units,7.2,pH,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-07-24T08:50:00,PH,pH,6.9,pH units,6.9,pH,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-08-14T08:35:00,PH,pH,7.1,pH units,7.1,pH,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-09-25T08:30:00,PH,pH,6.9,pH units,6.9,pH,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-10-23T09:30:00,PH,pH,7.5,pH units,7.5,pH,,outside,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-11-20T09:00:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-12-11T08:40:00,PH,pH,7.5,pH units,7.5,pH,,outside,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-01-18T08:00:00,TP,Total phosphorus,0.021,mg/L,0.021,mg/L,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-02-15T08:15:00,TP,Total phosphorus,0.015,mg/L,0.015,mg/L,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-03-21T08:55:00,TP,Total phosphorus,0.017,mg/L,0.017,mg/L,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-04-18T10:30:00,TP,Total phosphorus,0.011,mg/L,0.011,mg/L,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-05-23T10:25:00,TP,Total phosphorus,0.008,mg/L,0.008,mg/L,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-06-27T11:05:00,TP,Total phosphorus,0.007,mg/L,0.007,mg/L,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-07-24T08:50:00,TP,Total phosphorus,0.012,mg/L,0.012,mg/L,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-08-14T08:35:00,TP,Total phosphorus,0.005,mg/L,0.005,mg/L,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-09-25T08:30:00,TP,Total phosphorus,0.008,mg/L,0.008,mg/L,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-10-23T09:30:00,TP,Total phosphorus,0.005,mg/L,0.005,mg/L,,within,LT,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-11-20T09:00:00,TP,Total phosphorus,0.008,mg/L,0.008,mg/L,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-12-11T08:40:00,TP,Total phosphorus,0.005,mg/L,0.005,mg/L,,within,LT,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-01-18T08:00:00,TURB,Turbidity,5.5,NTU,5.5,NTU,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-02-15T08:15:00,TURB,Turbidity,4.2,NTU,4.2,NTU,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-03-21T08:55:00,TURB,Turbidity,1.6,NTU,1.6,NTU,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-04-18T10:30:00,TURB,Turbidity,0.8,NTU,0.8,NTU,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-05-23T10:25:00,TURB,Turbidity,0.8,NTU,0.8,NTU,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-06-27T11:05:00,TURB,Turbidity,0.1,NTU,0.1,NTU,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-07-24T08:50:00,TURB,Turbidity,6.5,NTU,6.5,NTU,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-08-14T08:35:00,TURB,Turbidity,1.4,NTU,1.4,NTU,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-09-25T08:30:00,TURB,Turbidity,2,NTU,2,NTU,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-10-23T09:30:00,TURB,Turbidity,3.4,NTU,3.4,NTU,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-11-20T09:00:00,TURB,Turbidity,3.6,NTU,3.6,NTU,,within,,1,Unedited data
+405219,GOULBURN @ DOHERTYS,2024-12-11T08:40:00,TURB,Turbidity,2.7,NTU,2.7,NTU,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-01-02T10:00:00,DO,Dissolved oxygen saturation,91.849,% saturation (estimated),7.4,ppm,25.6,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-02-05T10:15:00,DO,Dissolved oxygen saturation,80.382,% saturation (estimated),6.5,ppm,25.4,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-03-04T10:20:00,DO,Dissolved oxygen saturation,84.6347,% saturation (estimated),7.2,ppm,22.7,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-04-02T11:15:00,DO,Dissolved oxygen saturation,90.9847,% saturation (estimated),8,ppm,21,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-05-07T11:15:00,DO,Dissolved oxygen saturation,95.7074,% saturation (estimated),9.8,ppm,13.7,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-06-03T11:30:00,DO,Dissolved oxygen saturation,92.6511,% saturation (estimated),10.3,ppm,10.1,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-07-01T12:00:00,DO,Dissolved oxygen saturation,92.6648,% saturation (estimated),10.6,ppm,8.9,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-08-05T11:30:00,DO,Dissolved oxygen saturation,93.1108,% saturation (estimated),10.6,ppm,9.1,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-09-02T11:35:00,DO,Dissolved oxygen saturation,91.9567,% saturation (estimated),9.5,ppm,13.3,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-10-07T11:00:00,DO,Dissolved oxygen saturation,94.8538,% saturation (estimated),9.2,ppm,16.2,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-11-06T10:50:00,DO,Dissolved oxygen saturation,104.866,% saturation (estimated),8.99,ppm,22.3,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-12-02T11:30:00,DO,Dissolved oxygen saturation,89.4447,% saturation (estimated),7.3,ppm,24.9,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-01-02T10:00:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-02-05T10:15:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-03-04T10:20:00,PH,pH,7.3,pH units,7.3,pH,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-04-02T11:15:00,PH,pH,7.5,pH units,7.5,pH,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-05-07T11:15:00,PH,pH,7.6,pH units,7.6,pH,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-06-03T11:30:00,PH,pH,6.9,pH units,6.9,pH,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-07-01T12:00:00,PH,pH,7.8,pH units,7.8,pH,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-08-05T11:30:00,PH,pH,7.3,pH units,7.3,pH,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-09-02T11:35:00,PH,pH,7.5,pH units,7.5,pH,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-10-07T11:00:00,PH,pH,7.7,pH units,7.7,pH,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-11-06T10:50:00,PH,pH,7.5,pH units,7.5,pH,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-12-02T11:30:00,PH,pH,7.1,pH units,7.1,pH,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-01-02T10:00:00,TN,Total nitrogen,0.43,mg/L,0.43,mg/L,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-02-05T10:15:00,TN,Total nitrogen,0.59,mg/L,0.59,mg/L,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-03-04T10:20:00,TN,Total nitrogen,0.33,mg/L,0.33,mg/L,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-04-02T11:15:00,TN,Total nitrogen,0.33,mg/L,0.33,mg/L,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-05-07T11:15:00,TN,Total nitrogen,0.38,mg/L,0.38,mg/L,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-06-03T11:30:00,TN,Total nitrogen,0.55,mg/L,0.55,mg/L,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-07-01T12:00:00,TN,Total nitrogen,0.64,mg/L,0.64,mg/L,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-08-05T11:30:00,TN,Total nitrogen,0.9,mg/L,0.9,mg/L,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-09-02T11:35:00,TN,Total nitrogen,0.53,mg/L,0.53,mg/L,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-10-07T11:00:00,TN,Total nitrogen,0.42,mg/L,0.42,mg/L,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-11-06T10:50:00,TN,Total nitrogen,0.51,mg/L,0.51,mg/L,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-12-02T11:30:00,TN,Total nitrogen,0.65,mg/L,0.65,mg/L,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-01-02T10:00:00,TP,Total phosphorus,0.12,mg/L,0.12,mg/L,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-02-05T10:15:00,TP,Total phosphorus,0.13,mg/L,0.13,mg/L,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-03-04T10:20:00,TP,Total phosphorus,0.092,mg/L,0.092,mg/L,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-04-02T11:15:00,TP,Total phosphorus,0.076,mg/L,0.076,mg/L,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-05-07T11:15:00,TP,Total phosphorus,0.043,mg/L,0.043,mg/L,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-06-03T11:30:00,TP,Total phosphorus,0.084,mg/L,0.084,mg/L,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-07-01T12:00:00,TP,Total phosphorus,0.064,mg/L,0.064,mg/L,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-08-05T11:30:00,TP,Total phosphorus,0.07,mg/L,0.07,mg/L,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-09-02T11:35:00,TP,Total phosphorus,0.059,mg/L,0.059,mg/L,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-10-07T11:00:00,TP,Total phosphorus,0.024,mg/L,0.024,mg/L,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-11-06T10:50:00,TP,Total phosphorus,0.064,mg/L,0.064,mg/L,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-12-02T11:30:00,TP,Total phosphorus,0.1,mg/L,0.1,mg/L,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-01-02T10:00:00,TURB,Turbidity,43.6,NTU,43.6,NTU,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-02-05T10:15:00,TURB,Turbidity,95.7,NTU,95.7,NTU,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-03-04T10:20:00,TURB,Turbidity,41.6,NTU,41.6,NTU,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-04-02T11:15:00,TURB,Turbidity,31.3,NTU,31.3,NTU,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-05-07T11:15:00,TURB,Turbidity,15.9,NTU,15.9,NTU,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-06-03T11:30:00,TURB,Turbidity,47.7,NTU,47.7,NTU,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-07-01T12:00:00,TURB,Turbidity,29.8,NTU,29.8,NTU,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-08-05T11:30:00,TURB,Turbidity,29.1,NTU,29.1,NTU,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-09-02T11:35:00,TURB,Turbidity,19.4,NTU,19.4,NTU,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-10-07T11:00:00,TURB,Turbidity,16.8,NTU,16.8,NTU,,within,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-11-06T10:50:00,TURB,Turbidity,37.9,NTU,37.9,NTU,,outside,,1,Unedited data
+405232,GOULBURB R MCCOYS BR,2024-12-02T11:30:00,TURB,Turbidity,33,NTU,33,NTU,,outside,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-01-10T12:41:00,DO,Dissolved oxygen saturation,98.307,% saturation (estimated),8,ppm,22.9,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-02-06T13:35:00,DO,Dissolved oxygen saturation,111.085,% saturation (estimated),8.87,ppm,23.9,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-03-07T12:37:00,DO,Dissolved oxygen saturation,115.127,% saturation (estimated),9.28,ppm,23.4,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-04-04T12:38:00,DO,Dissolved oxygen saturation,103.28,% saturation (estimated),9.15,ppm,18.6,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-05-06T13:08:00,DO,Dissolved oxygen saturation,106.585,% saturation (estimated),10.55,ppm,13.4,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-06-06T10:17:00,DO,Dissolved oxygen saturation,103.265,% saturation (estimated),10.29,ppm,13.1,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-07-04T11:52:00,DO,Dissolved oxygen saturation,101.751,% saturation (estimated),11.34,ppm,8.3,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-08-08T12:45:00,DO,Dissolved oxygen saturation,99.4251,% saturation (estimated),11.3,ppm,7.5,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-09-05T10:24:00,DO,Dissolved oxygen saturation,99.2455,% saturation (estimated),10.35,ppm,11.1,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-10-07T12:46:00,DO,Dissolved oxygen saturation,97.904,% saturation (estimated),9.5,ppm,14.3,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-11-07T13:40:00,DO,Dissolved oxygen saturation,94.4525,% saturation (estimated),8.3,ppm,19,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-12-03T12:15:00,DO,Dissolved oxygen saturation,95.6842,% saturation (estimated),8,ppm,21.5,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-01-10T12:41:00,PH,pH,6.76,pH units,6.76,pH,,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-02-06T13:35:00,PH,pH,7.28,pH units,7.28,pH,,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-03-07T12:37:00,PH,pH,7.48,pH units,7.48,pH,,outside,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-04-04T12:38:00,PH,pH,6.96,pH units,6.96,pH,,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-05-06T13:08:00,PH,pH,7.29,pH units,7.29,pH,,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-06-06T10:17:00,PH,pH,7.46,pH units,7.46,pH,,outside,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-07-04T11:52:00,PH,pH,7.63,pH units,7.63,pH,,outside,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-08-08T12:45:00,PH,pH,7.49,pH units,7.49,pH,,outside,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-09-05T10:24:00,PH,pH,7.3,pH units,7.3,pH,,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-10-07T12:46:00,PH,pH,7.24,pH units,7.24,pH,,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-11-07T13:40:00,PH,pH,6.6,pH units,6.6,pH,,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-12-03T12:15:00,PH,pH,6.9,pH units,6.9,pH,,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-01-10T12:41:00,TP,Total phosphorus,0.14,mg/L,0.14,mg/L,,outside,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-02-06T13:35:00,TP,Total phosphorus,0.065,mg/L,0.065,mg/L,,outside,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-03-07T12:37:00,TP,Total phosphorus,0.11,mg/L,0.11,mg/L,,outside,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-04-04T12:38:00,TP,Total phosphorus,0.06,mg/L,0.06,mg/L,,outside,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-05-06T13:08:00,TP,Total phosphorus,0.045,mg/L,0.045,mg/L,,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-06-06T10:17:00,TP,Total phosphorus,0.036,mg/L,0.036,mg/L,,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-07-04T11:52:00,TP,Total phosphorus,0.069,mg/L,0.069,mg/L,,outside,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-08-08T12:45:00,TP,Total phosphorus,0.053,mg/L,0.053,mg/L,,outside,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-09-05T10:24:00,TP,Total phosphorus,0.055,mg/L,0.055,mg/L,,outside,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-10-07T12:46:00,TP,Total phosphorus,0.054,mg/L,0.054,mg/L,,outside,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-11-07T13:40:00,TP,Total phosphorus,0.066,mg/L,0.066,mg/L,,outside,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-12-03T12:15:00,TP,Total phosphorus,0.13,mg/L,0.13,mg/L,,outside,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-01-10T12:41:00,TURB,Turbidity,31.5,NTU,31.5,NTU,,outside,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-02-06T13:35:00,TURB,Turbidity,10.9,NTU,10.9,NTU,,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-03-07T12:37:00,TURB,Turbidity,10.1,NTU,10.1,NTU,,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-04-04T12:38:00,TURB,Turbidity,11.8,NTU,11.8,NTU,,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-05-06T13:08:00,TURB,Turbidity,19.8,NTU,19.8,NTU,,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-06-06T10:17:00,TURB,Turbidity,29.1,NTU,29.1,NTU,,outside,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-07-04T11:52:00,TURB,Turbidity,18.8,NTU,18.8,NTU,,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-08-08T12:45:00,TURB,Turbidity,10.8,NTU,10.8,NTU,,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-09-05T10:24:00,TURB,Turbidity,16.4,NTU,16.4,NTU,,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-10-07T12:46:00,TURB,Turbidity,13,NTU,13,NTU,,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-11-07T13:40:00,TURB,Turbidity,13,NTU,13,NTU,,within,,1,Unedited data
+405234,SEVEN C MCQUINN WEIR,2024-12-03T12:15:00,TURB,Turbidity,25.6,NTU,25.6,NTU,,outside,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-01-17T11:05:00,DO,Dissolved oxygen saturation,99.9746,% saturation (estimated),9.5,ppm,15.2,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-03-20T11:10:00,DO,Dissolved oxygen saturation,100.91,% saturation (estimated),9.8,ppm,14.2,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-04-17T12:10:00,DO,Dissolved oxygen saturation,104.156,% saturation (estimated),11,ppm,10.5,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-05-22T13:55:00,DO,Dissolved oxygen saturation,102.783,% saturation (estimated),11.9,ppm,6.7,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-06-26T12:20:00,DO,Dissolved oxygen saturation,101.646,% saturation (estimated),12.1,ppm,5.6,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-07-23T12:05:00,DO,Dissolved oxygen saturation,101.364,% saturation (estimated),11.2,ppm,8.6,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-08-13T12:00:00,DO,Dissolved oxygen saturation,103.196,% saturation (estimated),11.8,ppm,7.2,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-09-24T12:00:00,DO,Dissolved oxygen saturation,104.811,% saturation (estimated),11.2,ppm,10,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-10-22T13:25:00,DO,Dissolved oxygen saturation,105.042,% saturation (estimated),10.5,ppm,12.9,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-11-19T12:25:00,DO,Dissolved oxygen saturation,105.029,% saturation (estimated),10.2,ppm,14.2,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-12-11T11:20:00,DO,Dissolved oxygen saturation,103.648,% saturation (estimated),10,ppm,14.5,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-01-17T11:05:00,PH,pH,6.5,pH units,6.5,pH,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-03-20T11:10:00,PH,pH,6.9,pH units,6.9,pH,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-04-17T12:10:00,PH,pH,7,pH units,7,pH,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-05-22T13:55:00,PH,pH,7.1,pH units,7.1,pH,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-06-26T12:20:00,PH,pH,7,pH units,7,pH,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-07-23T12:05:00,PH,pH,6.6,pH units,6.6,pH,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-08-13T12:00:00,PH,pH,7,pH units,7,pH,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-09-24T12:00:00,PH,pH,6.9,pH units,6.9,pH,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-10-22T13:25:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-11-19T12:25:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-12-11T11:20:00,PH,pH,7.3,pH units,7.3,pH,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-01-17T11:05:00,TP,Total phosphorus,0.021,mg/L,0.021,mg/L,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-03-20T11:10:00,TP,Total phosphorus,0.033,mg/L,0.033,mg/L,,outside,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-04-17T12:10:00,TP,Total phosphorus,0.014,mg/L,0.014,mg/L,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-05-22T13:55:00,TP,Total phosphorus,0.013,mg/L,0.013,mg/L,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-06-26T12:20:00,TP,Total phosphorus,0.008,mg/L,0.008,mg/L,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-07-23T12:05:00,TP,Total phosphorus,0.015,mg/L,0.015,mg/L,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-08-13T12:00:00,TP,Total phosphorus,0.01,mg/L,0.01,mg/L,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-09-24T12:00:00,TP,Total phosphorus,0.012,mg/L,0.012,mg/L,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-10-22T13:25:00,TP,Total phosphorus,0.005,mg/L,0.005,mg/L,,within,LT,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-11-19T12:25:00,TP,Total phosphorus,0.011,mg/L,0.011,mg/L,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-12-11T11:20:00,TP,Total phosphorus,0.011,mg/L,0.011,mg/L,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-01-17T11:05:00,TURB,Turbidity,6.7,NTU,6.7,NTU,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-03-20T11:10:00,TURB,Turbidity,7.1,NTU,7.1,NTU,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-04-17T12:10:00,TURB,Turbidity,1.7,NTU,1.7,NTU,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-05-22T13:55:00,TURB,Turbidity,1.5,NTU,1.5,NTU,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-06-26T12:20:00,TURB,Turbidity,1.6,NTU,1.6,NTU,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-07-23T12:05:00,TURB,Turbidity,9.4,NTU,9.4,NTU,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-08-13T12:00:00,TURB,Turbidity,3.2,NTU,3.2,NTU,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-09-24T12:00:00,TURB,Turbidity,3.5,NTU,3.5,NTU,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-10-22T13:25:00,TURB,Turbidity,3.6,NTU,3.6,NTU,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-11-19T12:25:00,TURB,Turbidity,3.4,NTU,3.4,NTU,,within,,1,Unedited data
+405264,BIG @ FRENCHMAN,2024-12-11T11:20:00,TURB,Turbidity,3.4,NTU,3.4,NTU,,within,,1,Unedited data
+405270,GOULBURN @ ARCADIA,2024-01-23T07:45:00,DO,Dissolved oxygen saturation,82.2479,% saturation (estimated),7.23,ppm,21,within,,1,Unedited data
+405270,GOULBURN @ ARCADIA,2024-01-23T07:45:00,PH,pH,7.01,pH units,7.01,pH,,within,,1,Unedited data
+405270,GOULBURN @ ARCADIA,2024-01-23T07:45:00,TN,Total nitrogen,0.6,mg/L,0.6,mg/L,,within,,1,Unedited data
+405270,GOULBURN @ ARCADIA,2024-01-23T07:45:00,TP,Total phosphorus,0.087,mg/L,0.087,mg/L,,outside,,1,Unedited data
+405270,GOULBURN @ ARCADIA,2024-01-23T07:45:00,TURB,Turbidity,35.5,NTU,35.5,NTU,,outside,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-01-30T13:25:00,DO,Dissolved oxygen saturation,80.9202,% saturation (estimated),6.75,ppm,23.7,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-02-26T12:12:00,DO,Dissolved oxygen saturation,84.393,% saturation (estimated),7,ppm,24,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-03-26T13:15:00,DO,Dissolved oxygen saturation,97.2932,% saturation (estimated),8.6,ppm,20.7,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-04-29T13:45:00,DO,Dissolved oxygen saturation,99.1753,% saturation (estimated),9.8,ppm,15.3,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-05-27T13:10:00,DO,Dissolved oxygen saturation,94.0512,% saturation (estimated),10.4,ppm,10.3,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-06-24T11:40:00,DO,Dissolved oxygen saturation,97.0925,% saturation (estimated),11.4,ppm,7.8,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-07-29T12:15:00,DO,Dissolved oxygen saturation,104.32,% saturation (estimated),11.7,ppm,9.7,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-08-27T12:20:00,DO,Dissolved oxygen saturation,96.5311,% saturation (estimated),9.9,ppm,13.6,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-09-25T11:29:00,DO,Dissolved oxygen saturation,95.8965,% saturation (estimated),9.6,ppm,14.7,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-10-22T11:05:00,DO,Dissolved oxygen saturation,96.0418,% saturation (estimated),8.54,ppm,20.4,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-11-21T06:35:00,DO,Dissolved oxygen saturation,91.0243,% saturation (estimated),8.03,ppm,20.8,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-12-18T08:20:00,DO,Dissolved oxygen saturation,74.4797,% saturation (estimated),6.26,ppm,23.3,outside,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-01-30T13:25:00,PH,pH,6.9,pH units,6.9,pH,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-02-26T12:12:00,PH,pH,7.1,pH units,7.1,pH,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-03-26T13:15:00,PH,pH,7.5,pH units,7.5,pH,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-04-29T13:45:00,PH,pH,7.6,pH units,7.6,pH,,outside,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-05-27T13:10:00,PH,pH,7.5,pH units,7.5,pH,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-06-24T11:40:00,PH,pH,6.8,pH units,6.8,pH,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-07-29T12:15:00,PH,pH,7.7,pH units,7.7,pH,,outside,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-08-27T12:20:00,PH,pH,7.1,pH units,7.1,pH,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-09-25T11:29:00,PH,pH,7.3,pH units,7.3,pH,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-10-22T11:05:00,PH,pH,7.3,pH units,7.3,pH,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-11-21T06:35:00,PH,pH,7.3,pH units,7.3,pH,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-12-18T08:20:00,PH,pH,7.2,pH units,7.2,pH,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-01-30T13:25:00,TN,Total nitrogen,1,mg/L,1,mg/L,,outside,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-02-26T12:12:00,TN,Total nitrogen,0.44,mg/L,0.44,mg/L,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-03-26T13:15:00,TN,Total nitrogen,0.3,mg/L,0.3,mg/L,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-04-29T13:45:00,TN,Total nitrogen,0.36,mg/L,0.36,mg/L,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-05-27T13:10:00,TN,Total nitrogen,0.36,mg/L,0.36,mg/L,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-06-24T11:40:00,TN,Total nitrogen,0.55,mg/L,0.55,mg/L,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-07-29T12:15:00,TN,Total nitrogen,1.7,mg/L,1.7,mg/L,,outside,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-08-27T12:20:00,TN,Total nitrogen,0.6,mg/L,0.6,mg/L,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-09-25T11:29:00,TN,Total nitrogen,0.48,mg/L,0.48,mg/L,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-10-22T11:05:00,TN,Total nitrogen,0.36,mg/L,0.36,mg/L,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-11-21T06:35:00,TN,Total nitrogen,0.4,mg/L,0.4,mg/L,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-12-18T08:20:00,TN,Total nitrogen,0.76,mg/L,0.76,mg/L,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-01-30T13:25:00,TP,Total phosphorus,0.11,mg/L,0.11,mg/L,,outside,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-02-26T12:12:00,TP,Total phosphorus,0.088,mg/L,0.088,mg/L,,outside,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-03-26T13:15:00,TP,Total phosphorus,0.084,mg/L,0.084,mg/L,,outside,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-04-29T13:45:00,TP,Total phosphorus,0.041,mg/L,0.041,mg/L,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-05-27T13:10:00,TP,Total phosphorus,0.026,mg/L,0.026,mg/L,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-06-24T11:40:00,TP,Total phosphorus,0.027,mg/L,0.027,mg/L,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-07-29T12:15:00,TP,Total phosphorus,0.14,mg/L,0.14,mg/L,,outside,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-08-27T12:20:00,TP,Total phosphorus,0.058,mg/L,0.058,mg/L,,outside,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-09-25T11:29:00,TP,Total phosphorus,0.034,mg/L,0.034,mg/L,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-10-22T11:05:00,TP,Total phosphorus,0.053,mg/L,0.053,mg/L,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-11-21T06:35:00,TP,Total phosphorus,0.055,mg/L,0.055,mg/L,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-12-18T08:20:00,TP,Total phosphorus,0.089,mg/L,0.089,mg/L,,outside,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-01-30T13:25:00,TURB,Turbidity,54,NTU,54,NTU,,outside,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-02-26T12:12:00,TURB,Turbidity,40.2,NTU,40.2,NTU,,outside,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-03-26T13:15:00,TURB,Turbidity,26.8,NTU,26.8,NTU,,outside,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-04-29T13:45:00,TURB,Turbidity,13.6,NTU,13.6,NTU,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-05-27T13:10:00,TURB,Turbidity,19.7,NTU,19.7,NTU,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-06-24T11:40:00,TURB,Turbidity,20,NTU,20,NTU,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-07-29T12:15:00,TURB,Turbidity,35.6,NTU,35.6,NTU,,outside,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-08-27T12:20:00,TURB,Turbidity,21.3,NTU,21.3,NTU,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-09-25T11:29:00,TURB,Turbidity,26.5,NTU,26.5,NTU,,outside,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-10-22T11:05:00,TURB,Turbidity,24.9,NTU,24.9,NTU,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-11-21T06:35:00,TURB,Turbidity,24.7,NTU,24.7,NTU,,within,,1,Unedited data
+405276,GOULBURN @ GARRY,2024-12-18T08:20:00,TURB,Turbidity,38.6,NTU,38.6,NTU,,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-01-31T13:16:00,DO,Dissolved oxygen saturation,121.434,% saturation (estimated),9.9,ppm,25,within,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-02-26T10:50:00,DO,Dissolved oxygen saturation,90.0402,% saturation (estimated),7.71,ppm,22.4,within,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-07-29T11:36:00,DO,Dissolved oxygen saturation,76.6552,% saturation (estimated),9.17,ppm,7.1,within,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-08-26T11:08:00,DO,Dissolved oxygen saturation,37.806,% saturation (estimated),3.9,ppm,13.4,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-11-25T10:20:00,DO,Dissolved oxygen saturation,75.2018,% saturation (estimated),6.54,ppm,21.6,within,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-12-17T09:40:00,DO,Dissolved oxygen saturation,26.885,% saturation (estimated),2.25,ppm,23.6,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-01-31T13:16:00,PH,pH,7.2,pH units,7.2,pH,,within,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-02-26T10:50:00,PH,pH,7.33,pH units,7.33,pH,,within,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-07-29T11:36:00,PH,pH,7.3,pH units,7.3,pH,,within,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-08-26T11:08:00,PH,pH,7.1,pH units,7.1,pH,,within,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-11-25T10:20:00,PH,pH,7.6,pH units,7.6,pH,,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-12-17T09:40:00,PH,pH,7.3,pH units,7.3,pH,,within,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-01-31T13:16:00,TN,Total nitrogen,5,mg/L,5,mg/L,,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-02-26T10:50:00,TN,Total nitrogen,6.4,mg/L,6.4,mg/L,,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-07-29T11:36:00,TN,Total nitrogen,3.2,mg/L,3.2,mg/L,,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-08-26T11:08:00,TN,Total nitrogen,4.1,mg/L,4.1,mg/L,,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-11-25T10:20:00,TN,Total nitrogen,9.7,mg/L,9.7,mg/L,,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-12-17T09:40:00,TN,Total nitrogen,4.1,mg/L,4.1,mg/L,,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-01-31T13:16:00,TP,Total phosphorus,1.8,mg/L,1.8,mg/L,,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-02-26T10:50:00,TP,Total phosphorus,2.2,mg/L,2.2,mg/L,,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-07-29T11:36:00,TP,Total phosphorus,0.56,mg/L,0.56,mg/L,,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-08-26T11:08:00,TP,Total phosphorus,1.2,mg/L,1.2,mg/L,,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-11-25T10:20:00,TP,Total phosphorus,3.2,mg/L,3.2,mg/L,,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-12-17T09:40:00,TP,Total phosphorus,1.2,mg/L,1.2,mg/L,,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-01-31T13:16:00,TURB,Turbidity,64,NTU,64,NTU,,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-02-26T10:50:00,TURB,Turbidity,124,NTU,124,NTU,,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-07-29T11:36:00,TURB,Turbidity,20.2,NTU,20.2,NTU,,within,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-08-26T11:08:00,TURB,Turbidity,58.7,NTU,58.7,NTU,,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-11-25T10:20:00,TURB,Turbidity,49.2,NTU,49.2,NTU,,outside,,1,Unedited data
+405297,WARRIGAL C @ STEWART,2024-12-17T09:40:00,TURB,Turbidity,34.6,NTU,34.6,NTU,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-01-15T08:30:00,DO,Dissolved oxygen saturation,89.18,% saturation (estimated),7.54,ppm,23,within,,1,Unedited data
+405602,LAKE COOPER,2024-02-05T09:20:00,DO,Dissolved oxygen saturation,120.975,% saturation (estimated),9.98,ppm,24.3,within,,1,Unedited data
+405602,LAKE COOPER,2024-03-04T13:30:00,DO,Dissolved oxygen saturation,130.642,% saturation (estimated),11.37,ppm,21.5,outside,,1,Unedited data
+405602,LAKE COOPER,2024-04-02T08:35:00,DO,Dissolved oxygen saturation,89.639,% saturation (estimated),8.02,ppm,20.1,within,,1,Unedited data
+405602,LAKE COOPER,2024-05-01T08:45:00,DO,Dissolved oxygen saturation,102.395,% saturation (estimated),11.09,ppm,11.2,within,,1,Unedited data
+405602,LAKE COOPER,2024-06-03T09:30:00,DO,Dissolved oxygen saturation,91.2843,% saturation (estimated),10.24,ppm,9.7,within,,1,Unedited data
+405602,LAKE COOPER,2024-07-01T09:06:00,DO,Dissolved oxygen saturation,99.3166,% saturation (estimated),11.55,ppm,8.2,within,,1,Unedited data
+405602,LAKE COOPER,2024-08-05T09:38:00,DO,Dissolved oxygen saturation,102.984,% saturation (estimated),11.39,ppm,10.3,within,,1,Unedited data
+405602,LAKE COOPER,2024-09-03T07:53:00,DO,Dissolved oxygen saturation,97.7369,% saturation (estimated),10.61,ppm,11.1,within,,1,Unedited data
+405602,LAKE COOPER,2024-10-02T08:39:00,DO,Dissolved oxygen saturation,109.609,% saturation (estimated),11.12,ppm,14.1,within,,1,Unedited data
+405602,LAKE COOPER,2024-11-06T08:34:00,DO,Dissolved oxygen saturation,141.222,% saturation (estimated),12.61,ppm,20.2,outside,,1,Unedited data
+405602,LAKE COOPER,2024-12-03T07:22:00,DO,Dissolved oxygen saturation,94.7476,% saturation (estimated),7.95,ppm,23.4,within,,1,Unedited data
+405602,LAKE COOPER,2024-01-15T08:30:00,PH,pH,9,pH units,9,pH,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-02-05T09:20:00,PH,pH,9.1,pH units,9.1,pH,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-03-04T13:30:00,PH,pH,9.1,pH units,9.1,pH,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-04-02T08:35:00,PH,pH,8.6,pH units,8.6,pH,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-05-01T08:45:00,PH,pH,8.7,pH units,8.7,pH,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-06-03T09:30:00,PH,pH,8.6,pH units,8.6,pH,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-07-01T09:06:00,PH,pH,8.7,pH units,8.7,pH,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-08-05T09:38:00,PH,pH,8.8,pH units,8.8,pH,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-09-03T07:53:00,PH,pH,8.9,pH units,8.9,pH,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-10-02T08:39:00,PH,pH,9.1,pH units,9.1,pH,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-11-06T08:34:00,PH,pH,9.7,pH units,9.7,pH,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-12-03T07:22:00,PH,pH,10,pH units,10,pH,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-01-15T08:30:00,TURB,Turbidity,59.3,NTU,59.3,NTU,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-02-05T09:20:00,TURB,Turbidity,3.4,NTU,3.4,NTU,,within,,1,Unedited data
+405602,LAKE COOPER,2024-03-04T13:30:00,TURB,Turbidity,36.4,NTU,36.4,NTU,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-04-02T08:35:00,TURB,Turbidity,11.2,NTU,11.2,NTU,,within,,1,Unedited data
+405602,LAKE COOPER,2024-05-01T08:45:00,TURB,Turbidity,44.3,NTU,44.3,NTU,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-06-03T09:30:00,TURB,Turbidity,34.2,NTU,34.2,NTU,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-07-01T09:06:00,TURB,Turbidity,48.5,NTU,48.5,NTU,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-08-05T09:38:00,TURB,Turbidity,10.5,NTU,10.5,NTU,,within,,1,Unedited data
+405602,LAKE COOPER,2024-09-03T07:53:00,TURB,Turbidity,32,NTU,32,NTU,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-10-02T08:39:00,TURB,Turbidity,71.7,NTU,71.7,NTU,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-11-06T08:34:00,TURB,Turbidity,26.3,NTU,26.3,NTU,,outside,,1,Unedited data
+405602,LAKE COOPER,2024-12-03T07:22:00,TURB,Turbidity,3.7,NTU,3.7,NTU,,within,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-01-31T10:20:00,DO,Dissolved oxygen saturation,81.0165,% saturation (estimated),6.8,ppm,23.4,within,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-02-26T12:20:00,DO,Dissolved oxygen saturation,127.97,% saturation (estimated),10.6,ppm,24.1,within,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-03-25T13:00:00,DO,Dissolved oxygen saturation,73.1161,% saturation (estimated),6,ppm,24.6,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-04-29T13:05:00,DO,Dissolved oxygen saturation,77.3767,% saturation (estimated),7.75,ppm,14.7,within,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-05-27T13:26:00,DO,Dissolved oxygen saturation,80.9208,% saturation (estimated),8.89,ppm,10.6,within,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-06-24T13:01:00,DO,Dissolved oxygen saturation,81.5399,% saturation (estimated),9.77,ppm,7,within,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-07-29T13:12:00,DO,Dissolved oxygen saturation,138.257,% saturation (estimated),15.7,ppm,9.2,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-08-26T12:47:00,DO,Dissolved oxygen saturation,61.4022,% saturation (estimated),6.15,ppm,14.7,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-09-24T11:38:00,DO,Dissolved oxygen saturation,87.9556,% saturation (estimated),8.3,ppm,17.5,within,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-10-21T12:12:00,DO,Dissolved oxygen saturation,89.5311,% saturation (estimated),7.43,ppm,24,within,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-11-25T12:15:00,DO,Dissolved oxygen saturation,51.5742,% saturation (estimated),4.49,ppm,21.5,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-12-17T11:55:00,DO,Dissolved oxygen saturation,115.712,% saturation (estimated),9.12,ppm,26.8,within,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-01-31T10:20:00,PH,pH,7.27,pH units,7.27,pH,,within,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-02-26T12:20:00,PH,pH,8.6,pH units,8.6,pH,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-03-25T13:00:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-04-29T13:05:00,PH,pH,7.3,pH units,7.3,pH,,within,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-05-27T13:26:00,PH,pH,7.3,pH units,7.3,pH,,within,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-06-24T13:01:00,PH,pH,7.5,pH units,7.5,pH,,within,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-07-29T13:12:00,PH,pH,9.3,pH units,9.3,pH,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-08-26T12:47:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-09-24T11:38:00,PH,pH,8.1,pH units,8.1,pH,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-10-21T12:12:00,PH,pH,7.9,pH units,7.9,pH,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-11-25T12:15:00,PH,pH,7.8,pH units,7.8,pH,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-12-17T11:55:00,PH,pH,8.3,pH units,8.3,pH,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-01-31T10:20:00,TN,Total nitrogen,0.67,mg/L,0.67,mg/L,,within,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-02-26T12:20:00,TN,Total nitrogen,3.8,mg/L,3.8,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-03-25T13:00:00,TN,Total nitrogen,2.4,mg/L,2.4,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-04-29T13:05:00,TN,Total nitrogen,3.2,mg/L,3.2,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-05-27T13:26:00,TN,Total nitrogen,1.9,mg/L,1.9,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-06-24T13:01:00,TN,Total nitrogen,2,mg/L,2,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-07-29T13:12:00,TN,Total nitrogen,2,mg/L,2,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-08-26T12:47:00,TN,Total nitrogen,5.4,mg/L,5.4,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-09-24T11:38:00,TN,Total nitrogen,2.2,mg/L,2.2,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-10-21T12:12:00,TN,Total nitrogen,2.6,mg/L,2.6,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-11-25T12:15:00,TN,Total nitrogen,3.1,mg/L,3.1,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-12-17T11:55:00,TN,Total nitrogen,3.2,mg/L,3.2,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-01-31T10:20:00,TP,Total phosphorus,0.21,mg/L,0.21,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-02-26T12:20:00,TP,Total phosphorus,1.1,mg/L,1.1,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-03-25T13:00:00,TP,Total phosphorus,0.91,mg/L,0.91,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-04-29T13:05:00,TP,Total phosphorus,1,mg/L,1,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-05-27T13:26:00,TP,Total phosphorus,0.58,mg/L,0.58,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-06-24T13:01:00,TP,Total phosphorus,0.47,mg/L,0.47,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-07-29T13:12:00,TP,Total phosphorus,0.31,mg/L,0.31,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-08-26T12:47:00,TP,Total phosphorus,0.85,mg/L,0.85,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-09-24T11:38:00,TP,Total phosphorus,0.47,mg/L,0.47,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-10-21T12:12:00,TP,Total phosphorus,0.85,mg/L,0.85,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-11-25T12:15:00,TP,Total phosphorus,0.95,mg/L,0.95,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-12-17T11:55:00,TP,Total phosphorus,1.1,mg/L,1.1,mg/L,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-01-31T10:20:00,TURB,Turbidity,100,NTU,100,NTU,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-02-26T12:20:00,TURB,Turbidity,339,NTU,339,NTU,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-03-25T13:00:00,TURB,Turbidity,369,NTU,369,NTU,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-04-29T13:05:00,TURB,Turbidity,182,NTU,182,NTU,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-05-27T13:26:00,TURB,Turbidity,234,NTU,234,NTU,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-06-24T13:01:00,TURB,Turbidity,165,NTU,165,NTU,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-07-29T13:12:00,TURB,Turbidity,97.2,NTU,97.2,NTU,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-08-26T12:47:00,TURB,Turbidity,267,NTU,267,NTU,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-09-24T11:38:00,TURB,Turbidity,230,NTU,230,NTU,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-10-21T12:12:00,TURB,Turbidity,180,NTU,180,NTU,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-11-25T12:15:00,TURB,Turbidity,159,NTU,159,NTU,,outside,,1,Unedited data
+405720,RODNEY MAIN @ WELLS,2024-12-17T11:55:00,TURB,Turbidity,110,NTU,110,NTU,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-01-23T13:03:00,DO,Dissolved oxygen saturation,103.889,% saturation (estimated),7.43,ppm,32.3,within,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-02-20T10:23:00,DO,Dissolved oxygen saturation,25.9395,% saturation (estimated),2.22,ppm,22.3,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-03-26T12:08:00,DO,Dissolved oxygen saturation,79.0882,% saturation (estimated),7.39,ppm,17.9,within,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-05-22T14:17:00,DO,Dissolved oxygen saturation,104.787,% saturation (estimated),11.74,ppm,9.7,within,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-06-19T13:55:00,DO,Dissolved oxygen saturation,96.5985,% saturation (estimated),11.88,ppm,5.9,within,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-07-17T14:53:00,DO,Dissolved oxygen saturation,95.6889,% saturation (estimated),10.67,ppm,9.9,within,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-08-21T14:30:00,DO,Dissolved oxygen saturation,41.451,% saturation (estimated),4.2,ppm,14.1,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-09-24T10:15:00,DO,Dissolved oxygen saturation,77.6694,% saturation (estimated),7.7,ppm,15.1,within,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-10-23T10:14:00,DO,Dissolved oxygen saturation,59.4366,% saturation (estimated),5.6,ppm,17.5,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-11-11T09:30:00,DO,Dissolved oxygen saturation,33.5059,% saturation (estimated),3,ppm,20,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-12-17T08:15:00,DO,Dissolved oxygen saturation,46.3776,% saturation (estimated),4,ppm,21.9,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-01-23T13:03:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-02-20T10:23:00,PH,pH,7.2,pH units,7.2,pH,,within,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-03-26T12:08:00,PH,pH,7.03,pH units,7.03,pH,,within,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-05-22T14:17:00,PH,pH,7.49,pH units,7.49,pH,,within,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-06-19T13:55:00,PH,pH,7.68,pH units,7.68,pH,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-07-17T14:53:00,PH,pH,7.77,pH units,7.77,pH,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-08-21T14:30:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-09-24T10:15:00,PH,pH,7.2,pH units,7.2,pH,,within,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-10-23T10:14:00,PH,pH,6.9,pH units,6.9,pH,,within,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-11-11T09:30:00,PH,pH,6.8,pH units,6.8,pH,,within,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-12-17T08:15:00,PH,pH,7.2,pH units,7.2,pH,,within,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-01-23T13:03:00,TN,Total nitrogen,1.5,mg/L,1.5,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-02-20T10:23:00,TN,Total nitrogen,15,mg/L,15,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-03-26T12:08:00,TN,Total nitrogen,3.6,mg/L,3.6,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-05-22T14:17:00,TN,Total nitrogen,0.83,mg/L,0.83,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-06-19T13:55:00,TN,Total nitrogen,1.1,mg/L,1.1,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-07-17T14:53:00,TN,Total nitrogen,1.8,mg/L,1.8,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-08-21T14:30:00,TN,Total nitrogen,10,mg/L,10,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-09-24T10:15:00,TN,Total nitrogen,2.4,mg/L,2.4,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-10-23T10:14:00,TN,Total nitrogen,4.2,mg/L,4.2,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-11-11T09:30:00,TN,Total nitrogen,4.2,mg/L,4.2,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-12-17T08:15:00,TN,Total nitrogen,1.5,mg/L,1.5,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-01-23T13:03:00,TP,Total phosphorus,0.66,mg/L,0.66,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-02-20T10:23:00,TP,Total phosphorus,8.3,mg/L,8.3,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-03-26T12:08:00,TP,Total phosphorus,1.9,mg/L,1.9,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-05-22T14:17:00,TP,Total phosphorus,0.25,mg/L,0.25,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-06-19T13:55:00,TP,Total phosphorus,0.37,mg/L,0.37,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-07-17T14:53:00,TP,Total phosphorus,0.77,mg/L,0.77,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-08-21T14:30:00,TP,Total phosphorus,0.36,mg/L,0.36,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-09-24T10:15:00,TP,Total phosphorus,0.62,mg/L,0.62,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-10-23T10:14:00,TP,Total phosphorus,1.1,mg/L,1.1,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-11-11T09:30:00,TP,Total phosphorus,0.74,mg/L,0.74,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-12-17T08:15:00,TP,Total phosphorus,0.29,mg/L,0.29,mg/L,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-01-23T13:03:00,TURB,Turbidity,346,NTU,346,NTU,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-02-20T10:23:00,TURB,Turbidity,31.4,NTU,31.4,NTU,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-03-26T12:08:00,TURB,Turbidity,28.6,NTU,28.6,NTU,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-05-22T14:17:00,TURB,Turbidity,64.8,NTU,64.8,NTU,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-06-19T13:55:00,TURB,Turbidity,335,NTU,335,NTU,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-07-17T14:53:00,TURB,Turbidity,839,NTU,839,NTU,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-08-21T14:30:00,TURB,Turbidity,50,NTU,50,NTU,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-09-24T10:15:00,TURB,Turbidity,89.5,NTU,89.5,NTU,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-10-23T10:14:00,TURB,Turbidity,63.4,NTU,63.4,NTU,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-11-11T09:30:00,TURB,Turbidity,35.2,NTU,35.2,NTU,,outside,,1,Unedited data
+405730,TOOLAMBA COM. DRAIN,2024-12-17T08:15:00,TURB,Turbidity,9.2,NTU,9.2,NTU,,within,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-01-30T09:50:00,DO,Dissolved oxygen saturation,62.8807,% saturation (estimated),5.1,ppm,25.2,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-02-26T09:30:00,DO,Dissolved oxygen saturation,29.5768,% saturation (estimated),2.5,ppm,23,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-03-26T08:25:00,DO,Dissolved oxygen saturation,32.1515,% saturation (estimated),3.17,ppm,15.4,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-04-29T11:10:00,DO,Dissolved oxygen saturation,43.2866,% saturation (estimated),4.4,ppm,14,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-05-27T10:00:00,DO,Dissolved oxygen saturation,31.5752,% saturation (estimated),3.8,ppm,6.8,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-06-24T10:00:00,DO,Dissolved oxygen saturation,74.7797,% saturation (estimated),9.3,ppm,5.5,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-07-29T10:00:00,DO,Dissolved oxygen saturation,92.774,% saturation (estimated),11,ppm,7.4,within,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-08-27T09:04:00,DO,Dissolved oxygen saturation,56.6085,% saturation (estimated),5.95,ppm,12.5,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-09-25T08:09:00,DO,Dissolved oxygen saturation,38.2176,% saturation (estimated),3.76,ppm,15.5,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-10-22T07:30:00,DO,Dissolved oxygen saturation,25.3948,% saturation (estimated),2.4,ppm,17.4,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-11-21T08:45:00,DO,Dissolved oxygen saturation,72.6547,% saturation (estimated),6.46,ppm,20.4,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-12-18T10:05:00,DO,Dissolved oxygen saturation,41.6041,% saturation (estimated),3.67,ppm,20.8,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-01-30T09:50:00,PH,pH,7.2,pH units,7.2,pH,,within,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-02-26T09:30:00,PH,pH,7,pH units,7,pH,,within,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-03-26T08:25:00,PH,pH,7.2,pH units,7.2,pH,,within,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-04-29T11:10:00,PH,pH,7.1,pH units,7.1,pH,,within,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-05-27T10:00:00,PH,pH,7.2,pH units,7.2,pH,,within,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-06-24T10:00:00,PH,pH,6.8,pH units,6.8,pH,,within,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-07-29T10:00:00,PH,pH,7.8,pH units,7.8,pH,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-08-27T09:04:00,PH,pH,7.5,pH units,7.5,pH,,within,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-09-25T08:09:00,PH,pH,7.1,pH units,7.1,pH,,within,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-10-22T07:30:00,PH,pH,7.3,pH units,7.3,pH,,within,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-11-21T08:45:00,PH,pH,7.5,pH units,7.5,pH,,within,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-12-18T10:05:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-01-30T09:50:00,TN,Total nitrogen,3.9,mg/L,3.9,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-02-26T09:30:00,TN,Total nitrogen,2.5,mg/L,2.5,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-03-26T08:25:00,TN,Total nitrogen,2.8,mg/L,2.8,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-04-29T11:10:00,TN,Total nitrogen,2.4,mg/L,2.4,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-05-27T10:00:00,TN,Total nitrogen,3.7,mg/L,3.7,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-06-24T10:00:00,TN,Total nitrogen,2.2,mg/L,2.2,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-07-29T10:00:00,TN,Total nitrogen,2.4,mg/L,2.4,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-08-27T09:04:00,TN,Total nitrogen,4.4,mg/L,4.4,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-09-25T08:09:00,TN,Total nitrogen,3,mg/L,3,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-10-22T07:30:00,TN,Total nitrogen,4.3,mg/L,4.3,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-11-21T08:45:00,TN,Total nitrogen,3,mg/L,3,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-12-18T10:05:00,TN,Total nitrogen,5.4,mg/L,5.4,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-01-30T09:50:00,TP,Total phosphorus,1.9,mg/L,1.9,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-02-26T09:30:00,TP,Total phosphorus,1,mg/L,1,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-03-26T08:25:00,TP,Total phosphorus,0.89,mg/L,0.89,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-04-29T11:10:00,TP,Total phosphorus,0.86,mg/L,0.86,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-05-27T10:00:00,TP,Total phosphorus,1.2,mg/L,1.2,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-06-24T10:00:00,TP,Total phosphorus,0.34,mg/L,0.34,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-07-29T10:00:00,TP,Total phosphorus,0.37,mg/L,0.37,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-08-27T09:04:00,TP,Total phosphorus,1.2,mg/L,1.2,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-09-25T08:09:00,TP,Total phosphorus,0.83,mg/L,0.83,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-10-22T07:30:00,TP,Total phosphorus,1.4,mg/L,1.4,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-11-21T08:45:00,TP,Total phosphorus,0.78,mg/L,0.78,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-12-18T10:05:00,TP,Total phosphorus,1.4,mg/L,1.4,mg/L,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-01-30T09:50:00,TURB,Turbidity,46,NTU,46,NTU,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-02-26T09:30:00,TURB,Turbidity,96.2,NTU,96.2,NTU,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-03-26T08:25:00,TURB,Turbidity,141,NTU,141,NTU,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-04-29T11:10:00,TURB,Turbidity,84.6,NTU,84.6,NTU,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-05-27T10:00:00,TURB,Turbidity,561,NTU,561,NTU,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-06-24T10:00:00,TURB,Turbidity,130,NTU,130,NTU,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-07-29T10:00:00,TURB,Turbidity,89.3,NTU,89.3,NTU,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-08-27T09:04:00,TURB,Turbidity,482,NTU,482,NTU,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-09-25T08:09:00,TURB,Turbidity,310,NTU,310,NTU,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-10-22T07:30:00,TURB,Turbidity,369,NTU,369,NTU,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-11-21T08:45:00,TURB,Turbidity,208,NTU,208,NTU,,outside,,1,Unedited data
+405758,SHEPPARTON DR NO 12,2024-12-18T10:05:00,TURB,Turbidity,142,NTU,142,NTU,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-01-30T08:30:00,DO,Dissolved oxygen saturation,53.0442,% saturation (estimated),4.4,ppm,24,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-02-26T10:40:00,DO,Dissolved oxygen saturation,127.956,% saturation (estimated),10.9,ppm,22.6,within,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-03-26T11:00:00,DO,Dissolved oxygen saturation,92.9949,% saturation (estimated),8.61,ppm,18.4,within,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-04-29T12:40:00,DO,Dissolved oxygen saturation,71.5081,% saturation (estimated),7.5,ppm,12.6,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-05-27T11:40:00,DO,Dissolved oxygen saturation,68.4376,% saturation (estimated),7.9,ppm,8.5,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-06-24T10:30:00,DO,Dissolved oxygen saturation,79.6621,% saturation (estimated),9.4,ppm,7.6,within,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-07-29T11:16:00,DO,Dissolved oxygen saturation,94.4496,% saturation (estimated),11.2,ppm,7.4,within,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-08-27T10:20:00,DO,Dissolved oxygen saturation,85.6694,% saturation (estimated),8.69,ppm,14.1,within,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-09-25T10:00:00,DO,Dissolved oxygen saturation,69.873,% saturation (estimated),6.89,ppm,15.4,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-10-22T08:45:00,DO,Dissolved oxygen saturation,31.3201,% saturation (estimated),2.83,ppm,19.6,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-11-21T07:55:00,DO,Dissolved oxygen saturation,23.9537,% saturation (estimated),2.25,ppm,17.7,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-12-18T09:25:00,DO,Dissolved oxygen saturation,57.5627,% saturation (estimated),5.17,ppm,19.9,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-01-30T08:30:00,PH,pH,7.2,pH units,7.2,pH,,within,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-02-26T10:40:00,PH,pH,8.3,pH units,8.3,pH,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-03-26T11:00:00,PH,pH,8.2,pH units,8.2,pH,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-04-29T12:40:00,PH,pH,7.6,pH units,7.6,pH,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-05-27T11:40:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-06-24T10:30:00,PH,pH,6.6,pH units,6.6,pH,,within,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-07-29T11:16:00,PH,pH,7.9,pH units,7.9,pH,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-08-27T10:20:00,PH,pH,7.7,pH units,7.7,pH,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-09-25T10:00:00,PH,pH,7.3,pH units,7.3,pH,,within,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-10-22T08:45:00,PH,pH,7.2,pH units,7.2,pH,,within,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-11-21T07:55:00,PH,pH,7.4,pH units,7.4,pH,,within,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-12-18T09:25:00,PH,pH,7.5,pH units,7.5,pH,,within,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-01-30T08:30:00,TN,Total nitrogen,4.5,mg/L,4.5,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-02-26T10:40:00,TN,Total nitrogen,4.9,mg/L,4.9,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-03-26T11:00:00,TN,Total nitrogen,5.6,mg/L,5.6,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-04-29T12:40:00,TN,Total nitrogen,3.4,mg/L,3.4,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-05-27T11:40:00,TN,Total nitrogen,2.4,mg/L,2.4,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-06-24T10:30:00,TN,Total nitrogen,2.4,mg/L,2.4,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-07-29T11:16:00,TN,Total nitrogen,2.3,mg/L,2.3,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-08-27T10:20:00,TN,Total nitrogen,2.7,mg/L,2.7,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-09-25T10:00:00,TN,Total nitrogen,3.5,mg/L,3.5,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-10-22T08:45:00,TN,Total nitrogen,4.2,mg/L,4.2,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-11-21T07:55:00,TN,Total nitrogen,3.8,mg/L,3.8,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-12-18T09:25:00,TN,Total nitrogen,3.6,mg/L,3.6,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-01-30T08:30:00,TP,Total phosphorus,2,mg/L,2,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-02-26T10:40:00,TP,Total phosphorus,1.1,mg/L,1.1,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-03-26T11:00:00,TP,Total phosphorus,0.98,mg/L,0.98,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-04-29T12:40:00,TP,Total phosphorus,0.8,mg/L,0.8,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-05-27T11:40:00,TP,Total phosphorus,0.62,mg/L,0.62,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-06-24T10:30:00,TP,Total phosphorus,0.59,mg/L,0.59,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-07-29T11:16:00,TP,Total phosphorus,0.78,mg/L,0.78,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-08-27T10:20:00,TP,Total phosphorus,1.1,mg/L,1.1,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-09-25T10:00:00,TP,Total phosphorus,0.93,mg/L,0.93,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-10-22T08:45:00,TP,Total phosphorus,2.8,mg/L,2.8,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-11-21T07:55:00,TP,Total phosphorus,1.8,mg/L,1.8,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-12-18T09:25:00,TP,Total phosphorus,1.5,mg/L,1.5,mg/L,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-01-30T08:30:00,TURB,Turbidity,386,NTU,386,NTU,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-02-26T10:40:00,TURB,Turbidity,345,NTU,345,NTU,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-03-26T11:00:00,TURB,Turbidity,205,NTU,205,NTU,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-04-29T12:40:00,TURB,Turbidity,404,NTU,404,NTU,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-05-27T11:40:00,TURB,Turbidity,335,NTU,335,NTU,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-06-24T10:30:00,TURB,Turbidity,230,NTU,230,NTU,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-07-29T11:16:00,TURB,Turbidity,266,NTU,266,NTU,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-08-27T10:20:00,TURB,Turbidity,515,NTU,515,NTU,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-09-25T10:00:00,TURB,Turbidity,303,NTU,303,NTU,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-10-22T08:45:00,TURB,Turbidity,136,NTU,136,NTU,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-11-21T07:55:00,TURB,Turbidity,305,NTU,305,NTU,,outside,,1,Unedited data
+405779,SHEPPARTON DR 11,2024-12-18T09:25:00,TURB,Turbidity,198,NTU,198,NTU,,outside,,1,Unedited data

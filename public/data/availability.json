@@ -1,0 +1,3081 @@
+{
+  "title": "Goulburn 2024 availability and provisional ERS assessment",
+  "generated_at": "2026-09-01T09:40:02.345243+00:00",
+  "year": 2024,
+  "source_rows": 1815091,
+  "excluded_boundary_rows": 0,
+  "parameters": [
+    {
+      "code": "DO",
+      "label": "Dissolved oxygen saturation",
+      "short_label": "DO",
+      "unit": "% saturation (estimated)",
+      "ers_statistic": "25th percentile and maximum"
+    },
+    {
+      "code": "TN",
+      "label": "Total nitrogen",
+      "short_label": "TN",
+      "unit": "mg/L",
+      "ers_statistic": "75th percentile"
+    },
+    {
+      "code": "TP",
+      "label": "Total phosphorus",
+      "short_label": "TP",
+      "unit": "mg/L",
+      "ers_statistic": "75th percentile"
+    },
+    {
+      "code": "TURB",
+      "label": "Turbidity",
+      "short_label": "Turbidity",
+      "unit": "NTU",
+      "ers_statistic": "75th percentile"
+    },
+    {
+      "code": "PH",
+      "label": "pH",
+      "short_label": "pH",
+      "unit": "pH units",
+      "ers_statistic": "25th and 75th percentiles"
+    }
+  ],
+  "temporal_resolutions": {
+    "daily": {
+      "available": true,
+      "source": "continuous_daily.csv"
+    },
+    "monthly": {
+      "available": true,
+      "source": "client aggregation of daily summaries"
+    },
+    "hourly": {
+      "available": true,
+      "source": "continuous_hourly.csv",
+      "loading": "on demand"
+    }
+  },
+  "ers": {
+    "source": "EPA Victoria Environment Reference Standard, Table 5.8",
+    "source_url": "https://www.epa.vic.gov.au/sites/default/files/2025-05/consolidated-ERS.pdf",
+    "assessment_note": "Provisional annual comparison using daily sensor summaries where available, otherwise spot observations.",
+    "do_note": "DO percent saturation is estimated from paired DO concentration, water temperature and site elevation; salinity and measured barometric pressure were unavailable.",
+    "thresholds": {
+      "Uplands A": {
+        "context": "Upper Goulburn (part) and Broken basins",
+        "TP": {
+          "upper": 0.025,
+          "upper_stat": "p75"
+        },
+        "TN": {
+          "upper": 0.55,
+          "upper_stat": "p75"
+        },
+        "DO": {
+          "lower": 90.0,
+          "upper": 130.0,
+          "lower_stat": "p25",
+          "upper_stat": "max"
+        },
+        "TURB": {
+          "upper": 10.0,
+          "upper_stat": "p75"
+        },
+        "PH": {
+          "lower": 6.4,
+          "upper": 7.4,
+          "lower_stat": "p25",
+          "upper_stat": "p75"
+        }
+      },
+      "Uplands B": {
+        "context": "Northern-draining uplands: Ovens, Broken and Goulburn (part)",
+        "TP": {
+          "upper": 0.025,
+          "upper_stat": "p75"
+        },
+        "TN": {
+          "upper": 0.4,
+          "upper_stat": "p75"
+        },
+        "DO": {
+          "lower": 85.0,
+          "upper": 130.0,
+          "lower_stat": "p25",
+          "upper_stat": "max"
+        },
+        "TURB": {
+          "upper": 10.0,
+          "upper_stat": "p75"
+        },
+        "PH": {
+          "lower": 6.4,
+          "upper": 7.4,
+          "lower_stat": "p25",
+          "upper_stat": "p75"
+        }
+      },
+      "Central Foothills and Coastal Plains": {
+        "context": "Foothills of Ovens, Broken and Goulburn basins",
+        "TP": {
+          "upper": 0.05,
+          "upper_stat": "p75"
+        },
+        "TN": {
+          "upper": 0.8,
+          "upper_stat": "p75"
+        },
+        "DO": {
+          "lower": 70.0,
+          "upper": 130.0,
+          "lower_stat": "p25",
+          "upper_stat": "max"
+        },
+        "TURB": {
+          "upper": 20.0,
+          "upper_stat": "p75"
+        },
+        "PH": {
+          "lower": 6.4,
+          "upper": 7.4,
+          "lower_stat": "p25",
+          "upper_stat": "p75"
+        }
+      },
+      "Murray and Western Plains": {
+        "context": "Lowlands of Kiewa, Ovens and Goulburn basins",
+        "TP": {
+          "upper": 0.055,
+          "upper_stat": "p75"
+        },
+        "TN": {
+          "upper": 0.8,
+          "upper_stat": "p75"
+        },
+        "DO": {
+          "lower": 75.0,
+          "upper": 130.0,
+          "lower_stat": "p25",
+          "upper_stat": "max"
+        },
+        "TURB": {
+          "upper": 25.0,
+          "upper_stat": "p75"
+        },
+        "PH": {
+          "lower": 6.4,
+          "upper": 7.5,
+          "lower_stat": "p25",
+          "upper_stat": "p75"
+        }
+      }
+    }
+  },
+  "quality_policy": {
+    "note": "Provisional display filter; raw downloads are unchanged.",
+    "included": [
+      "1",
+      "2",
+      "8",
+      "11",
+      "15",
+      "50",
+      "76"
+    ],
+    "excluded": [
+      "3",
+      "100",
+      "151",
+      "153",
+      "161",
+      "180",
+      "255"
+    ]
+  },
+  "sites": {
+    "405200": {
+      "name": "GOULBURN @ MURCHISON",
+      "active": true,
+      "ers_segment": "Murray and Western Plains",
+      "parameters": {
+        "DO": {
+          "regime": "continuous+spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 12,
+          "continuous_count": 35033,
+          "daily_count": 366,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 92.55584,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 75.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 87.79077,
+              "median": 92.55584,
+              "p75": 95.49321,
+              "max": 105.98977
+            }
+          }
+        },
+        "TP": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/23 10:52:00",
+          "date_max": "2024/12/17 10:00:00",
+          "summary_value": 0.0285,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "upper": 0.055,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.0185,
+              "median": 0.0285,
+              "p75": 0.03725,
+              "max": 0.09
+            }
+          }
+        },
+        "TURB": {
+          "regime": "spot",
+          "unit": "NTU",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/23 10:52:00",
+          "date_max": "2024/12/17 10:00:00",
+          "summary_value": 9.9,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "upper": 25.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 8.0,
+              "median": 9.9,
+              "p75": 12.275,
+              "max": 36.5
+            }
+          }
+        },
+        "PH": {
+          "regime": "spot",
+          "unit": "pH units",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/23 10:52:00",
+          "date_max": "2024/12/17 10:00:00",
+          "summary_value": 7.285,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.5,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 7.1775,
+              "median": 7.285,
+              "p75": 7.3,
+              "max": 7.62
+            }
+          }
+        }
+      }
+    },
+    "405201": {
+      "name": "GOULBURN @ TRAWOOL",
+      "active": true,
+      "ers_segment": "Central Foothills and Coastal Plains",
+      "parameters": {
+        "DO": {
+          "regime": "continuous+spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 15,
+          "continuous_count": 35022,
+          "daily_count": 358,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 96.59985,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 70.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 94.17548,
+              "median": 96.59985,
+              "p75": 98.57946,
+              "max": 106.71645
+            }
+          }
+        },
+        "TP": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/15 08:40:00",
+          "date_max": "2024/12/10 11:00:00",
+          "summary_value": 0.0205,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "upper": 0.05,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.01675,
+              "median": 0.0205,
+              "p75": 0.02425,
+              "max": 0.15
+            }
+          }
+        },
+        "TURB": {
+          "regime": "continuous+spot",
+          "unit": "NTU",
+          "spot_count": 15,
+          "continuous_count": 34650,
+          "daily_count": 302,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 8.50156,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "upper": 20.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 5.81172,
+              "median": 8.50156,
+              "p75": 13.15664,
+              "max": 238.06458
+            }
+          }
+        },
+        "PH": {
+          "regime": "spot",
+          "unit": "pH units",
+          "spot_count": 15,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/15 08:40:00",
+          "date_max": "2024/12/10 11:00:00",
+          "summary_value": 7.44,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.4,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 6.905,
+              "median": 7.44,
+              "p75": 7.51,
+              "max": 7.68
+            }
+          }
+        }
+      }
+    },
+    "405203": {
+      "name": "GOULBURN @ EILDON",
+      "active": true,
+      "ers_segment": "Central Foothills and Coastal Plains",
+      "parameters": {
+        "DO": {
+          "regime": "continuous+spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 12,
+          "continuous_count": 34382,
+          "daily_count": 360,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 96.51465,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 70.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 88.09958,
+              "median": 96.51465,
+              "p75": 99.62095,
+              "max": 106.71718
+            }
+          }
+        },
+        "TP": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/10 08:12:00",
+          "date_max": "2024/12/03 07:58:00",
+          "summary_value": 0.009,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "upper": 0.05,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.006,
+              "median": 0.009,
+              "p75": 0.0155,
+              "max": 0.026
+            }
+          }
+        },
+        "TURB": {
+          "regime": "spot",
+          "unit": "NTU",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/10 08:12:00",
+          "date_max": "2024/12/03 07:58:00",
+          "summary_value": 1.7,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "upper": 20.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 1.575,
+              "median": 1.7,
+              "p75": 3.8,
+              "max": 22.9
+            }
+          }
+        },
+        "PH": {
+          "regime": "spot",
+          "unit": "pH units",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/10 08:12:00",
+          "date_max": "2024/12/03 07:58:00",
+          "summary_value": 7.35,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.4,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 7.175,
+              "median": 7.35,
+              "p75": 7.4175,
+              "max": 7.75
+            }
+          }
+        }
+      }
+    },
+    "405204": {
+      "name": "GOULBURN SHEPPARTON",
+      "active": true,
+      "ers_segment": "Murray and Western Plains",
+      "parameters": {
+        "DO": {
+          "regime": "spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/23 14:09:00",
+          "date_max": "2024/12/17 14:00:00",
+          "summary_value": 92.34475,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 75.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 89.50825,
+              "median": 92.34475,
+              "p75": 94.31483,
+              "max": 101.6803
+            }
+          }
+        },
+        "TP": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/23 14:09:00",
+          "date_max": "2024/12/17 14:00:00",
+          "summary_value": 0.0535,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 0.055,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.0345,
+              "median": 0.0535,
+              "p75": 0.06525,
+              "max": 0.11
+            }
+          }
+        },
+        "TURB": {
+          "regime": "spot",
+          "unit": "NTU",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/23 14:09:00",
+          "date_max": "2024/12/17 14:00:00",
+          "summary_value": 22.1,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 25.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 18.225,
+              "median": 22.1,
+              "p75": 29.2,
+              "max": 45.4
+            }
+          }
+        },
+        "PH": {
+          "regime": "spot",
+          "unit": "pH units",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/23 14:09:00",
+          "date_max": "2024/12/17 14:00:00",
+          "summary_value": 7.4,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.5,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 7.1875,
+              "median": 7.4,
+              "p75": 7.6,
+              "max": 7.94
+            }
+          }
+        }
+      }
+    },
+    "405205": {
+      "name": "MURRINDINDI COLWELLS",
+      "active": true,
+      "ers_segment": "Uplands A",
+      "parameters": {
+        "DO": {
+          "regime": "spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/22 09:45:00",
+          "date_max": "2024/12/10 07:00:00",
+          "summary_value": 99.57393,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 90.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 98.14375,
+              "median": 99.57393,
+              "p75": 100.59983,
+              "max": 101.97046
+            }
+          }
+        },
+        "TP": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 11,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/22 09:45:00",
+          "date_max": "2024/12/10 07:00:00",
+          "summary_value": 0.019,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 0.025,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.015,
+              "median": 0.019,
+              "p75": 0.0275,
+              "max": 0.12
+            }
+          }
+        },
+        "TURB": {
+          "regime": "spot",
+          "unit": "NTU",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/22 09:45:00",
+          "date_max": "2024/12/10 07:00:00",
+          "summary_value": 7.55,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "upper": 10.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 6.725,
+              "median": 7.55,
+              "p75": 8.675,
+              "max": 64.1
+            }
+          }
+        },
+        "PH": {
+          "regime": "spot",
+          "unit": "pH units",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/22 09:45:00",
+          "date_max": "2024/12/10 07:00:00",
+          "summary_value": 6.98,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.4,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 6.7675,
+              "median": 6.98,
+              "p75": 7.0275,
+              "max": 7.8
+            }
+          }
+        }
+      }
+    },
+    "405209": {
+      "name": "ACHERON @ TAGGERTY",
+      "active": true,
+      "ers_segment": "Uplands A",
+      "parameters": {
+        "DO": {
+          "regime": "spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/10 09:00:00",
+          "date_max": "2024/12/03 09:50:00",
+          "summary_value": 99.81391,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 90.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 98.01829,
+              "median": 99.81391,
+              "p75": 100.62448,
+              "max": 101.89367
+            }
+          }
+        },
+        "TP": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/10 09:00:00",
+          "date_max": "2024/12/03 09:50:00",
+          "summary_value": 0.0165,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "upper": 0.025,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.01425,
+              "median": 0.0165,
+              "p75": 0.02025,
+              "max": 0.036
+            }
+          }
+        },
+        "TURB": {
+          "regime": "spot",
+          "unit": "NTU",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/10 09:00:00",
+          "date_max": "2024/12/03 09:50:00",
+          "summary_value": 5.25,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "upper": 10.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 3.675,
+              "median": 5.25,
+              "p75": 8.3,
+              "max": 16.9
+            }
+          }
+        },
+        "PH": {
+          "regime": "spot",
+          "unit": "pH units",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/10 09:00:00",
+          "date_max": "2024/12/03 09:50:00",
+          "summary_value": 7.17,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.4,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 6.96,
+              "median": 7.17,
+              "p75": 7.4975,
+              "max": 7.79
+            }
+          }
+        }
+      }
+    },
+    "405212": {
+      "name": "SUNDAY @ TALLAROOK",
+      "active": true,
+      "ers_segment": "Central Foothills and Coastal Plains",
+      "parameters": {
+        "DO": {
+          "regime": "spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 15,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/15 09:40:00",
+          "date_max": "2024/12/10 11:50:00",
+          "summary_value": 75.78118,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 70.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 54.78436,
+              "median": 75.78118,
+              "p75": 86.21949,
+              "max": 96.38887
+            }
+          }
+        },
+        "TP": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/15 09:40:00",
+          "date_max": "2024/12/10 11:50:00",
+          "summary_value": 0.0765,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 0.05,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.0595,
+              "median": 0.0765,
+              "p75": 0.2,
+              "max": 0.69
+            }
+          }
+        },
+        "TURB": {
+          "regime": "continuous+spot",
+          "unit": "NTU",
+          "spot_count": 15,
+          "continuous_count": 18339,
+          "daily_count": 310,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/30 23:45:00",
+          "summary_value": 31.69389,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 20.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 22.79287,
+              "median": 31.69389,
+              "p75": 50.8946,
+              "max": 528.1
+            }
+          }
+        },
+        "PH": {
+          "regime": "spot",
+          "unit": "pH units",
+          "spot_count": 15,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/15 09:40:00",
+          "date_max": "2024/12/10 11:50:00",
+          "summary_value": 7.37,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.4,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 7.285,
+              "median": 7.37,
+              "p75": 7.725,
+              "max": 8.0
+            }
+          }
+        }
+      }
+    },
+    "405214": {
+      "name": "DELATITE @ TONGA",
+      "active": true,
+      "ers_segment": "Central Foothills and Coastal Plains",
+      "parameters": {
+        "DO": {
+          "regime": "spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/18 10:10:00",
+          "date_max": "2024/12/11 10:20:00",
+          "summary_value": 103.95233,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 70.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 102.622,
+              "median": 103.95233,
+              "p75": 106.33348,
+              "max": 110.02102
+            }
+          }
+        },
+        "TP": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/18 10:10:00",
+          "date_max": "2024/12/11 10:20:00",
+          "summary_value": 0.017,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "upper": 0.05,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.01275,
+              "median": 0.017,
+              "p75": 0.026,
+              "max": 0.044
+            }
+          }
+        },
+        "TURB": {
+          "regime": "spot",
+          "unit": "NTU",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/18 10:10:00",
+          "date_max": "2024/12/11 10:20:00",
+          "summary_value": 5.0,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "upper": 20.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 2.9,
+              "median": 5.0,
+              "p75": 6.05,
+              "max": 13.6
+            }
+          }
+        },
+        "PH": {
+          "regime": "spot",
+          "unit": "pH units",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/18 10:10:00",
+          "date_max": "2024/12/11 10:20:00",
+          "summary_value": 7.4,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.4,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 7.2,
+              "median": 7.4,
+              "p75": 7.6,
+              "max": 7.8
+            }
+          }
+        }
+      }
+    },
+    "405218": {
+      "name": "JAMIESON @ GERRANG",
+      "active": true,
+      "ers_segment": "Uplands B",
+      "parameters": {
+        "DO": {
+          "regime": "continuous",
+          "unit": "% saturation (estimated)",
+          "spot_count": 0,
+          "continuous_count": 34815,
+          "daily_count": 0,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": null,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "unavailable",
+            "objective": {
+              "lower": 85.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": null,
+              "median": null,
+              "p75": null,
+              "max": null
+            }
+          }
+        },
+        "TURB": {
+          "regime": "continuous",
+          "unit": "NTU",
+          "spot_count": 0,
+          "continuous_count": 15492,
+          "daily_count": 36,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/07/24 11:02:20",
+          "summary_value": 16.12305,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 10.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 7.92177,
+              "median": 16.12305,
+              "p75": 34.16068,
+              "max": 131.11979
+            }
+          }
+        }
+      }
+    },
+    "405219": {
+      "name": "GOULBURN @ DOHERTYS",
+      "active": true,
+      "ers_segment": "Uplands B",
+      "parameters": {
+        "DO": {
+          "regime": "spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/18 08:00:00",
+          "date_max": "2024/12/11 08:40:00",
+          "summary_value": 98.98421,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 85.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 98.01526,
+              "median": 98.98421,
+              "p75": 99.88769,
+              "max": 101.78029
+            }
+          }
+        },
+        "TP": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/18 08:00:00",
+          "date_max": "2024/12/11 08:40:00",
+          "summary_value": 0.008,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "upper": 0.025,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.0065,
+              "median": 0.008,
+              "p75": 0.01275,
+              "max": 0.021
+            }
+          }
+        },
+        "TURB": {
+          "regime": "spot",
+          "unit": "NTU",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/18 08:00:00",
+          "date_max": "2024/12/11 08:40:00",
+          "summary_value": 2.35,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "upper": 10.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 1.25,
+              "median": 2.35,
+              "p75": 3.75,
+              "max": 6.5
+            }
+          }
+        },
+        "PH": {
+          "regime": "spot",
+          "unit": "pH units",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/18 08:00:00",
+          "date_max": "2024/12/11 08:40:00",
+          "summary_value": 7.2,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.4,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 7.0,
+              "median": 7.2,
+              "p75": 7.4,
+              "max": 7.5
+            }
+          }
+        }
+      }
+    },
+    "405226": {
+      "name": "PRANJIP @ MOORILIM",
+      "active": true,
+      "ers_segment": "Murray and Western Plains",
+      "parameters": {
+        "DO": {
+          "regime": "continuous",
+          "unit": "% saturation (estimated)",
+          "spot_count": 0,
+          "continuous_count": 35069,
+          "daily_count": 310,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 34.17576,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 75.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 15.40784,
+              "median": 34.17576,
+              "p75": 45.25894,
+              "max": 66.93491
+            }
+          }
+        }
+      }
+    },
+    "405228": {
+      "name": "HUGHES @ TARCOMBE RD",
+      "active": true,
+      "ers_segment": "Central Foothills and Coastal Plains",
+      "parameters": {
+        "DO": {
+          "regime": "continuous",
+          "unit": "% saturation (estimated)",
+          "spot_count": 0,
+          "continuous_count": 34926,
+          "daily_count": 220,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 91.76382,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 70.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 86.88726,
+              "median": 91.76382,
+              "p75": 95.11,
+              "max": 100.2081
+            }
+          }
+        }
+      }
+    },
+    "405232": {
+      "name": "GOULBURB R MCCOYS BR",
+      "active": true,
+      "ers_segment": "Murray and Western Plains",
+      "parameters": {
+        "DO": {
+          "regime": "continuous+spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 12,
+          "continuous_count": 22035,
+          "daily_count": 210,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 92.24603,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 75.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 90.08758,
+              "median": 92.24603,
+              "p75": 94.15722,
+              "max": 100.34856
+            }
+          }
+        },
+        "TN": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/02 10:00:00",
+          "date_max": "2024/12/02 11:30:00",
+          "summary_value": 0.52,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "upper": 0.8,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.41,
+              "median": 0.52,
+              "p75": 0.6025,
+              "max": 0.9
+            }
+          }
+        },
+        "TP": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/02 10:00:00",
+          "date_max": "2024/12/02 11:30:00",
+          "summary_value": 0.073,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 0.055,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.06275,
+              "median": 0.073,
+              "p75": 0.094,
+              "max": 0.13
+            }
+          }
+        },
+        "TURB": {
+          "regime": "spot",
+          "unit": "NTU",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/02 10:00:00",
+          "date_max": "2024/12/02 11:30:00",
+          "summary_value": 32.15,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 25.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 26.675,
+              "median": 32.15,
+              "p75": 42.1,
+              "max": 95.7
+            }
+          }
+        },
+        "PH": {
+          "regime": "continuous+spot",
+          "unit": "pH units",
+          "spot_count": 12,
+          "continuous_count": 18214,
+          "daily_count": 191,
+          "date_min": "2024/01/02 10:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 7.69115,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.5,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 7.55948,
+              "median": 7.69115,
+              "p75": 7.83026,
+              "max": 8.04833
+            }
+          }
+        }
+      }
+    },
+    "405234": {
+      "name": "SEVEN C MCQUINN WEIR",
+      "active": true,
+      "ers_segment": "Central Foothills and Coastal Plains",
+      "parameters": {
+        "DO": {
+          "regime": "spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/10 12:41:00",
+          "date_max": "2024/12/03 12:15:00",
+          "summary_value": 100.58787,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 70.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 98.20625,
+              "median": 100.58787,
+              "p75": 104.10657,
+              "max": 115.12687
+            }
+          }
+        },
+        "TP": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/10 12:41:00",
+          "date_max": "2024/12/03 12:15:00",
+          "summary_value": 0.0625,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 0.05,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.05375,
+              "median": 0.0625,
+              "p75": 0.07925,
+              "max": 0.14
+            }
+          }
+        },
+        "TURB": {
+          "regime": "spot",
+          "unit": "NTU",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/10 12:41:00",
+          "date_max": "2024/12/03 12:15:00",
+          "summary_value": 14.7,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 20.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 11.575,
+              "median": 14.7,
+              "p75": 21.25,
+              "max": 31.5
+            }
+          }
+        },
+        "PH": {
+          "regime": "spot",
+          "unit": "pH units",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/10 12:41:00",
+          "date_max": "2024/12/03 12:15:00",
+          "summary_value": 7.285,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.4,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 6.945,
+              "median": 7.285,
+              "p75": 7.465,
+              "max": 7.63
+            }
+          }
+        }
+      }
+    },
+    "405240": {
+      "name": "SUGARLOAF @ ASH BDG",
+      "active": true,
+      "ers_segment": "Murray and Western Plains",
+      "parameters": {
+        "TURB": {
+          "regime": "continuous",
+          "unit": "NTU",
+          "spot_count": 0,
+          "continuous_count": 35013,
+          "daily_count": 366,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 18.49107,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 25.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 12.09167,
+              "median": 18.49107,
+              "p75": 33.69531,
+              "max": 250.15312
+            }
+          }
+        }
+      }
+    },
+    "405257": {
+      "name": "SNOBS @SNO. HATCHERY",
+      "active": true,
+      "ers_segment": "Central Foothills and Coastal Plains",
+      "parameters": {
+        "TURB": {
+          "regime": "continuous",
+          "unit": "NTU",
+          "spot_count": 0,
+          "continuous_count": 23839,
+          "daily_count": 0,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/09/05 11:00:00",
+          "summary_value": null,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "unavailable",
+            "objective": {
+              "upper": 20.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": null,
+              "median": null,
+              "p75": null,
+              "max": null
+            }
+          }
+        }
+      }
+    },
+    "405259": {
+      "name": "GOULBURN WEIR (H.G.)",
+      "active": true,
+      "ers_segment": "Murray and Western Plains",
+      "parameters": {
+        "DO": {
+          "regime": "continuous",
+          "unit": "% saturation (estimated)",
+          "spot_count": 0,
+          "continuous_count": 35069,
+          "daily_count": 366,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 91.38771,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 75.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 86.32479,
+              "median": 91.38771,
+              "p75": 94.53148,
+              "max": 101.85735
+            }
+          }
+        },
+        "TURB": {
+          "regime": "continuous",
+          "unit": "NTU",
+          "spot_count": 0,
+          "continuous_count": 35021,
+          "daily_count": 320,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 11.57396,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "upper": 25.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 9.00885,
+              "median": 11.57396,
+              "p75": 15.79505,
+              "max": 355.96771
+            }
+          }
+        },
+        "PH": {
+          "regime": "continuous",
+          "unit": "pH units",
+          "spot_count": 0,
+          "continuous_count": 21522,
+          "daily_count": 206,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/09/26 14:35:00",
+          "summary_value": 6.42307,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.5,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 6.09516,
+              "median": 6.42307,
+              "p75": 6.57393,
+              "max": 7.15333
+            }
+          }
+        }
+      }
+    },
+    "405264": {
+      "name": "BIG @ FRENCHMAN",
+      "active": true,
+      "ers_segment": "Uplands A",
+      "parameters": {
+        "DO": {
+          "regime": "spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 11,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/17 11:05:00",
+          "date_max": "2024/12/11 11:20:00",
+          "summary_value": 103.19608,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 90.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 101.50543,
+              "median": 103.19608,
+              "p75": 104.48369,
+              "max": 105.04213
+            }
+          }
+        },
+        "TP": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 11,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/17 11:05:00",
+          "date_max": "2024/12/11 11:20:00",
+          "summary_value": 0.012,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "upper": 0.025,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.0105,
+              "median": 0.012,
+              "p75": 0.0145,
+              "max": 0.033
+            }
+          }
+        },
+        "TURB": {
+          "regime": "spot",
+          "unit": "NTU",
+          "spot_count": 11,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/17 11:05:00",
+          "date_max": "2024/12/11 11:20:00",
+          "summary_value": 3.4,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "upper": 10.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 2.45,
+              "median": 3.4,
+              "p75": 5.15,
+              "max": 9.4
+            }
+          }
+        },
+        "PH": {
+          "regime": "spot",
+          "unit": "pH units",
+          "spot_count": 11,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/17 11:05:00",
+          "date_max": "2024/12/11 11:20:00",
+          "summary_value": 7.0,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.4,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 6.9,
+              "median": 7.0,
+              "p75": 7.2,
+              "max": 7.4
+            }
+          }
+        }
+      }
+    },
+    "405269": {
+      "name": "SEVEN @ KIALLA WEST",
+      "active": true,
+      "ers_segment": "Murray and Western Plains",
+      "parameters": {
+        "DO": {
+          "regime": "continuous",
+          "unit": "% saturation (estimated)",
+          "spot_count": 0,
+          "continuous_count": 33192,
+          "daily_count": 305,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 60.16339,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 75.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 41.01125,
+              "median": 60.16339,
+              "p75": 70.51973,
+              "max": 86.50773
+            }
+          }
+        }
+      }
+    },
+    "405270": {
+      "name": "GOULBURN @ ARCADIA",
+      "active": false,
+      "ers_segment": "Murray and Western Plains",
+      "parameters": {
+        "DO": {
+          "regime": "spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 1,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/23 07:45:00",
+          "date_max": "2024/01/23 07:45:00",
+          "summary_value": 82.24795,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 75.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 82.24795,
+              "median": 82.24795,
+              "p75": 82.24795,
+              "max": 82.24795
+            }
+          }
+        },
+        "TN": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 1,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/23 07:45:00",
+          "date_max": "2024/01/23 07:45:00",
+          "summary_value": 0.6,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "upper": 0.8,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.6,
+              "median": 0.6,
+              "p75": 0.6,
+              "max": 0.6
+            }
+          }
+        },
+        "TP": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 1,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/23 07:45:00",
+          "date_max": "2024/01/23 07:45:00",
+          "summary_value": 0.087,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 0.055,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.087,
+              "median": 0.087,
+              "p75": 0.087,
+              "max": 0.087
+            }
+          }
+        },
+        "TURB": {
+          "regime": "spot",
+          "unit": "NTU",
+          "spot_count": 1,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/23 07:45:00",
+          "date_max": "2024/01/23 07:45:00",
+          "summary_value": 35.5,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 25.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 35.5,
+              "median": 35.5,
+              "p75": 35.5,
+              "max": 35.5
+            }
+          }
+        },
+        "PH": {
+          "regime": "spot",
+          "unit": "pH units",
+          "spot_count": 1,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/23 07:45:00",
+          "date_max": "2024/01/23 07:45:00",
+          "summary_value": 7.01,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.5,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 7.01,
+              "median": 7.01,
+              "p75": 7.01,
+              "max": 7.01
+            }
+          }
+        }
+      }
+    },
+    "405271": {
+      "name": "GOULBURN @ SHEPP",
+      "active": true,
+      "ers_segment": "Murray and Western Plains",
+      "parameters": {
+        "DO": {
+          "regime": "continuous",
+          "unit": "% saturation (estimated)",
+          "spot_count": 0,
+          "continuous_count": 35043,
+          "daily_count": 357,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 91.61912,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 75.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 86.5485,
+              "median": 91.61912,
+              "p75": 95.39553,
+              "max": 105.96817
+            }
+          }
+        }
+      }
+    },
+    "405276": {
+      "name": "GOULBURN @ GARRY",
+      "active": true,
+      "ers_segment": "Murray and Western Plains",
+      "parameters": {
+        "DO": {
+          "regime": "continuous+spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 12,
+          "continuous_count": 35021,
+          "daily_count": 0,
+          "date_min": "2024/01/01 00:05:31",
+          "date_max": "2024/12/30 23:47:24",
+          "summary_value": 95.96916,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 75.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 89.36646,
+              "median": 95.96916,
+              "p75": 97.14266,
+              "max": 104.32023
+            }
+          }
+        },
+        "TN": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/30 13:25:00",
+          "date_max": "2024/12/18 08:20:00",
+          "summary_value": 0.46,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "upper": 0.8,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.36,
+              "median": 0.46,
+              "p75": 0.64,
+              "max": 1.7
+            }
+          }
+        },
+        "TP": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/30 13:25:00",
+          "date_max": "2024/12/18 08:20:00",
+          "summary_value": 0.0565,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 0.055,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.03925,
+              "median": 0.0565,
+              "p75": 0.08825,
+              "max": 0.14
+            }
+          }
+        },
+        "TURB": {
+          "regime": "spot",
+          "unit": "NTU",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/30 13:25:00",
+          "date_max": "2024/12/18 08:20:00",
+          "summary_value": 25.7,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 25.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 20.975,
+              "median": 25.7,
+              "p75": 36.35,
+              "max": 54.0
+            }
+          }
+        },
+        "PH": {
+          "regime": "spot",
+          "unit": "pH units",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/30 13:25:00",
+          "date_max": "2024/12/18 08:20:00",
+          "summary_value": 7.3,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.5,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 7.1,
+              "median": 7.3,
+              "p75": 7.5,
+              "max": 7.7
+            }
+          }
+        }
+      }
+    },
+    "405282": {
+      "name": "GOULBURN R KIRWAN'S",
+      "active": true,
+      "ers_segment": "Murray and Western Plains",
+      "parameters": {
+        "DO": {
+          "regime": "continuous",
+          "unit": "% saturation (estimated)",
+          "spot_count": 0,
+          "continuous_count": 35072,
+          "daily_count": 366,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 89.83254,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 75.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 84.964,
+              "median": 89.83254,
+              "p75": 93.81222,
+              "max": 100.546
+            }
+          }
+        }
+      }
+    },
+    "405297": {
+      "name": "WARRIGAL C @ STEWART",
+      "active": true,
+      "ers_segment": "Murray and Western Plains",
+      "parameters": {
+        "DO": {
+          "regime": "spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 6,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/31 13:16:00",
+          "date_max": "2024/12/17 09:40:00",
+          "summary_value": 75.92852,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 75.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 47.15497,
+              "median": 75.92852,
+              "p75": 86.69394,
+              "max": 121.43435
+            }
+          }
+        },
+        "TN": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 6,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/31 13:16:00",
+          "date_max": "2024/12/17 09:40:00",
+          "summary_value": 4.55,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 0.8,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 4.1,
+              "median": 4.55,
+              "p75": 6.05,
+              "max": 9.7
+            }
+          }
+        },
+        "TP": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 6,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/31 13:16:00",
+          "date_max": "2024/12/17 09:40:00",
+          "summary_value": 1.5,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 0.055,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 1.2,
+              "median": 1.5,
+              "p75": 2.1,
+              "max": 3.2
+            }
+          }
+        },
+        "TURB": {
+          "regime": "spot",
+          "unit": "NTU",
+          "spot_count": 6,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/31 13:16:00",
+          "date_max": "2024/12/17 09:40:00",
+          "summary_value": 53.95,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 25.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 38.25,
+              "median": 53.95,
+              "p75": 62.675,
+              "max": 124.0
+            }
+          }
+        },
+        "PH": {
+          "regime": "spot",
+          "unit": "pH units",
+          "spot_count": 6,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/31 13:16:00",
+          "date_max": "2024/12/17 09:40:00",
+          "summary_value": 7.3,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.5,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 7.225,
+              "median": 7.3,
+              "p75": 7.3225,
+              "max": 7.6
+            }
+          }
+        }
+      }
+    },
+    "405307": {
+      "name": "SEVEN CKS GALLSGAP R",
+      "active": true,
+      "ers_segment": "Central Foothills and Coastal Plains",
+      "parameters": {
+        "DO": {
+          "regime": "continuous",
+          "unit": "% saturation (estimated)",
+          "spot_count": 0,
+          "continuous_count": 34933,
+          "daily_count": 366,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 94.71196,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 70.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 87.94331,
+              "median": 94.71196,
+              "p75": 98.16184,
+              "max": 102.92303
+            }
+          }
+        }
+      }
+    },
+    "405323": {
+      "name": "GOULBURN @ TAHBILK",
+      "active": true,
+      "ers_segment": "Murray and Western Plains",
+      "parameters": {
+        "DO": {
+          "regime": "continuous",
+          "unit": "% saturation (estimated)",
+          "spot_count": 0,
+          "continuous_count": 35036,
+          "daily_count": 366,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 92.95676,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 75.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 89.03687,
+              "median": 92.95676,
+              "p75": 95.94098,
+              "max": 101.60777
+            }
+          }
+        }
+      }
+    },
+    "405335": {
+      "name": "KILMORE CK U/S WWTP",
+      "active": true,
+      "ers_segment": "Central Foothills and Coastal Plains",
+      "parameters": {
+        "DO": {
+          "regime": "continuous",
+          "unit": "% saturation (estimated)",
+          "spot_count": 0,
+          "continuous_count": 34252,
+          "daily_count": 270,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 78.33912,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 70.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 67.52243,
+              "median": 78.33912,
+              "p75": 85.87739,
+              "max": 104.53504
+            }
+          }
+        },
+        "PH": {
+          "regime": "continuous",
+          "unit": "pH units",
+          "spot_count": 0,
+          "continuous_count": 32754,
+          "daily_count": 272,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 7.37677,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.4,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 6.97063,
+              "median": 7.37677,
+              "p75": 7.65091,
+              "max": 8.54146
+            }
+          }
+        }
+      }
+    },
+    "405602": {
+      "name": "LAKE COOPER",
+      "active": true,
+      "ers_segment": "Murray and Western Plains",
+      "parameters": {
+        "DO": {
+          "regime": "spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/15 08:30:00",
+          "date_max": "2024/12/03 07:22:00",
+          "summary_value": 100.85584,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 75.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 93.88182,
+              "median": 100.85584,
+              "p75": 112.45066,
+              "max": 141.22243
+            }
+          }
+        },
+        "TURB": {
+          "regime": "spot",
+          "unit": "NTU",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/15 08:30:00",
+          "date_max": "2024/12/03 07:22:00",
+          "summary_value": 33.1,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 25.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 11.025,
+              "median": 33.1,
+              "p75": 45.35,
+              "max": 71.7
+            }
+          }
+        },
+        "PH": {
+          "regime": "spot",
+          "unit": "pH units",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/15 08:30:00",
+          "date_max": "2024/12/03 07:22:00",
+          "summary_value": 8.95,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.5,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 8.7,
+              "median": 8.95,
+              "p75": 9.1,
+              "max": 10.0
+            }
+          }
+        }
+      }
+    },
+    "405720": {
+      "name": "RODNEY MAIN @ WELLS",
+      "active": true,
+      "ers_segment": "Murray and Western Plains",
+      "parameters": {
+        "DO": {
+          "regime": "spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/31 10:20:00",
+          "date_max": "2024/12/17 11:55:00",
+          "summary_value": 81.27824,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 75.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 76.31156,
+              "median": 81.27824,
+              "p75": 96.07624,
+              "max": 138.25676
+            }
+          }
+        },
+        "TN": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/31 10:20:00",
+          "date_max": "2024/12/17 11:55:00",
+          "summary_value": 2.5,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 0.8,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 2.0,
+              "median": 2.5,
+              "p75": 3.2,
+              "max": 5.4
+            }
+          }
+        },
+        "TP": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/31 10:20:00",
+          "date_max": "2024/12/17 11:55:00",
+          "summary_value": 0.85,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 0.055,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.47,
+              "median": 0.85,
+              "p75": 0.9625,
+              "max": 1.1
+            }
+          }
+        },
+        "TURB": {
+          "regime": "spot",
+          "unit": "NTU",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/31 10:20:00",
+          "date_max": "2024/12/17 11:55:00",
+          "summary_value": 181.0,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 25.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 146.75,
+              "median": 181.0,
+              "p75": 242.25,
+              "max": 369.0
+            }
+          }
+        },
+        "PH": {
+          "regime": "spot",
+          "unit": "pH units",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/31 10:20:00",
+          "date_max": "2024/12/17 11:55:00",
+          "summary_value": 7.65,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.5,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 7.375,
+              "median": 7.65,
+              "p75": 8.15,
+              "max": 9.3
+            }
+          }
+        }
+      }
+    },
+    "405730": {
+      "name": "TOOLAMBA COM. DRAIN",
+      "active": true,
+      "ers_segment": "Murray and Western Plains",
+      "parameters": {
+        "DO": {
+          "regime": "spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 11,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/23 13:03:00",
+          "date_max": "2024/12/17 08:15:00",
+          "summary_value": 77.66944,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 75.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 43.91431,
+              "median": 77.66944,
+              "p75": 96.14368,
+              "max": 104.78726
+            }
+          }
+        },
+        "TN": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 11,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/23 13:03:00",
+          "date_max": "2024/12/17 08:15:00",
+          "summary_value": 2.4,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 0.8,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 1.5,
+              "median": 2.4,
+              "p75": 4.2,
+              "max": 15.0
+            }
+          }
+        },
+        "TP": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 11,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/23 13:03:00",
+          "date_max": "2024/12/17 08:15:00",
+          "summary_value": 0.66,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 0.055,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.365,
+              "median": 0.66,
+              "p75": 0.935,
+              "max": 8.3
+            }
+          }
+        },
+        "TURB": {
+          "regime": "spot",
+          "unit": "NTU",
+          "spot_count": 11,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/23 13:03:00",
+          "date_max": "2024/12/17 08:15:00",
+          "summary_value": 63.4,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 25.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 33.3,
+              "median": 63.4,
+              "p75": 212.25,
+              "max": 839.0
+            }
+          }
+        },
+        "PH": {
+          "regime": "spot",
+          "unit": "pH units",
+          "spot_count": 11,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/23 13:03:00",
+          "date_max": "2024/12/17 08:15:00",
+          "summary_value": 7.2,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.5,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 7.115,
+              "median": 7.2,
+              "p75": 7.445,
+              "max": 7.77
+            }
+          }
+        }
+      }
+    },
+    "405758": {
+      "name": "SHEPPARTON DR NO 12",
+      "active": true,
+      "ers_segment": "Murray and Western Plains",
+      "parameters": {
+        "DO": {
+          "regime": "spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/30 09:50:00",
+          "date_max": "2024/12/18 10:05:00",
+          "summary_value": 42.44537,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 75.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 32.0074,
+              "median": 42.44537,
+              "p75": 65.3242,
+              "max": 92.77397
+            }
+          }
+        },
+        "TN": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/30 09:50:00",
+          "date_max": "2024/12/18 10:05:00",
+          "summary_value": 3.0,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 0.8,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 2.475,
+              "median": 3.0,
+              "p75": 4.0,
+              "max": 5.4
+            }
+          }
+        },
+        "TP": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/30 09:50:00",
+          "date_max": "2024/12/18 10:05:00",
+          "summary_value": 0.945,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 0.055,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.8175,
+              "median": 0.945,
+              "p75": 1.25,
+              "max": 1.9
+            }
+          }
+        },
+        "TURB": {
+          "regime": "spot",
+          "unit": "NTU",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/30 09:50:00",
+          "date_max": "2024/12/18 10:05:00",
+          "summary_value": 141.5,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 25.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 94.475,
+              "median": 141.5,
+              "p75": 324.75,
+              "max": 561.0
+            }
+          }
+        },
+        "PH": {
+          "regime": "spot",
+          "unit": "pH units",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/30 09:50:00",
+          "date_max": "2024/12/18 10:05:00",
+          "summary_value": 7.2,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.5,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 7.1,
+              "median": 7.2,
+              "p75": 7.425,
+              "max": 7.8
+            }
+          }
+        }
+      }
+    },
+    "405779": {
+      "name": "SHEPPARTON DR 11",
+      "active": true,
+      "ers_segment": "Murray and Western Plains",
+      "parameters": {
+        "DO": {
+          "regime": "spot",
+          "unit": "% saturation (estimated)",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/30 08:30:00",
+          "date_max": "2024/12/18 09:25:00",
+          "summary_value": 70.69056,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 75.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 56.43308,
+              "median": 70.69056,
+              "p75": 87.50074,
+              "max": 127.95627
+            }
+          }
+        },
+        "TN": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/30 08:30:00",
+          "date_max": "2024/12/18 09:25:00",
+          "summary_value": 3.55,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 0.8,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 2.625,
+              "median": 3.55,
+              "p75": 4.275,
+              "max": 5.6
+            }
+          }
+        },
+        "TP": {
+          "regime": "spot",
+          "unit": "mg/L",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/30 08:30:00",
+          "date_max": "2024/12/18 09:25:00",
+          "summary_value": 1.04,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 0.055,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 0.795,
+              "median": 1.04,
+              "p75": 1.575,
+              "max": 2.8
+            }
+          }
+        },
+        "TURB": {
+          "regime": "spot",
+          "unit": "NTU",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/30 08:30:00",
+          "date_max": "2024/12/18 09:25:00",
+          "summary_value": 304.0,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 25.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 223.75,
+              "median": 304.0,
+              "p75": 355.25,
+              "max": 515.0
+            }
+          }
+        },
+        "PH": {
+          "regime": "spot",
+          "unit": "pH units",
+          "spot_count": 12,
+          "continuous_count": 0,
+          "daily_count": 0,
+          "date_min": "2024/01/30 08:30:00",
+          "date_max": "2024/12/18 09:25:00",
+          "summary_value": 7.45,
+          "summary_source": "spot observations",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.5,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 7.275,
+              "median": 7.45,
+              "p75": 7.75,
+              "max": 8.3
+            }
+          }
+        }
+      }
+    },
+    "409215": {
+      "name": "MURRAY @ BARMAH",
+      "active": true,
+      "ers_segment": "Murray and Western Plains",
+      "parameters": {
+        "DO": {
+          "regime": "continuous",
+          "unit": "% saturation (estimated)",
+          "spot_count": 0,
+          "continuous_count": 34945,
+          "daily_count": 366,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 94.81865,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "within",
+            "objective": {
+              "lower": 75.0,
+              "upper": 130.0,
+              "lower_stat": "p25",
+              "upper_stat": "max"
+            },
+            "statistics": {
+              "p25": 83.70562,
+              "median": 94.81865,
+              "p75": 97.1989,
+              "max": 105.52976
+            }
+          }
+        },
+        "TURB": {
+          "regime": "continuous",
+          "unit": "NTU",
+          "spot_count": 0,
+          "continuous_count": 34548,
+          "daily_count": 338,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 24.3761,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "upper": 25.0,
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 16.58252,
+              "median": 24.3761,
+              "p75": 31.52656,
+              "max": 52.85789
+            }
+          }
+        },
+        "PH": {
+          "regime": "continuous",
+          "unit": "pH units",
+          "spot_count": 0,
+          "continuous_count": 34945,
+          "daily_count": 352,
+          "date_min": "2024/01/01 00:00:00",
+          "date_max": "2024/12/31 00:00:00",
+          "summary_value": 7.54875,
+          "summary_source": "daily sensor summaries",
+          "ers_assessment": {
+            "status": "outside",
+            "objective": {
+              "lower": 6.4,
+              "upper": 7.5,
+              "lower_stat": "p25",
+              "upper_stat": "p75"
+            },
+            "statistics": {
+              "p25": 7.38977,
+              "median": 7.54875,
+              "p75": 7.70339,
+              "max": 8.00458
+            }
+          }
+        }
+      }
+    }
+  }
+}

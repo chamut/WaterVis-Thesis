@@ -1,0 +1,23 @@
+{
+  "name": "goulburn-water-quality-prototype",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=22.13.0"
+  },
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "data": "python scripts/preprocess.py"
+  },
+  "dependencies": {
+    "d3": "7.9.0",
+    "maplibre-gl": "6.6.0"
+  },
+  "devDependencies": {
+    "@openai/sites-vite-plugin": "^0.2.0",
+    "vite": "8.0.13"
+  },
+  "type": "module"
+}

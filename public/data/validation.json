@@ -1,0 +1,31 @@
+{
+  "source_measurement_rows": 1815091,
+  "target_sites": 33,
+  "ers_sites_assigned": 33,
+  "spot_rows": 967,
+  "daily_rows": 9068,
+  "hourly_rows": 215543,
+  "do_saturation_rows": 473471,
+  "do_unpaired_rows": 70601,
+  "excluded_2025_boundary_rows": 0,
+  "observed_quality_codes": {
+    "1": 975,
+    "2": 627858,
+    "3": 23839,
+    "8": 2355,
+    "11": 7327,
+    "15": 72810,
+    "50": 26043,
+    "76": 1,
+    "100": 11866,
+    "151": 8240,
+    "153": 5285,
+    "161": 42990,
+    "180": 19559,
+    "255": 1
+  },
+  "undefined_quality_codes": [
+    "255"
+  ],
+  "source_files_modified": false
+}
