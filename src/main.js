@@ -3,6 +3,8 @@ import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './styles.css';
 import './compact.css';
+import { createTemporalMap } from './temporal-map.js';
+import { parseMeasurement } from './temporal-map-model.js';
 
 const PARAMETER_COLOURS = {
   DO: '#168aad',
@@ -16,6 +18,7 @@ const state = {
   hoveredSite: null,
   selectedSite: null,
   selectedParameter: 'DO',
+  mapDisplayMode: 'markers',
   detailMode: 'site',
   selectedResolution: 'daily',
   siteSort: 'south-north',
@@ -31,10 +34,7 @@ const STATUS_COLOURS = {
 };
 
 const app = document.querySelector('#app');
-const number = (value) => {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : null;
-};
+const number = parseMeasurement;
 const boolean = (value) => value === true || value === 'true';
 const cellKey = (siteId, parameterCode) => `${siteId}|${parameterCode}`;
 const dateInputFormat = d3.timeFormat('%Y-%m-%d');
@@ -190,7 +190,7 @@ function monthlyContinuous(data, rows) {
         : meanFinite(values, (row) => row.value);
       return {
         ...sample,
-        dateValue: d3.timeMonth.floor(sample.dateValue),
+        dateValue: new Date(Math.max(+state.rangeStart, +d3.timeMonth.floor(sample.dateValue))),
         value: weighted,
         min: d3.min(values, (row) => row.min),
         max: d3.max(values, (row) => row.max),
@@ -217,7 +217,7 @@ function monthlySpot(data, rows) {
       const value = meanFinite(values, (row) => row.value);
       return {
         ...sample,
-        datetimeValue: d3.timeMonth.floor(sample.datetimeValue),
+        datetimeValue: new Date(Math.max(+state.rangeStart, +d3.timeMonth.floor(sample.datetimeValue))),
         value,
         rawValue: meanFinite(values, (row) => row.rawValue),
         temperature: meanFinite(values, (row) => row.temperature),
@@ -234,10 +234,10 @@ function monthlySpot(data, rows) {
   ).flatMap(([, parameters]) => parameters.flatMap(([, months]) => months.map(([, row]) => row)));
 }
 
-function buildTemporalView(data) {
+function buildTemporalView(data, allSites = false) {
   const continuousSource = state.selectedResolution === 'hourly' ? (data.hourly || []) : data.daily;
-  let continuous = continuousSource.filter((row) => state.selectedSites.has(row.site_id) && dateInSelectedRange(row.dateValue));
-  let spot = data.spot.filter((row) => state.selectedSites.has(row.site_id) && dateInSelectedRange(row.datetimeValue));
+  let continuous = continuousSource.filter((row) => (allSites || state.selectedSites.has(row.site_id)) && dateInSelectedRange(row.dateValue));
+  let spot = data.spot.filter((row) => (allSites || state.selectedSites.has(row.site_id)) && dateInSelectedRange(row.datetimeValue));
   if (state.selectedResolution === 'monthly') {
     continuous = monthlyContinuous(data, continuous);
     spot = monthlySpot(data, spot);
@@ -505,7 +505,26 @@ function setupCompactWorkspace(data) {
   parameterMenu.addEventListener('click', (event) => {
     if (event.target.closest('.parameter-button')) parameterMenu.open = false;
   });
+  const mapDisplay = document.createElement('div');
+  mapDisplay.className = 'map-display-toggle';
+  mapDisplay.setAttribute('role', 'group');
+  mapDisplay.setAttribute('aria-label', 'Map display');
+  mapDisplay.innerHTML = '<button type="button" data-map-display="markers" aria-pressed="true">Markers</button><button type="button" data-map-display="temporal" aria-pressed="false">Temporal charts</button>';
+  mapDisplay.addEventListener('click', (event) => {
+    const mode = event.target.dataset.mapDisplay;
+    if (!mode || mode === state.mapDisplayMode) return;
+    state.mapDisplayMode = mode;
+    state.hoveredSite = null;
+    document.querySelector('.map-tooltip').classList.remove('visible');
+    updateLinkedViews(data, { detail: false });
+    data.temporalMap.scheduleLayout();
+  });
   toolbar.append(document.querySelector('.ers-legend-group'));
+  toolbar.append(mapDisplay);
+  const temporalLegend = document.createElement('p');
+  temporalLegend.className = 'temporal-map-legend';
+  temporalLegend.hidden = true;
+  toolbar.append(temporalLegend);
   document.querySelector('.parameter-bar').remove();
   document.querySelector('.masthead .eyebrow').remove();
   document.querySelector('.subtitle').textContent = 'Goulburn basin · 2024';
@@ -780,10 +799,7 @@ function createMap(data) {
       .on('pointerenter focus', (event) => setHoveredSite(data, site.site_id, event))
       .on('pointermove', (event) => positionTooltip(data, site, event))
       .on('pointerleave blur', () => setHoveredSite(data, null))
-      .on('click', (event) => selectSite(data, site.site_id, event, 'site'))
-      .on('keydown', (event) => {
-        if (event.key === 'Enter' || event.key === ' ') selectSite(data, site.site_id, event, 'site');
-      });
+      .on('click', (event) => selectSite(data, site.site_id, event, 'site'));
     return { element, site };
   });
 
@@ -1203,7 +1219,7 @@ function updateLinkedViews(data, { detail = true } = {}) {
       && item?.parameter?.code === parameter;
   });
   data.map.markerEntries.forEach(({ element, site }) => {
-    element.hidden = !state.selectedSites.has(site.site_id);
+    element.hidden = state.mapDisplayMode === 'temporal' || !state.selectedSites.has(site.site_id);
     const group = d3.select(element);
     const record = data.availability.sites[site.site_id]?.parameters?.[parameter];
     group
@@ -1216,6 +1232,7 @@ function updateLinkedViews(data, { detail = true } = {}) {
   data.matrix.rows
     .classed('hovered', (site) => site.site_id === state.hoveredSite)
     .classed('selected', (site) => site.site_id === state.selectedSite);
+  data.temporalMap?.update();
   if (detail) updateDetail(data);
 }
 
@@ -1298,6 +1315,18 @@ async function init() {
     data.temporalView = buildTemporalView(data);
     renderShell(data);
     createMap(data);
+    let allSitesViewKey = null;
+    let allSitesView = null;
+    data.temporalMap = createTemporalMap({
+      data, state, colours: PARAMETER_COLOURS,
+      temporalView: () => {
+        const key = `${state.selectedResolution}|${+state.rangeStart}|${+state.rangeEnd}`;
+        if (key !== allSitesViewKey) { allSitesView = buildTemporalView(data, true); allSitesViewKey = key; }
+        return allSitesView;
+      },
+      onHover: (siteId) => setHoveredSite(data, siteId),
+      onSelect: (siteId, event) => selectPlot(data, siteId, state.selectedParameter, event),
+    });
     createMatrix(data);
     updateLinkedViews(data);
   } catch (error) {
