@@ -22,6 +22,7 @@ const state = {
   detailMode: 'site',
   selectedResolution: 'daily',
   siteSort: 'south-north',
+  matrixCollapsed: false,
   rangeStart: new Date('2024-01-01T00:00:00'),
   rangeEnd: new Date('2024-12-31T23:59:59'),
   selectedSites: new Set(),
@@ -396,7 +397,7 @@ function renderShell(data) {
           </div>
           <div class="chart-key"><span class="line-key"></span>Daily sensor summary <span class="point-key"></span>Spot observation</div>
         </div>
-        <div class="matrix-scroll" tabindex="0" aria-label="Scrollable small-multiple matrix">
+        <div class="matrix-scroll" id="matrix-content" tabindex="0" aria-label="Scrollable small-multiple matrix">
           <div id="matrix"></div>
         </div>
       </section>
@@ -548,6 +549,22 @@ function setupCompactWorkspace(data) {
   sortNote.id = 'site-sort-note';
   sortNote.textContent = 'Position and elevation orders do not establish upstream–downstream connections.';
   matrixPanel.querySelector('.matrix-title-row').after(sortNote);
+  const matrixToggle = document.createElement('button');
+  matrixToggle.type = 'button';
+  matrixToggle.className = 'matrix-toggle';
+  matrixToggle.textContent = 'Minimize';
+  matrixToggle.setAttribute('aria-expanded', 'true');
+  matrixToggle.setAttribute('aria-controls', 'matrix-content');
+  matrixPanel.querySelector('.matrix-title-row').append(matrixToggle);
+  matrixToggle.addEventListener('click', () => {
+    state.matrixCollapsed = !state.matrixCollapsed;
+    document.querySelector('.analysis-workspace').classList.toggle('matrix-collapsed', state.matrixCollapsed);
+    matrixPanel.querySelector('.matrix-scroll').hidden = state.matrixCollapsed;
+    sortNote.hidden = state.matrixCollapsed;
+    matrixToggle.textContent = state.matrixCollapsed ? 'Show panel' : 'Minimize';
+    matrixToggle.setAttribute('aria-expanded', String(!state.matrixCollapsed));
+    data.temporalMap?.scheduleLayout();
+  });
   const select = sortControl.querySelector('select');
   select.value = state.siteSort;
   select.setAttribute('aria-describedby', 'site-sort-note');
@@ -1270,7 +1287,7 @@ function selectSite(data, siteId, event, mode = 'site') {
   state.detailMode = mode;
   updateLinkedViews(data);
   if (state.selectedSite) focusMapOnSite(data, state.selectedSite);
-  if (event?.currentTarget?.classList?.contains('site-marker') && state.selectedSite) {
+  if (state.selectedSite) {
     document.querySelector(`.matrix-row[data-site-id="${siteId}"]`)?.scrollIntoView({ block: 'nearest' });
   }
 }
@@ -1284,7 +1301,10 @@ function selectPlot(data, siteId, parameterCode, event) {
   state.selectedParameter = parameterCode;
   state.detailMode = 'plot';
   updateLinkedViews(data);
-  if (state.selectedSite) focusMapOnSite(data, state.selectedSite);
+  if (state.selectedSite) {
+    focusMapOnSite(data, state.selectedSite);
+    document.querySelector(`.matrix-row[data-site-id="${siteId}"]`)?.scrollIntoView({ block: 'nearest' });
+  }
 }
 
 function positionTooltip(data, site, event) {

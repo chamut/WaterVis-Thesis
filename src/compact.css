@@ -103,6 +103,14 @@ footer { padding:7px 12px; gap:12px; border-top:1px solid var(--line); font-size
 .site-sort-control select:focus-visible { outline:2px solid var(--green); outline-offset:2px; }
 .matrix-title-row { flex-wrap:wrap; }
 .site-sort-note { margin:0; padding:4px 12px; border-bottom:1px solid var(--line); color:var(--muted); font-size:12px; }
+.matrix-toggle { min-height:34px; padding:5px 10px; border:1px solid var(--line); border-radius:4px; background:#fff; color:var(--ink); font:inherit; font-size:12px; cursor:pointer; }
+.matrix-toggle:focus-visible { outline:2px solid var(--green); outline-offset:2px; }
+.analysis-workspace.matrix-collapsed { grid-template-rows:minmax(306px,1fr) auto; }
+.analysis-workspace.detail-above.matrix-collapsed:not(.no-detail) { grid-template-rows:auto 360px auto; }
+@media(max-width:640px) {
+  .analysis-workspace.matrix-collapsed,.analysis-workspace.detail-expanded.matrix-collapsed:not(.no-detail) { grid-template-rows:340px auto auto; }
+  .analysis-workspace.no-detail.matrix-collapsed { grid-template-rows:340px auto; }
+}
 
 /* Keep the ERS dot colour intact; a blue halo identifies linked hover. */
 .site-marker.hovered .site-halo,
