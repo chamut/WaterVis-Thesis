@@ -3,6 +3,9 @@ import * as maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './styles.css';
 import './compact.css';
+import { createSidebarResize } from './sidebar-resize.js';
+import { createSpatialGrid } from './spatial-grid.js';
+import { drawComparison } from './site-comparison.js';
 import { createTemporalMap } from './temporal-map.js';
 import { parseMeasurement } from './temporal-map-model.js';
 
@@ -14,7 +17,12 @@ const PARAMETER_COLOURS = {
   PH: '#2f9e67',
 };
 
+const viewMode = location.pathname.includes('multiparameter-grid-matrix') ? 'multi' : location.pathname.includes('spatial-grid-minimap') ? 'grid' : 'main';
+const isGrid = viewMode !== 'main';
 const state = {
+  selectedParameters: new Set(['DO','TN','TP','TURB','PH']),
+  comparedSites: new Map(),
+  compareMode: false,
   hoveredSite: null,
   selectedSite: null,
   selectedParameter: 'DO',
@@ -77,12 +85,12 @@ function formatObjective(parameter, objective) {
 
 async function loadData() {
   const [sitesRaw, spotRaw, dailyRaw, availability, boundary, validation] = await Promise.all([
-    d3.csv('/data/sites.csv'),
-    d3.csv('/data/spot_observations.csv'),
-    d3.csv('/data/continuous_daily.csv'),
-    d3.json('/data/availability.json'),
-    d3.json('/data/goulburn_boundary.geojson'),
-    d3.json('/data/validation.json'),
+    d3.csv(import.meta.env.BASE_URL + 'data/sites.csv'),
+    d3.csv(import.meta.env.BASE_URL + 'data/spot_observations.csv'),
+    d3.csv(import.meta.env.BASE_URL + 'data/continuous_daily.csv'),
+    d3.json(import.meta.env.BASE_URL + 'data/availability.json'),
+    d3.json(import.meta.env.BASE_URL + 'data/goulburn_boundary.geojson'),
+    d3.json(import.meta.env.BASE_URL + 'data/validation.json'),
   ]);
   if (!sitesRaw.length || !availability?.parameters?.length) {
     throw new Error('The generated site or availability data is empty.');
@@ -146,7 +154,7 @@ async function loadData() {
 
 async function loadHourlyData(data) {
   if (data.hourly) return;
-  const hourlyRaw = await d3.csv('/data/continuous_hourly.csv');
+  const hourlyRaw = await d3.csv(import.meta.env.BASE_URL + 'data/continuous_hourly.csv');
   data.hourly = hourlyRaw.map((row) => ({
     ...row,
     value: number(row.value_mean),
@@ -444,7 +452,11 @@ function renderShell(data) {
     .style('--parameter-colour', (parameter) => PARAMETER_COLOURS[parameter.code])
     .html((parameter) => `<span>${parameter.short_label}</span><small>${parameter.unit}</small>`)
     .on('click', (_, parameter) => {
-      state.selectedParameter = parameter.code;
+      if (viewMode === 'multi') {
+        if (state.selectedParameters.has(parameter.code)) { if (state.selectedParameters.size === 1) return; state.selectedParameters.delete(parameter.code); }
+        else state.selectedParameters.add(parameter.code);
+        if (!state.selectedParameters.has(state.selectedParameter)) state.selectedParameter = [...state.selectedParameters][0];
+      } else state.selectedParameter = parameter.code;
       buttons.attr('aria-pressed', (item) => item.code === state.selectedParameter);
       updateLinkedViews(data);
     });
@@ -504,7 +516,7 @@ function setupCompactWorkspace(data) {
   toolbar.append(document.querySelector('.site-filter-control'));
   const parameterMenu = menu('<span id="compact-parameter">DO · Map</span> ▾', document.querySelector('.parameter-buttons'), 'parameter-menu');
   parameterMenu.addEventListener('click', (event) => {
-    if (event.target.closest('.parameter-button')) parameterMenu.open = false;
+    if (viewMode !== 'multi' && event.target.closest('.parameter-button')) parameterMenu.open = false;
   });
   const mapDisplay = document.createElement('div');
   mapDisplay.className = 'map-display-toggle';
@@ -518,10 +530,22 @@ function setupCompactWorkspace(data) {
     state.hoveredSite = null;
     document.querySelector('.map-tooltip').classList.remove('visible');
     updateLinkedViews(data, { detail: false });
-    data.temporalMap.scheduleLayout();
+    data.temporalMap?.scheduleLayout();
   });
   toolbar.append(document.querySelector('.ers-legend-group'));
   toolbar.append(mapDisplay);
+  mapDisplay.hidden = isGrid;
+  const compare = document.createElement('button');
+  compare.className = 'compare-sites'; compare.type = 'button'; compare.textContent = 'Compare sites · 0/5'; compare.setAttribute('aria-pressed', 'false');
+  compare.onclick = () => { state.compareMode = !state.compareMode; updateLinkedViews(data); };
+  toolbar.append(compare);
+  const links = document.createElement('nav'); links.className = 'view-links'; links.setAttribute('aria-label', 'Views');
+  for (const [mode, path, label] of [['main','','Geographic map'],['grid','previews/spatial-grid-minimap-preview.html','Temporal grid'],['multi','previews/multiparameter-grid-matrix-preview.html','Multi-parameter grid']]) {
+    const link = document.createElement('a'); link.href = import.meta.env.BASE_URL + path; link.textContent = label; if (mode === viewMode) link.setAttribute('aria-current','page'); links.append(link);
+  }
+  toolbar.before(links);
+  if (viewMode === 'grid') { document.querySelector('.analysis-workspace').classList.add('single-grid'); document.querySelector('.matrix-panel').hidden = true; }
+  if (isGrid) document.querySelector('.method-note').innerHTML = '<strong>How to read this</strong><p>Click a site or parameter for temporal detail. Turn on Compare sites to compare up to five sites. Sensor lines and spot observations remain distinct.</p><p>The mini-map dots retain actual geographic coordinates. The rectangle shows the schematic grid viewport; it is not an exact geographic selection boundary.</p>';
   const temporalLegend = document.createElement('p');
   temporalLegend.className = 'temporal-map-legend';
   temporalLegend.hidden = true;
@@ -582,16 +606,22 @@ function setupCompactWorkspace(data) {
   heading.addEventListener('click', (event) => {
     const action = event.target.dataset.detail;
     const workspace = document.querySelector('.analysis-workspace');
-    if (action === 'close') { state.selectedSite = null; updateLinkedViews(data); }
+    if (action === 'close') { state.selectedSite = null; state.compareMode = false; updateLinkedViews(data); }
     if (action === 'expand') {
       const expanded = workspace.classList.toggle('detail-expanded');
+      if (expanded) data.sidebar.expand(); else data.sidebar.setWidth(340);
       event.target.setAttribute('aria-label', expanded ? 'Reduce detail panel' : 'Expand detail panel');
     }
     if (action === 'dock') {
       const above = workspace.classList.toggle('detail-above');
       event.target.setAttribute('aria-label', above ? 'Dock detail to the right' : 'Move detail above map');
     }
-    if (action) requestAnimationFrame(() => { data.map?.map.resize(); updateDetail(data); });
+    if (action) requestAnimationFrame(() => { data.map?.map.resize(); data.grid?.resize(); updateDetail(data); });
+  });
+  data.sidebar = createSidebarResize(document.querySelector('.analysis-workspace'), () => {
+    data.map?.map.resize();
+    data.grid?.resize();
+    if (data.matrix) updateDetail(data);
   });
   const closeMenus = (event) => {
     document.querySelectorAll('.compact-menu[open]').forEach((item) => {
@@ -631,6 +661,8 @@ function updateTemporalSummary(data, message = null) {
 }
 
 function refreshTemporalViews(data) {
+  for (const id of state.comparedSites.keys()) if (!state.selectedSites.has(id)) state.comparedSites.delete(id);
+  if (!state.selectedSites.has(state.hoveredSite)) state.hoveredSite = null;
   data.temporalView = buildTemporalView(data);
   createMatrix(data);
   updateTemporalSummary(data);
@@ -662,6 +694,7 @@ function setupTemporalControls(data) {
   const startInput = document.querySelector('#range-start');
   const endInput = document.querySelector('#range-end');
   const applyRange = (changed) => {
+    if (!startInput.value || !endInput.value || !startInput.checkValidity() || !endInput.checkValidity()) { updateTemporalSummary(data, 'Choose valid dates within 2024.'); return; }
     let start = new Date(`${startInput.value}T00:00:00`);
     let end = new Date(`${endInput.value}T23:59:59`);
     if (start > end) {
@@ -778,7 +811,7 @@ function createMap(data) {
     });
     map.addSource('goulburn-watercourses', {
       type: 'image',
-      url: '/data/goulburn_watercourses.png',
+      url: import.meta.env.BASE_URL + 'data/goulburn_watercourses.png',
       coordinates: [
         [watercourseBounds.west, watercourseBounds.north],
         [watercourseBounds.east, watercourseBounds.north],
@@ -1172,6 +1205,12 @@ function drawDetailChart(data, site, parameter, record) {
 }
 
 function updateDetail(data) {
+  if (state.compareMode) {
+    document.querySelector('.detail-panel').hidden = false;
+    document.querySelector('.analysis-workspace').classList.remove('no-detail');
+    drawComparison({data,state,colours:PARAMETER_COLOURS,onRemove:id=>{state.comparedSites.delete(id);updateLinkedViews(data);}});
+    return;
+  }
   const site = getFocusSite(data);
   const parameter = getParameter(data, state.selectedParameter);
   const detail = document.querySelector('#site-detail');
@@ -1179,7 +1218,7 @@ function updateDetail(data) {
   const closed = !site;
   if (workspace.classList.contains('no-detail') !== closed) {
     workspace.classList.toggle('no-detail', closed);
-    requestAnimationFrame(() => data.map?.map.resize());
+    requestAnimationFrame(() => { data.map?.map.resize(); data.grid?.resize(); });
   }
   document.querySelector('.detail-panel').hidden = closed;
   if (!site) {
@@ -1218,15 +1257,17 @@ function updateDetail(data) {
       <div class="detail-chart-key"><span><i class="daily"></i>${state.selectedResolution === 'monthly' ? 'Monthly mean' : state.selectedResolution === 'hourly' ? 'Hourly mean' : 'Daily mean'}</span><span><i class="spot"></i>${state.selectedResolution === 'monthly' ? 'Monthly spot mean' : 'Spot'}</span><span><i class="objective"></i>ERS objective</span></div>
     </section>` : '<p class="detail-action-hint">Click a matrix plot to open its detailed temporal inspection here.</p>'}
   `;
+  if (isGrid && showPlot) detail.querySelector('.detail-coordinate').after(detail.querySelector('.detail-plot-section'));
   if (showPlot) requestAnimationFrame(() => drawDetailChart(data, site, parameter, record));
 }
 
 function updateLinkedViews(data, { detail = true } = {}) {
   const parameter = state.selectedParameter;
   const currentParameter = getParameter(data, parameter);
-  document.querySelector('#compact-parameter').textContent = `${currentParameter.short_label} · ${currentParameter.unit} · Map`;
+  document.querySelector('#compact-parameter').textContent = viewMode === 'multi' ? `${state.selectedParameters.size} parameters · Grid` : `${currentParameter.short_label} · ${currentParameter.unit}`;
+  const compare = document.querySelector('.compare-sites'); compare.textContent = `Compare sites · ${state.comparedSites.size}/5`; compare.setAttribute('aria-pressed', String(state.compareMode));
   app.style.setProperty('--current-parameter', PARAMETER_COLOURS[parameter]);
-  d3.selectAll('.parameter-button').attr('aria-pressed', (item) => item.code === parameter);
+  d3.selectAll('.parameter-button').attr('aria-pressed', (item) => viewMode === 'multi' ? state.selectedParameters.has(item.code) : item.code === parameter);
   d3.selectAll('.column-heading').classed('selected-parameter', (item) => item.code === parameter);
   d3.selectAll('.chart-cell').classed('selected-parameter', function selectedColumn() {
     return this.dataset.parameter === parameter;
@@ -1235,7 +1276,7 @@ function updateLinkedViews(data, { detail = true } = {}) {
       && item?.site?.site_id === state.selectedSite
       && item?.parameter?.code === parameter;
   });
-  data.map.markerEntries.forEach(({ element, site }) => {
+  data.map?.markerEntries.forEach(({ element, site }) => {
     element.hidden = state.mapDisplayMode === 'temporal' || !state.selectedSites.has(site.site_id);
     const group = d3.select(element);
     const record = data.availability.sites[site.site_id]?.parameters?.[parameter];
@@ -1246,10 +1287,16 @@ function updateLinkedViews(data, { detail = true } = {}) {
     group.select('.site-dot')
       .attr('fill', STATUS_COLOURS[record?.ers_assessment?.status || 'unavailable']);
   });
-  data.matrix.rows
+  data.matrix?.rows
     .classed('hovered', (site) => site.site_id === state.hoveredSite)
-    .classed('selected', (site) => site.site_id === state.selectedSite);
+    .classed('selected', (site) => state.compareMode ? state.comparedSites.has(site.site_id) : site.site_id === state.selectedSite);
   data.temporalMap?.update();
+  data.grid?.update();
+  if (isGrid) {
+    document.querySelector('.ers-legend-group').hidden = true;
+    const legend = document.querySelector('.temporal-map-legend'); legend.hidden = false;
+    legend.textContent = viewMode === 'multi' ? 'Latest in selected period · deviation beyond site objective (bars capped at 160%) · not annual ERS status' : 'Shared value scale · line: sensor · dots: spot';
+  }
   if (detail) updateDetail(data);
 }
 
@@ -1265,6 +1312,7 @@ function setHoveredSite(data, siteId, event = null) {
 }
 
 function focusMapOnSite(data, siteId) {
+  if (data.grid) { requestAnimationFrame(() => data.grid.focus(siteId)); return; }
   const site = data.sites.find((item) => item.site_id === siteId);
   if (!site || !Number.isFinite(site.longitude) || !Number.isFinite(site.latitude)) return;
   // Wait for the detail panel to resize the map before centring the selection.
@@ -1280,8 +1328,16 @@ function focusMapOnSite(data, siteId) {
   });
 }
 
+function toggleComparedSite(data, id) {
+  if (state.comparedSites.has(id)) state.comparedSites.delete(id);
+  else if (state.comparedSites.size < 5) { let slot=0; while ([...state.comparedSites.values()].includes(slot)) slot++; state.comparedSites.set(id,slot); }
+  else { document.querySelector('.compare-sites').textContent = 'Maximum 5 sites — remove one first'; return; }
+  updateLinkedViews(data);
+}
+
 function selectSite(data, siteId, event, mode = 'site') {
   event?.preventDefault();
+  if (state.compareMode) { toggleComparedSite(data, siteId); return; }
   const togglingOff = state.selectedSite === siteId && state.detailMode === mode;
   state.selectedSite = togglingOff ? null : siteId;
   state.detailMode = mode;
@@ -1294,11 +1350,13 @@ function selectSite(data, siteId, event, mode = 'site') {
 
 function selectPlot(data, siteId, parameterCode, event) {
   event?.preventDefault();
+  if (state.compareMode) { toggleComparedSite(data, siteId); return; }
   const togglingOff = state.selectedSite === siteId
     && state.selectedParameter === parameterCode
     && state.detailMode === 'plot';
   state.selectedSite = togglingOff ? null : siteId;
   state.selectedParameter = parameterCode;
+  if (viewMode === 'multi') state.selectedParameters.add(parameterCode);
   state.detailMode = 'plot';
   updateLinkedViews(data);
   if (state.selectedSite) {
@@ -1334,10 +1392,16 @@ async function init() {
     state.selectedSites = new Set(data.sites.filter((site) => site.hasData).map((site) => site.site_id));
     data.temporalView = buildTemporalView(data);
     renderShell(data);
-    createMap(data);
+    if (!isGrid) createMap(data);
     let allSitesViewKey = null;
     let allSitesView = null;
-    data.temporalMap = createTemporalMap({
+    const allTemporal = () => {
+      const key = `${state.selectedResolution}|${+state.rangeStart}|${+state.rangeEnd}`;
+      if (key !== allSitesViewKey) { allSitesView = buildTemporalView(data, true); allSitesViewKey = key; }
+      return allSitesView;
+    };
+    if (isGrid) data.grid = createSpatialGrid({data,state,colours:PARAMETER_COLOURS,multi:viewMode === 'multi',allTemporal,onHover:id=>setHoveredSite(data,id),onSelect:(id,code,event)=>selectPlot(data,id,code,event)});
+    else data.temporalMap = createTemporalMap({
       data, state, colours: PARAMETER_COLOURS,
       temporalView: () => {
         const key = `${state.selectedResolution}|${+state.rangeStart}|${+state.rangeEnd}`;
@@ -1348,6 +1412,7 @@ async function init() {
       onSelect: (siteId, event) => selectPlot(data, siteId, state.selectedParameter, event),
     });
     createMatrix(data);
+    updateTemporalSummary(data);
     updateLinkedViews(data);
   } catch (error) {
     console.error(error);
