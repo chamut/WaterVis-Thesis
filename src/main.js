@@ -1230,6 +1230,17 @@ function updateDetail(data) {
       </div>`;
     return;
   }
+  if (viewMode === 'multi' && state.detailMode !== 'plot') {
+    detail.innerHTML = `
+      <h3>${site.short_name}</h3>
+      <p class="detail-coordinate">Site ${site.site_id} · ${site.ers_segment}</p>
+      <div class="detail-plot-heading"><strong>Temporal threshold states</strong><span>${displayDateFormat(state.rangeStart)}–${displayDateFormat(state.rangeEnd)} · ${state.selectedResolution}</span></div>
+      <div class="multi-detail-overview"></div>
+      <p class="multi-state-legend"><span><i style="background:#c95050"></i>Exceeds</span><span><i style="background:#b8d9c4"></i>Does not exceed</span><span><i class="missing"></i>No data / no objective</span></p>
+      <p class="detail-action-hint">Time runs from bottom to top. Click a parameter to inspect its values. These states screen the selected-resolution data, not annual ERS status.</p>`;
+    data.grid?.renderOverview(detail.querySelector('.multi-detail-overview'), site);
+    return;
+  }
   const siteRecord = data.availability.sites[site.site_id];
   const record = siteRecord?.parameters?.[state.selectedParameter];
   const assessment = record?.ers_assessment;
@@ -1257,6 +1268,14 @@ function updateDetail(data) {
       <div class="detail-chart-key"><span><i class="daily"></i>${state.selectedResolution === 'monthly' ? 'Monthly mean' : state.selectedResolution === 'hourly' ? 'Hourly mean' : 'Daily mean'}</span><span><i class="spot"></i>${state.selectedResolution === 'monthly' ? 'Monthly spot mean' : 'Spot'}</span><span><i class="objective"></i>ERS objective</span></div>
     </section>` : '<p class="detail-action-hint">Click a matrix plot to open its detailed temporal inspection here.</p>'}
   `;
+  if (viewMode === 'multi' && showPlot) {
+    const back = document.createElement('button');
+    back.type = 'button';
+    back.className = 'multi-overview-back';
+    back.textContent = '← All selected parameters';
+    back.onclick = () => { state.detailMode = 'site'; updateLinkedViews(data); };
+    detail.prepend(back);
+  }
   if (isGrid && showPlot) detail.querySelector('.detail-coordinate').after(detail.querySelector('.detail-plot-section'));
   if (showPlot) requestAnimationFrame(() => drawDetailChart(data, site, parameter, record));
 }
@@ -1295,7 +1314,7 @@ function updateLinkedViews(data, { detail = true } = {}) {
   if (isGrid) {
     document.querySelector('.ers-legend-group').hidden = true;
     const legend = document.querySelector('.temporal-map-legend'); legend.hidden = false;
-    legend.textContent = viewMode === 'multi' ? 'Latest in selected period · deviation beyond site objective (bars capped at 160%) · not annual ERS status' : 'Shared value scale · line: sensor · dots: spot';
+    legend.textContent = viewMode === 'multi' ? 'Time ↑ · Red: exceeds · Pale green: does not exceed · Hatched: no data / no objective · screening of selected-resolution values, not annual ERS status' : 'Shared value scale · line: sensor · dots: spot';
   }
   if (detail) updateDetail(data);
 }
@@ -1338,10 +1357,11 @@ function toggleComparedSite(data, id) {
 function selectSite(data, siteId, event, mode = 'site') {
   event?.preventDefault();
   if (state.compareMode) { toggleComparedSite(data, siteId); return; }
-  const togglingOff = state.selectedSite === siteId && state.detailMode === mode;
+  const togglingOff = viewMode !== 'multi' && state.selectedSite === siteId && state.detailMode === mode;
   state.selectedSite = togglingOff ? null : siteId;
   state.detailMode = mode;
   updateLinkedViews(data);
+  document.querySelector('.detail-panel').scrollTop = 0;
   if (state.selectedSite) focusMapOnSite(data, state.selectedSite);
   if (state.selectedSite) {
     document.querySelector(`.matrix-row[data-site-id="${siteId}"]`)?.scrollIntoView({ block: 'nearest' });
@@ -1359,6 +1379,7 @@ function selectPlot(data, siteId, parameterCode, event) {
   if (viewMode === 'multi') state.selectedParameters.add(parameterCode);
   state.detailMode = 'plot';
   updateLinkedViews(data);
+  document.querySelector('.detail-panel').scrollTop = 0;
   if (state.selectedSite) {
     focusMapOnSite(data, state.selectedSite);
     document.querySelector(`.matrix-row[data-site-id="${siteId}"]`)?.scrollIntoView({ block: 'nearest' });
@@ -1400,7 +1421,7 @@ async function init() {
       if (key !== allSitesViewKey) { allSitesView = buildTemporalView(data, true); allSitesViewKey = key; }
       return allSitesView;
     };
-    if (isGrid) data.grid = createSpatialGrid({data,state,colours:PARAMETER_COLOURS,multi:viewMode === 'multi',allTemporal,onHover:id=>setHoveredSite(data,id),onSelect:(id,code,event)=>selectPlot(data,id,code,event)});
+    if (isGrid) data.grid = createSpatialGrid({data,state,colours:PARAMETER_COLOURS,multi:viewMode === 'multi',allTemporal,onHover:id=>setHoveredSite(data,id),onSelect:(id,code,event)=>code==null?selectSite(data,id,event,'site'):selectPlot(data,id,code,event)});
     else data.temporalMap = createTemporalMap({
       data, state, colours: PARAMETER_COLOURS,
       temporalView: () => {

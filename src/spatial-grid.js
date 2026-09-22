@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { GRID_POSITIONS, WORLD, zoomAt, viewportWorld, fitCamera, referenceDeviation } from './grid-navigation.js';
+import { GRID_POSITIONS, WORLD, zoomAt, viewportWorld, fitCamera } from './grid-navigation.js';
 import { sensorSegments, pixelSample, sharedDomain } from './temporal-map-model.js';
 import './spatial-grid.css';
 
@@ -17,8 +17,9 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
  const sites=data.sites.filter(s=>s.hasData),entries=new Map();
  for(const site of sites){
   const card=document.createElement('div');card.className='spatial-card';card.dataset.siteId=site.site_id;
-  const heading=document.createElement('button');heading.className='spatial-card-heading';heading.type='button';heading.textContent=site.short_name+' · '+site.site_id;heading.onclick=e=>{if(!moved)onSelect(site.site_id,state.selectedParameter,e)};
+  const heading=document.createElement('button');heading.className='spatial-card-heading';heading.type='button';heading.textContent=site.short_name+' · '+site.site_id;heading.onclick=e=>{if(!moved)onSelect(site.site_id,multi?null:state.selectedParameter,e)};
   const plot=document.createElement('div');plot.className='spatial-card-plot';card.append(heading,plot);layer.append(card);
+  card.addEventListener('click',e=>{if(multi&&!moved&&!e.target.closest('button'))onSelect(site.site_id,null,e)});
   card.addEventListener('pointerenter',()=>{if(!dragging)onHover(site.site_id)});card.addEventListener('pointerleave',()=>{if(!dragging)onHover(null)});
   card.addEventListener('focusin',e=>{onHover(site.site_id);if(e.target.matches(':focus-visible')){const r=card.getBoundingClientRect(),v=viewport.getBoundingClientRect();if(r.left<v.left||r.right>v.right||r.top<v.top||r.bottom>v.bottom)focus(site.site_id)}});card.addEventListener('focusout',e=>{if(!card.contains(e.relatedTarget))onHover(null)});
   entries.set(site.site_id,{card,plot,site});
@@ -46,7 +47,7 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
   // Draw the boundary above the river raster so it remains legible.
   svg.append('path').datum(data.boundary).attr('class','mini-basin-outline').attr('d',d3.geoPath(projection)).attr('fill','none').attr('stroke','#829e8b').attr('stroke-width',2).attr('stroke-linejoin','round').attr('pointer-events','none');
   frame=svg.append('rect').attr('class','mini-viewport-rectangle').attr('fill','#168aad').attr('fill-opacity',.07).attr('stroke','#168aad').attr('stroke-dasharray','4 3').attr('stroke-width',1.5);
-  dots=svg.selectAll('.mini-site').data(sites).join('circle').attr('class','mini-site').attr('cx',s=>projection([s.longitude,s.latitude])[0]).attr('cy',s=>projection([s.longitude,s.latitude])[1]).attr('stroke','white').attr('stroke-width',1).attr('tabindex',0).attr('role','button').attr('aria-label',s=>s.short_name+'; open details').on('pointerenter',(e,s)=>onHover(s.site_id)).on('pointerleave',()=>onHover(null)).on('click',(e,s)=>{e.stopPropagation();onSelect(s.site_id,state.selectedParameter,e);focus(s.site_id)}).on('keydown',(e,s)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onSelect(s.site_id,state.selectedParameter,e);focus(s.site_id)}});
+  dots=svg.selectAll('.mini-site').data(sites).join('circle').attr('class','mini-site').attr('cx',s=>projection([s.longitude,s.latitude])[0]).attr('cy',s=>projection([s.longitude,s.latitude])[1]).attr('stroke','white').attr('stroke-width',1).attr('tabindex',0).attr('role','button').attr('aria-label',s=>s.short_name+'; open details').on('pointerenter',(e,s)=>onHover(s.site_id)).on('pointerleave',()=>onHover(null)).on('click',(e,s)=>{e.stopPropagation();onSelect(s.site_id,multi?null:state.selectedParameter,e);focus(s.site_id)}).on('keydown',(e,s)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();onSelect(s.site_id,multi?null:state.selectedParameter,e);focus(s.site_id)}});
   updateMini();
  }
  function layout(){
@@ -71,18 +72,23 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
   s.selectAll('.spot').data(spot).join('circle').attr('class','spot').attr('cx',r=>x(r.datetimeValue)).attr('cy',r=>y(r.value)).attr('r',2).attr('fill',colours[code]);
   if(!segments.length&&!spot.length)s.append('text').attr('x',120).attr('y',54).attr('text-anchor','middle').text('No data in selected period');
  }
- function drawGlyph(plot,site,code,view){
-  const observation=view.latestByCell.get(`${site.site_id}|${code}`),objective=data.availability.ers.thresholds[site.ers_segment]?.[code],deviation=referenceDeviation(observation?.value,objective);
-  const p=data.availability.parameters.find(p=>p.code===code),button=document.createElement('button');button.className='spatial-glyph';button.onclick=e=>{if(!moved)onSelect(site.site_id,code,e)};
-  const text=!observation?'No data':deviation===null?'No objective':deviation===0?'Within':d3.format('.2~f')(deviation)+'%';
-  button.setAttribute('aria-label',`${site.short_name}, ${p.label}: ${text}; open temporal detail`);
-  button.title=observation?`${d3.timeFormat('%d %b %Y %H:%M')(observation.date)} · ${d3.format('.4~g')(observation.value)} ${p.unit} · latest in selected period; not annual ERS assessment`:'No data in selected period';plot.append(button);
-  const s=d3.select(button).append('svg').attr('viewBox','0 0 42 112');
-  s.append('line').attr('x1',4).attr('x2',38).attr('y1',81).attr('y2',81).attr('stroke','#adbdb4');
-  if(deviation!==null&&deviation>0){const height=Math.min(deviation,160)/160*55;s.append('rect').attr('x',13).attr('y',81-height).attr('width',16).attr('height',height).attr('fill',colours[code]);}
-  s.append('text').attr('x',21).attr('y',16).attr('text-anchor','middle').text(text);
-  if(deviation===0)s.append('text').attr('x',21).attr('y',68).attr('text-anchor','middle').text('✓');
-  s.append('text').attr('x',21).attr('y',104).attr('text-anchor','middle').text(p.short_label);
+ function drawGlyph(plot,site,code,view,scope="card"){
+  const objective=data.availability.ers.thresholds[site.ers_segment]?.[code],p=data.availability.parameters.find(p=>p.code===code);
+  const button=document.createElement('button');button.className='spatial-glyph';button.setAttribute('aria-label',`${site.short_name}, ${p.label}, temporal threshold states; ${scope==='detail'?'open parameter detail':'open site overview'}`);button.onclick=e=>{if(!moved)onSelect(site.site_id,scope==='detail'?code:null,e)};plot.append(button);
+  const s=d3.select(button).append('svg').attr('viewBox','0 0 42 112'),start=+state.rangeStart,end=+state.rangeEnd+1,interval=state.selectedResolution==='hourly'?d3.timeHour:state.selectedResolution==='monthly'?d3.timeMonth:d3.timeDay;
+  const edges=[start,...interval.range(interval.ceil(new Date(start+1)),new Date(end)).map(Number),end],bins=edges.slice(0,-1).map((a,i)=>({a,b:edges[i+1],values:[],sensor:0,spot:0}));
+  const add=(r,date,source)=>{const t=+date;if(t<start||t>=end||!Number.isFinite(r.value))return;const index=d3.bisectRight(edges,t)-1,bin=bins[index];if(!bin)return;bin.values.push(...[r.value,r.min,r.max].filter(Number.isFinite));bin[source]++};
+  view.continuous.filter(r=>r.site_id===site.site_id&&r.parameter_code===code).forEach(r=>add(r,r.dateValue,'sensor'));
+  view.spot.filter(r=>r.site_id===site.site_id&&r.parameter_code===code).forEach(r=>add(r,r.datetimeValue,'spot'));
+  const y=d3.scaleTime().domain([new Date(start),new Date(end)]).range([98,25]),groups=[];
+  for(const bin of bins){const status=!bin.values.length?'missing':!objective?'unknown':bin.values.some(v=>(Number.isFinite(objective.lower)&&v<objective.lower)||(Number.isFinite(objective.upper)&&v>objective.upper))?'outside':'within',pixel=Math.floor(y(bin.a)),last=groups.at(-1);if(last&&last.pixel===pixel){last.b=bin.b;last.values.push(...bin.values);last.sensor+=bin.sensor;last.spot+=bin.spot;last.count++;if(status==='outside'||last.status==='missing')last.status=status}else groups.push({...bin,status,pixel,count:1})}
+  const patternId=`state-missing-${scope}-${site.site_id}-${code}`,pattern=s.append('defs').append('pattern').attr('id',patternId).attr('width',5).attr('height',5).attr('patternUnits','userSpaceOnUse');pattern.append('rect').attr('width',5).attr('height',5).attr('fill','#edf0ee');pattern.append('path').attr('d','M0,5L5,0').attr('stroke','#aab8b0').attr('stroke-width',1);
+  s.append('rect').attr('x',5).attr('y',2).attr('width',32).attr('height',3).attr('fill',colours[code]);s.append('text').attr('x',21).attr('y',17).attr('text-anchor','middle').text(p.short_label);
+  const fmt=d3.format('.4~g'),dateFmt=d3.timeFormat('%d %b %Y %H:%M'),bounds=objective?[Number.isFinite(objective.lower)?'≥ '+fmt(objective.lower):null,Number.isFinite(objective.upper)?'≤ '+fmt(objective.upper):null].filter(Boolean).join(' and '):'Unavailable';
+  const description=d=>`${site.short_name} · ${p.short_label} · ${dateFmt(new Date(d.a))} — ${dateFmt(new Date(d.b-1))} · ${{outside:'Exceeds',within:'Does not exceed',missing:'No data',unknown:'No objective'}[d.status]} · ${d.values.length?'Range '+fmt(d3.min(d.values))+'–'+fmt(d3.max(d.values))+' '+p.unit:'No observations'} · ${d.sensor} sensor summaries / ${d.spot} spot observations · Bounds ${bounds}${d.count>1?' · '+d.count+' time intervals combined for display':''}`;
+  s.selectAll('.time-state').data(groups).join('rect').attr('class','time-state').attr('x',5).attr('y',d=>y(d.b)).attr('width',32).attr('height',d=>Math.max(.5,y(d.a)-y(d.b)-(bins.length<=31?.4:0))).attr('fill',d=>d.status==='outside'?'#c95050':d.status==='within'?'#b8d9c4':`url(#${patternId})`).on('pointermove',(event,d)=>{button.title=description(d);stage.querySelector('.spatial-status').textContent=description(d)}).append('title').text(description);
+  button.onfocus=()=>{stage.querySelector('.spatial-status').textContent=`${p.label} · ${state.selectedResolution} states · earliest at bottom, latest at top · click for temporal detail`};
+  s.append('text').attr('x',21).attr('y',110).attr('text-anchor','middle').text('Time ↑');
  }
  function update(){
   const codes=multi?[...state.selectedParameters]:[state.selectedParameter];
@@ -109,5 +115,5 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
  miniEl.addEventListener('wheel',e=>{e.preventDefault();const p=point(e),ax=worldX.invert(p.x)*camera.zoom+camera.x,ay=worldY.invert(p.y)*camera.zoom+camera.y;camera=zoomAt(camera,camera.zoom*Math.exp(-e.deltaY*.005),ax,ay);layout()},{passive:false});
  miniEl.addEventListener('keydown',e=>{if(e.target!==miniEl)return;const name={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down','+':'in','-':'out'}[e.key];if(name){e.preventDefault();action(name)}});
  const observer=new ResizeObserver(()=>{drawMini();layout()});observer.observe(viewport);observer.observe(miniEl);
- drawMini();update();return {update,focus,resize:()=>{drawMini();layout()},scheduleLayout:layout};
+ drawMini();update();return {update,focus,renderOverview:(host,site)=>{host.replaceChildren();const view=allTemporal();for(const code of state.selectedParameters)drawGlyph(host,site,code,view,"detail")},resize:()=>{drawMini();layout()},scheduleLayout:layout};
 }
