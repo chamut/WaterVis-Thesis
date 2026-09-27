@@ -128,9 +128,6 @@ footer { padding:7px 12px; gap:12px; border-top:1px solid var(--line); font-size
 .site-marker.hovered .site-dot,
 .site-marker:hover .site-dot,
 .site-marker:focus-visible .site-dot { opacity:1; stroke:white; stroke-width:2; }
-.matrix-row.hovered,
-.matrix-row:hover { background:#e5f4ff; box-shadow:inset 4px 0 #087dcc; }
-.matrix-row.hovered .chart-cell,
-.matrix-row:hover .chart-cell { background:rgba(27, 151, 235, .08); }
-.matrix-row.hovered .row-label,
-.matrix-row:hover .row-label { background:#e5f4ff; }
+.matrix-row.hovered { background:#e5f4ff; box-shadow:inset 4px 0 #087dcc; }
+.matrix-row.hovered .chart-cell { background:rgba(27, 151, 235, .08); }
+.matrix-row.hovered .row-label { background:#e5f4ff; }

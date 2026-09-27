@@ -6,7 +6,7 @@ const WIDTH = 150;
 const HEIGHT = 96;
 const PLOT_HEIGHT = 72;
 const margin = { left: 36, right: 7, top: 5, bottom: 16 };
-const dateLabel = d3.timeFormat('%d %b');
+const dateLabel = d3.timeFormat('%b %Y');
 const numberLabel = d3.format('.3~g');
 
 export function createTemporalMap({ data, state, colours, temporalView, onHover, onSelect }) {
@@ -105,7 +105,7 @@ export function createTemporalMap({ data, state, colours, temporalView, onHover,
       const observations = (spotBySite.get(site.site_id) || []).filter((row) => Number.isFinite(row.value));
       const segments = sensorSegments(rows, state.selectedResolution).map((segment) => pixelSample(segment, x));
       const samples = segments.flat();
-      button.setAttribute('aria-label', `${site.short_name} · ${parameter.label} (${parameter.unit}) · ${dateLabel(state.rangeStart)}–${dateLabel(state.rangeEnd)} ${state.rangeEnd.getFullYear()} · ${state.selectedResolution} · ${samples.length || observations.length ? 'Open temporal detail' : 'No data in selected period'}`);
+      button.setAttribute('aria-label', `${site.short_name} · ${parameter.label} (${parameter.unit}) · ${dateLabel(state.rangeStart)}–${dateLabel(state.rangeEnd)} · ${state.selectedResolution} · ${samples.length || observations.length ? 'Open temporal detail' : 'No data in selected period'}`);
       if (!samples.length && !observations.length) {
         const empty = document.createElement('span');
         empty.className = 'temporal-map-empty';
@@ -130,7 +130,7 @@ export function createTemporalMap({ data, state, colours, temporalView, onHover,
       }
       plot.selectAll('.map-chart-spot').data(observations).join('circle').attr('class', 'map-chart-spot').attr('cx', (row) => x(row.datetimeValue)).attr('cy', (row) => y(row.value)).attr('r', 2);
     }
-    document.querySelector('.temporal-map-legend').textContent = `${parameter.short_label} · ${parameter.unit} · shared scale · line: sensor · dots: spot · dashed: ERS reference`;
+    document.querySelector('.temporal-map-legend').textContent = `${parameter.short_label} · ${parameter.unit} · shared scale · points: aggregated spot observations · dashed: ERS reference`;
   }
 
   function update() {

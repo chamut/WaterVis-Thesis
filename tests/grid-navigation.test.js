@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {GRID_POSITIONS,WORLD,zoomAt,viewportWorld,fitCamera,referenceDeviation} from '../src/grid-navigation.js';
-test('all 33 schematic positions are retained and fall inside the shared world',()=>{assert.equal(GRID_POSITIONS.size,33);for(const [x,y] of GRID_POSITIONS.values()){assert(x>=0&&x<=WORLD.width);assert(y>=0&&y<=WORLD.height)}});
+test('all 24 dataset sites have schematic positions inside the shared world',()=>{assert.equal(GRID_POSITIONS.size,24);for(const [x,y] of GRID_POSITIONS.values()){assert(x>=0&&x<=WORLD.width);assert(y>=0&&y<=WORLD.height)}});
 test('zoom preserves the world point under the pointer and respects limits',()=>{const original={x:-310,y:27,zoom:.7};for(const next of [.001,.3,1.8,10]){const c=zoomAt(original,next,170,90);assert(Math.abs((170-c.x)/c.zoom-(170-original.x)/original.zoom)<1e-8);assert(Math.abs((90-c.y)/c.zoom-(90-original.y)/original.zoom)<1e-8);assert(c.zoom>=.08&&c.zoom<=3)}});
 test('viewport rectangle is the inverse camera, including outside-world extents',()=>{const c={x:100,y:200,zoom:.5};assert.deepEqual(viewportWorld(c,800,400),{x:-200,y:-400,width:1600,height:800});const r=viewportWorld(fitCamera(900,600),900,600);assert(r.width>=WORLD.width);assert(r.height>=WORLD.height)});
 test('threshold glyphs handle lower, upper, range, zero and missing observations',()=>{assert.equal(referenceDeviation(60,{lower:80}),25);assert.equal(referenceDeviation(1.5,{upper:1}),50);assert.equal(referenceDeviation(7,{lower:6.5,upper:8.5}),0);assert(referenceDeviation(9,{lower:6.5,upper:8.5})>0);assert.equal(referenceDeviation(0,{upper:1}),0);assert.equal(referenceDeviation(null,{upper:1}),null);assert.equal(referenceDeviation(8,{}),null)});

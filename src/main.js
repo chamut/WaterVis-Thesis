@@ -28,10 +28,10 @@ const state = {
   selectedParameter: 'DO',
   mapDisplayMode: 'markers',
   detailMode: 'site',
-  selectedResolution: 'daily',
+  selectedResolution: 'monthly',
   siteSort: 'south-north',
   matrixCollapsed: false,
-  rangeStart: new Date('2024-01-01T00:00:00'),
+  rangeStart: new Date('2015-01-01T00:00:00'),
   rangeEnd: new Date('2024-12-31T23:59:59'),
   selectedSites: new Set(),
 };
@@ -48,6 +48,17 @@ const boolean = (value) => value === true || value === 'true';
 const cellKey = (siteId, parameterCode) => `${siteId}|${parameterCode}`;
 const dateInputFormat = d3.timeFormat('%Y-%m-%d');
 const displayDateFormat = d3.timeFormat('%d %b %Y');
+const resolutionLabel = (value) => ({ monthly: 'Monthly', seasonal: 'Seasonal', yearly: 'Yearly' }[value] || value);
+
+function periodDateLabel(date, resolution = state.selectedResolution) {
+  if (resolution === 'yearly') return d3.timeFormat('%Y')(date);
+  if (resolution === 'seasonal') {
+    const season = ({ 11: 'Summer', 2: 'Autumn', 5: 'Winter', 8: 'Spring' })[date.getMonth()] || 'Summer';
+    const year = date.getMonth() === 11 ? date.getFullYear() + 1 : date.getFullYear();
+    return `${season} ${year}`;
+  }
+  return d3.timeFormat('%b %Y')(date);
+}
 
 function formatValue(value) {
   if (!Number.isFinite(value)) return 'No data';
@@ -58,18 +69,22 @@ function formatValue(value) {
 
 function formatObservationTime(observation) {
   if (!observation?.date || Number.isNaN(observation.date.getTime())) return 'Timestamp unavailable';
-  const formatter = observation.precision === 'time'
-    ? d3.timeFormat('%d %b %Y · %H:%M')
-    : observation.precision === 'month'
-      ? d3.timeFormat('%B %Y')
-      : d3.timeFormat('%d %b %Y');
-  return `${observation.source} · ${formatter(observation.date)}`;
+  const formatted = ['monthly', 'seasonal', 'yearly'].includes(observation.precision)
+    ? periodDateLabel(observation.date, observation.precision)
+    : d3.timeFormat('%d %b %Y · %H:%M')(observation.date);
+  return `${observation.source} · ${formatted}`;
 }
 
 function formatStatus(status) {
-  if (status === 'within') return 'Within ERS objective';
-  if (status === 'outside') return 'Outside ERS objective';
-  return 'ERS unavailable';
+  if (status === 'within') return 'Does not exceed reference';
+  if (status === 'outside') return 'Exceeds reference';
+  return 'Reference unavailable';
+}
+
+function formatAnnualStatus(status) {
+  if (status === 'within') return 'Within annual ERS objective';
+  if (status === 'outside') return 'Outside annual ERS objective';
+  return 'Annual ERS unavailable';
 }
 
 function formatObjective(parameter, objective) {
@@ -84,10 +99,9 @@ function formatObjective(parameter, objective) {
 }
 
 async function loadData() {
-  const [sitesRaw, spotRaw, dailyRaw, availability, boundary, validation] = await Promise.all([
+  const [sitesRaw, spotRaw, availability, boundary, validation] = await Promise.all([
     d3.csv(import.meta.env.BASE_URL + 'data/sites.csv'),
     d3.csv(import.meta.env.BASE_URL + 'data/spot_observations.csv'),
-    d3.csv(import.meta.env.BASE_URL + 'data/continuous_daily.csv'),
     d3.json(import.meta.env.BASE_URL + 'data/availability.json'),
     d3.json(import.meta.env.BASE_URL + 'data/goulburn_boundary.geojson'),
     d3.json(import.meta.env.BASE_URL + 'data/validation.json'),
@@ -100,8 +114,9 @@ async function loadData() {
     latitude: number(row.latitude),
     longitude: number(row.longitude),
     active: boolean(row.active),
-    hasData: boolean(row.has_target_data_2024),
+    hasData: boolean(row.has_target_data),
     elevation: number(row.elevation_m),
+    insideBoundary: d3.geoContains(boundary, [number(row.longitude), number(row.latitude)]),
   }));
   const spot = spotRaw.map((row) => ({
     ...row,
@@ -110,32 +125,7 @@ async function loadData() {
     temperature: number(row.temperature_c),
     datetimeValue: new Date(row.datetime),
   }));
-  const daily = dailyRaw.map((row) => ({
-    ...row,
-    value: number(row.value_mean),
-    min: number(row.value_min),
-    max: number(row.value_max),
-    rawValue: number(row.raw_value_mean),
-    temperature: number(row.temperature_c),
-    dateValue: new Date(`${row.date}T12:00:00`),
-    nTotal: number(row.n_total),
-    nUsable: number(row.n_usable),
-    temporalResolution: 'daily',
-  }));
   const latestByCell = new Map();
-  daily.forEach((row) => {
-    if (!Number.isFinite(row.value)) return;
-    const key = cellKey(row.site_id, row.parameter_code);
-    const observation = {
-      value: row.value,
-      unit: row.unit,
-      date: row.dateValue,
-      source: 'Daily sensor mean',
-      precision: 'day',
-      status: row.ers_point_status,
-    };
-    if (!latestByCell.has(key) || observation.date > latestByCell.get(key).date) latestByCell.set(key, observation);
-  });
   spot.forEach((row) => {
     if (!Number.isFinite(row.value)) return;
     const key = cellKey(row.site_id, row.parameter_code);
@@ -149,28 +139,23 @@ async function loadData() {
     };
     if (!latestByCell.has(key) || observation.date > latestByCell.get(key).date) latestByCell.set(key, observation);
   });
-  return { sites, spot, daily, hourly: null, latestByCell, availability, boundary, validation };
-}
-
-async function loadHourlyData(data) {
-  if (data.hourly) return;
-  const hourlyRaw = await d3.csv(import.meta.env.BASE_URL + 'data/continuous_hourly.csv');
-  data.hourly = hourlyRaw.map((row) => ({
-    ...row,
-    value: number(row.value_mean),
-    min: number(row.value_min),
-    max: number(row.value_max),
-    rawValue: number(row.raw_value_mean),
-    temperature: number(row.temperature_c),
-    dateValue: new Date(row.datetime),
-    nTotal: number(row.n_total),
-    nUsable: number(row.n_usable),
-    temporalResolution: 'hourly',
-  }));
+  return { sites, spot, daily: [], hourly: [], latestByCell, availability, boundary, validation };
 }
 
 function dateInSelectedRange(date) {
   return date >= state.rangeStart && date <= state.rangeEnd;
+}
+
+function latestAnnualAssessment(data, siteId, parameterCode) {
+  const annual = data.availability.sites[siteId]?.parameters?.[parameterCode]?.annual_ers_assessments || {};
+  const years = Object.keys(annual).map(Number).filter(Number.isFinite).sort(d3.descending);
+  const eligible = years.find((year) => {
+    const yearStart = new Date(year, 0, 1, 0, 0, 0, 0);
+    const yearEnd = new Date(year, 11, 31, 23, 59, 59, 0);
+    return state.rangeStart <= yearStart && state.rangeEnd >= yearEnd;
+  });
+  return eligible == null ? { year: null, status: 'unavailable', objective: data.availability.ers.thresholds[data.sites.find((site) => site.site_id === siteId)?.ers_segment]?.[parameterCode] }
+    : { year: eligible, ...annual[String(eligible)] };
 }
 
 function meanFinite(rows, accessor) {
@@ -188,37 +173,18 @@ function classifyTemporalValue(data, siteId, parameterCode, value) {
   return 'within';
 }
 
-function monthlyContinuous(data, rows) {
-  return d3.rollups(
-    rows,
-    (values) => {
-      const sample = values[0];
-      const usable = d3.sum(values, (row) => row.nUsable || 0);
-      const weighted = usable
-        ? d3.sum(values, (row) => Number.isFinite(row.value) ? row.value * (row.nUsable || 0) : 0) / usable
-        : meanFinite(values, (row) => row.value);
-      return {
-        ...sample,
-        dateValue: new Date(Math.max(+state.rangeStart, +d3.timeMonth.floor(sample.dateValue))),
-        value: weighted,
-        min: d3.min(values, (row) => row.min),
-        max: d3.max(values, (row) => row.max),
-        rawValue: meanFinite(values, (row) => row.rawValue),
-        temperature: meanFinite(values, (row) => row.temperature),
-        nTotal: d3.sum(values, (row) => row.nTotal || 0),
-        nUsable: usable,
-        daysAggregated: values.length,
-        temporalResolution: 'monthly',
-        ers_point_status: classifyTemporalValue(data, sample.site_id, sample.parameter_code, weighted),
-      };
-    },
-    (row) => row.site_id,
-    (row) => row.parameter_code,
-    (row) => d3.timeMonth.floor(row.dateValue),
-  ).flatMap(([, parameters]) => parameters.flatMap(([, months]) => months.map(([, row]) => row)));
+function temporalBucket(date, resolution) {
+  if (resolution === 'yearly') return d3.timeYear.floor(date);
+  if (resolution === 'seasonal') {
+    const month = date.getMonth();
+    const startMonth = month < 2 ? 11 : month < 5 ? 2 : month < 8 ? 5 : month < 11 ? 8 : 11;
+    const year = month < 2 ? date.getFullYear() - 1 : date.getFullYear();
+    return new Date(year, startMonth, 1);
+  }
+  return d3.timeMonth.floor(date);
 }
 
-function monthlySpot(data, rows) {
+function aggregateSpot(data, rows, resolution) {
   return d3.rollups(
     rows,
     (values) => {
@@ -226,34 +192,31 @@ function monthlySpot(data, rows) {
       const value = meanFinite(values, (row) => row.value);
       return {
         ...sample,
-        datetimeValue: new Date(Math.max(+state.rangeStart, +d3.timeMonth.floor(sample.datetimeValue))),
+        datetimeValue: new Date(Math.max(+state.rangeStart, +temporalBucket(sample.datetimeValue, resolution))),
         value,
+        min: d3.min(values, (row) => row.value),
+        max: d3.max(values, (row) => row.value),
         rawValue: meanFinite(values, (row) => row.rawValue),
         temperature: meanFinite(values, (row) => row.temperature),
         observationCount: values.length,
         quality_code: 'multiple',
         quality_text: `${values.length} spot observations aggregated`,
-        temporalResolution: 'monthly-spot',
+        temporalResolution: `${resolution}-spot`,
         ers_point_status: classifyTemporalValue(data, sample.site_id, sample.parameter_code, value),
       };
     },
     (row) => row.site_id,
     (row) => row.parameter_code,
-    (row) => d3.timeMonth.floor(row.datetimeValue),
-  ).flatMap(([, parameters]) => parameters.flatMap(([, months]) => months.map(([, row]) => row)));
+    (row) => temporalBucket(row.datetimeValue, resolution),
+  ).flatMap(([, parameters]) => parameters.flatMap(([, periods]) => periods.map(([, row]) => row)));
 }
 
 function buildTemporalView(data, allSites = false) {
-  const continuousSource = state.selectedResolution === 'hourly' ? (data.hourly || []) : data.daily;
-  let continuous = continuousSource.filter((row) => (allSites || state.selectedSites.has(row.site_id)) && dateInSelectedRange(row.dateValue));
   let spot = data.spot.filter((row) => (allSites || state.selectedSites.has(row.site_id)) && dateInSelectedRange(row.datetimeValue));
-  if (state.selectedResolution === 'monthly') {
-    continuous = monthlyContinuous(data, continuous);
-    spot = monthlySpot(data, spot);
-  }
+  spot = aggregateSpot(data, spot, state.selectedResolution);
+  const continuous = [];
   const latestByCell = new Map();
-  [...continuous.map((row) => ({ ...row, date: row.dateValue, source: `${state.selectedResolution} sensor summary`, precision: state.selectedResolution === 'hourly' ? 'time' : 'day' })),
-    ...spot.map((row) => ({ ...row, date: row.datetimeValue, source: state.selectedResolution === 'monthly' ? 'Monthly spot mean' : 'Spot observation', precision: state.selectedResolution === 'monthly' ? 'month' : 'time' }))]
+  spot.map((row) => ({ ...row, date: row.datetimeValue, source: `${state.selectedResolution} spot mean`, precision: state.selectedResolution }))
     .forEach((row) => {
       if (!Number.isFinite(row.value)) return;
       const key = cellKey(row.site_id, row.parameter_code);
@@ -296,7 +259,7 @@ function renderShell(data) {
   app.innerHTML = `
     <header class="masthead">
       <div>
-        <p class="eyebrow">Thesis prototype · Goulburn basin · 2024</p>
+        <p class="eyebrow">Thesis prototype · Goulburn basin · 2015–2024</p>
         <h1>Water Quality Explorer</h1>
         <p class="subtitle">Linked spatial overview and site-by-parameter time series</p>
       </div>
@@ -311,7 +274,7 @@ function renderShell(data) {
         </div>
         <span><strong>${parameters.length}</strong> parameters</span>
         <span><strong>${data.validation.spot_rows.toLocaleString()}</strong> spot samples</span>
-        <span><strong>${data.validation.daily_rows.toLocaleString()}</strong> daily summaries</span>
+        <span><strong>10</strong> years</span>
       </div>
     </header>
 
@@ -321,17 +284,17 @@ function renderShell(data) {
         <h2 id="temporal-heading">Temporal view</h2>
       </div>
       <div class="resolution-buttons" role="group" aria-label="Temporal resolution">
-        <button type="button" data-resolution="daily" aria-pressed="true">Daily</button>
-        <button type="button" data-resolution="monthly" aria-pressed="false">Monthly</button>
-        <button type="button" data-resolution="hourly" aria-pressed="false">Hourly</button>
+        <button type="button" data-resolution="monthly" aria-pressed="true">Monthly</button>
+        <button type="button" data-resolution="seasonal" aria-pressed="false">Seasonal</button>
+        <button type="button" data-resolution="yearly" aria-pressed="false">Yearly</button>
       </div>
       <div class="date-range-controls">
-        <label>From<input type="date" id="range-start" min="2024-01-01" max="2024-12-31" value="${dateInputFormat(state.rangeStart)}"></label>
+        <label>From<input type="date" id="range-start" min="2015-01-01" max="2024-12-31" value="${dateInputFormat(state.rangeStart)}"></label>
         <span aria-hidden="true">→</span>
-        <label>To<input type="date" id="range-end" min="2024-01-01" max="2024-12-31" value="${dateInputFormat(state.rangeEnd)}"></label>
-        <button type="button" class="range-reset">Full year</button>
+        <label>To<input type="date" id="range-end" min="2015-01-01" max="2024-12-31" value="${dateInputFormat(state.rangeEnd)}"></label>
+        <button type="button" class="range-reset">Full period</button>
       </div>
-      <p class="temporal-summary" aria-live="polite">Daily · full year 2024</p>
+      <p class="temporal-summary" aria-live="polite">Monthly · 2015–2024</p>
     </section>
 
     <section class="parameter-bar" aria-labelledby="parameter-heading">
@@ -352,9 +315,9 @@ function renderShell(data) {
             <div class="ers-info-section">
               <strong>Condition shown on the map</strong>
               <dl class="ers-info-definitions">
-                <div><dt><i class="within"></i>Within</dt><dd>The required 2024 statistic meets the objective for that site's ERS segment.</dd></div>
-                <div><dt><i class="outside"></i>Outside</dt><dd>At least one required statistic falls beyond the segment objective. This is not an official risk grade.</dd></div>
-                <div><dt><i class="unavailable"></i>Unavailable</dt><dd>No applicable objective or not enough valid observations to make the comparison.</dd></div>
+                <div><dt><i class="within"></i>Within</dt><dd>The latest complete calendar year's required ERS statistic meets the objective for that site's segment.</dd></div>
+                <div><dt><i class="outside"></i>Outside</dt><dd>The latest complete calendar year's required statistic falls beyond the segment objective. This is provisional, not an official assessment.</dd></div>
+                <div><dt><i class="unavailable"></i>Unavailable</dt><dd>No complete selected year, no applicable objective, or fewer than 11 valid observations in that year.</dd></div>
               </dl>
             </div>
             <div class="ers-info-section">
@@ -383,7 +346,7 @@ function renderShell(data) {
             <p class="section-kicker">Spatial overview</p>
             <h2>Goulburn River basin</h2>
           </div>
-          <p class="map-note">Colour compares the selected parameter with its site-specific ERS objective.</p>
+          <p class="map-note">Colour shows the latest complete selected year's provisional ERS assessment; hover also shows the latest aggregated value.</p>
         </div>
         <div class="map-stage">
           <div id="map" role="application" aria-label="Interactive map of monitoring sites in the Goulburn River basin"></div>
@@ -403,7 +366,7 @@ function renderShell(data) {
             <p class="section-kicker">Temporal comparison</p>
             <h2 id="matrix-title">Sites × water-quality parameters</h2>
           </div>
-          <div class="chart-key"><span class="line-key"></span>Daily sensor summary <span class="point-key"></span>Spot observation</div>
+          <div class="chart-key"><span class="point-key"></span>Aggregated spot observations</div>
         </div>
         <div class="matrix-scroll" id="matrix-content" tabindex="0" aria-label="Scrollable small-multiple matrix">
           <div id="matrix"></div>
@@ -416,29 +379,29 @@ function renderShell(data) {
         <div class="method-note">
           <strong>How to read this</strong>
           <p>Click a temporal plot to open its detailed axes. Hover the detailed chart to inspect individual observations.</p>
-          <p>Annual ERS status uses the required percentile statistic; DO saturation is estimated from paired temperature and site elevation.</p>
-          <p>The time controls filter the plots. Map colour remains the full-year provisional ERS comparison.</p>
+          <p>Monthly, seasonal, and yearly values aggregate available spot observations. Empty periods remain missing.</p>
+          <p>ERS comparisons are provisional screening; DO saturation is estimated from paired temperature and site elevation.</p>
         </div>
       </aside>
     </section>
 
     <footer>
-      <span>Source: Goulburn 2024 downloaded observations</span>
+      <span>Source: Goulburn 2015–2024 downloaded spot observations</span>
       <span>${activeCount} active · ${targetSites.length - activeCount} inactive site in this extract</span>
     </footer>
 
     <section class="dataset-ribbon" aria-label="Dataset information">
       <div class="ribbon-title">
         <p class="section-kicker">Dataset snapshot</p>
-        <strong>Goulburn · 2024</strong>
+        <strong>Goulburn · 2015–2024</strong>
       </div>
       <dl class="ribbon-facts">
-        <div><dt>Coverage</dt><dd>1 Jan–31 Dec 2024</dd></div>
+        <div><dt>Coverage</dt><dd>1 Jan 2015–31 Dec 2024</dd></div>
         <div><dt>Monitoring sites</dt><dd>${targetSites.length} (${activeCount} active)</dd></div>
         <div><dt>Source measurements</dt><dd>${data.validation.source_measurement_rows.toLocaleString()} rows</dd></div>
-        <div><dt>Prototype extracts</dt><dd>${data.validation.spot_rows.toLocaleString()} spot · ${data.validation.daily_rows.toLocaleString()} daily · ${data.validation.hourly_rows.toLocaleString()} hourly</dd></div>
+        <div><dt>Usable prototype observations</dt><dd>${data.validation.spot_rows.toLocaleString()} spot records</dd></div>
       </dl>
-      <p class="ribbon-note">Provisional comparison with <a href="${data.availability.ers.source_url}" target="_blank" rel="noreferrer">ERS Table 5.8</a> · all ${data.validation.ers_sites_assigned} displayed sites spatially assigned · DO saturation estimated where temperature is paired · Not a final WQI</p>
+      <p class="ribbon-note">Provisional screening with <a href="${data.availability.ers.source_url}" target="_blank" rel="noreferrer">ERS Table 5.8</a> · all ${data.validation.ers_sites_assigned} displayed sites spatially assigned · DO saturation estimated where temperature is paired · TN uses direct total nitrogen or paired TKN + NOx · Not an official ERS assessment or final WQI</p>
     </section>
   `;
 
@@ -512,7 +475,7 @@ function setupCompactWorkspace(data) {
     toolbar.append(wrapper);
     return wrapper;
   }
-  menu('<span id="compact-period">Daily · 2024</span> ▾', document.querySelector('.temporal-controls'), 'time-menu');
+  menu('<span id="compact-period">Monthly · 2015–2024</span> ▾', document.querySelector('.temporal-controls'), 'time-menu');
   toolbar.append(document.querySelector('.site-filter-control'));
   const parameterMenu = menu('<span id="compact-parameter">DO · Map</span> ▾', document.querySelector('.parameter-buttons'), 'parameter-menu');
   parameterMenu.addEventListener('click', (event) => {
@@ -545,14 +508,14 @@ function setupCompactWorkspace(data) {
   }
   toolbar.before(links);
   if (viewMode === 'grid') { document.querySelector('.analysis-workspace').classList.add('single-grid'); document.querySelector('.matrix-panel').hidden = true; }
-  if (isGrid) document.querySelector('.method-note').innerHTML = '<strong>How to read this</strong><p>Click a site or parameter for temporal detail. Turn on Compare sites to compare up to five sites. Sensor lines and spot observations remain distinct.</p><p>The mini-map dots retain actual geographic coordinates. The rectangle shows the schematic grid viewport; it is not an exact geographic selection boundary.</p>';
+  if (isGrid) document.querySelector('.method-note').innerHTML = '<strong>How to read this</strong><p>Click a site or parameter for temporal detail. Turn on Compare sites to compare up to five sites. Values are means of available spot observations at the selected aggregation.</p><p>The mini-map dots retain actual geographic coordinates. The rectangle shows the schematic grid viewport; it is not an exact geographic selection boundary.</p>';
   const temporalLegend = document.createElement('p');
   temporalLegend.className = 'temporal-map-legend';
   temporalLegend.hidden = true;
   toolbar.append(temporalLegend);
   document.querySelector('.parameter-bar').remove();
   document.querySelector('.masthead .eyebrow').remove();
-  document.querySelector('.subtitle').textContent = 'Goulburn basin · 2024';
+  document.querySelector('.subtitle').textContent = 'Goulburn basin · 2015–2024';
   const snapshot = document.createElement('details');
   snapshot.className = 'compact-dataset';
   snapshot.innerHTML = '<summary>Dataset and methodology</summary>';
@@ -642,9 +605,9 @@ function updateTemporalSummary(data, message = null) {
     summary.textContent = message;
     return;
   }
-  const resolution = state.selectedResolution[0].toUpperCase() + state.selectedResolution.slice(1);
-  const fullYear = dateInputFormat(state.rangeStart) === '2024-01-01' && dateInputFormat(state.rangeEnd) === '2024-12-31';
-  const range = fullYear ? 'full year 2024' : `${displayDateFormat(state.rangeStart)}–${displayDateFormat(state.rangeEnd)}`;
+  const resolution = resolutionLabel(state.selectedResolution);
+  const fullPeriod = dateInputFormat(state.rangeStart) === '2015-01-01' && dateInputFormat(state.rangeEnd) === '2024-12-31';
+  const range = fullPeriod ? '2015–2024' : `${displayDateFormat(state.rangeStart)}–${displayDateFormat(state.rangeEnd)}`;
   const period = document.querySelector('#compact-period');
   if (period) period.textContent = `${resolution} · ${range}`;
   const selectedCount = state.selectedSites.size;
@@ -654,9 +617,7 @@ function updateTemporalSummary(data, message = null) {
   });
   const chartKey = document.querySelector('.chart-key');
   if (chartKey) {
-    const sensorLabel = state.selectedResolution === 'monthly' ? 'Monthly sensor mean' : `${resolution} sensor summary`;
-    const spotLabel = state.selectedResolution === 'monthly' ? 'Monthly spot mean' : 'Spot observation';
-    chartKey.innerHTML = `<span class="line-key"></span>${sensorLabel} <span class="point-key"></span>${spotLabel}`;
+    chartKey.innerHTML = `<span class="point-key"></span>${resolution} mean of available spot observations`;
   }
 }
 
@@ -671,22 +632,9 @@ function refreshTemporalViews(data) {
 
 function setupTemporalControls(data) {
   const resolutionButtons = document.querySelectorAll('[data-resolution]');
-  resolutionButtons.forEach((button) => button.addEventListener('click', async () => {
+  resolutionButtons.forEach((button) => button.addEventListener('click', () => {
     const nextResolution = button.dataset.resolution;
     if (nextResolution === state.selectedResolution) return;
-    if (nextResolution === 'hourly' && !data.hourly) {
-      resolutionButtons.forEach((item) => { item.disabled = true; });
-      updateTemporalSummary(data, 'Loading the hourly extract…');
-      try {
-        await loadHourlyData(data);
-      } catch (error) {
-        console.error(error);
-        updateTemporalSummary(data, 'Hourly data could not be loaded. Daily view retained.');
-        resolutionButtons.forEach((item) => { item.disabled = false; });
-        return;
-      }
-      resolutionButtons.forEach((item) => { item.disabled = false; });
-    }
     state.selectedResolution = nextResolution;
     refreshTemporalViews(data);
   }));
@@ -694,7 +642,7 @@ function setupTemporalControls(data) {
   const startInput = document.querySelector('#range-start');
   const endInput = document.querySelector('#range-end');
   const applyRange = (changed) => {
-    if (!startInput.value || !endInput.value || !startInput.checkValidity() || !endInput.checkValidity()) { updateTemporalSummary(data, 'Choose valid dates within 2024.'); return; }
+    if (!startInput.value || !endInput.value || !startInput.checkValidity() || !endInput.checkValidity()) { updateTemporalSummary(data, 'Choose valid dates from 2015 through 2024.'); return; }
     let start = new Date(`${startInput.value}T00:00:00`);
     let end = new Date(`${endInput.value}T23:59:59`);
     if (start > end) {
@@ -715,7 +663,7 @@ function setupTemporalControls(data) {
   startInput.addEventListener('change', () => applyRange('start'));
   endInput.addEventListener('change', () => applyRange('end'));
   document.querySelector('.range-reset').addEventListener('click', () => {
-    startInput.value = '2024-01-01';
+    startInput.value = '2015-01-01';
     endInput.value = '2024-12-31';
     applyRange('reset');
   });
@@ -929,12 +877,13 @@ function createMatrix(data) {
     .data(sites, (site) => site.site_id)
     .join('div')
     .attr('class', 'matrix-row matrix-grid')
-    .attr('data-site-id', (site) => site.site_id);
+    .attr('data-site-id', (site) => site.site_id)
+    .on('pointerenter focusin', (event, site) => setHoveredSite(data, site.site_id, event))
+    .on('pointerleave', () => setHoveredSite(data, null))
+    .on('focusout', function(event) { if (!this.contains(event.relatedTarget)) setHoveredSite(data, null); });
   rows.append('button')
     .attr('type', 'button')
     .attr('class', 'row-label')
-    .on('pointerenter focus', (event, site) => setHoveredSite(data, site.site_id, event))
-    .on('pointerleave blur', () => setHoveredSite(data, null))
     .on('click', (event, site) => selectSite(data, site.site_id, event, 'site'))
     .html((site) => `<strong>${site.short_name}</strong><span>${site.site_id}${site.active ? '' : ' · inactive'}</span>`);
 
@@ -952,8 +901,6 @@ function createMatrix(data) {
       .attr('data-parameter', ({ parameter }) => parameter.code)
       .style('--parameter-colour', ({ parameter }) => PARAMETER_COLOURS[parameter.code])
       .attr('aria-label', ({ site: itemSite, parameter }) => `Inspect ${parameter.label} at ${itemSite.short_name}`)
-      .on('pointerenter focus', (event, item) => setHoveredSite(data, item.site.site_id, event))
-      .on('pointerleave blur', () => setHoveredSite(data, null))
       .on('click', (event, item) => selectPlot(data, item.site.site_id, item.parameter.code, event));
 
     cells.each(function drawCell({ site: currentSite, parameter }) {
@@ -1049,6 +996,9 @@ function getCellSeries(data, siteId, parameterCode) {
 
 function assessmentText(parameter, assessment) {
   if (!assessment?.statistics) return 'No usable observations';
+  if (assessment.status === 'unavailable' && assessment.sample_count < (assessment.minimum_count || 11)) {
+    return `${assessment.sample_count || 0} observations · at least ${assessment.minimum_count || 11} required`;
+  }
   const stats = assessment.statistics;
   if (parameter.code === 'DO') return `P25 ${formatValue(stats.p25)} · max ${formatValue(stats.max)}`;
   if (parameter.code === 'PH') return `P25 ${formatValue(stats.p25)} · P75 ${formatValue(stats.p75)}`;
@@ -1058,22 +1008,13 @@ function assessmentText(parameter, assessment) {
 function detailPointHtml(observation, parameter) {
   const date = observation.dateValue || observation.datetimeValue;
   const resolution = observation.temporalResolution;
-  const source = observation.dateValue
-    ? `${resolution === 'monthly' ? 'Monthly' : resolution === 'hourly' ? 'Hourly' : 'Daily'} sensor summary`
-    : resolution === 'monthly-spot' ? 'Monthly spot mean' : 'Spot observation';
-  const dateText = resolution === 'monthly' || resolution === 'monthly-spot'
-    ? d3.timeFormat('%B %Y')(date)
-    : resolution === 'hourly' || !observation.dateValue
-      ? d3.timeFormat('%d %b %Y · %H:%M')(date)
-      : d3.timeFormat('%d %b %Y')(date);
+  const aggregation = resolution?.replace('-spot', '') || state.selectedResolution;
+  const source = `${resolutionLabel(aggregation)} mean of available spot observations`;
+  const dateText = periodDateLabel(date, aggregation);
   const raw = parameter.code === 'DO' && Number.isFinite(observation.rawValue)
     ? `<span>Measured ${formatValue(observation.rawValue)} ${observation.raw_unit}${Number.isFinite(observation.temperature) ? ` · ${formatValue(observation.temperature)} °C` : ''}</span>`
     : '';
-  const sample = observation.dateValue
-    ? `<span>${observation.nUsable.toLocaleString()} usable sensor records${observation.daysAggregated ? ` across ${observation.daysAggregated} days` : ''}</span>`
-    : observation.temporalResolution === 'monthly-spot'
-      ? `<span>${observation.observationCount} spot observations aggregated</span>`
-      : `<span>Quality ${observation.quality_code}: ${observation.quality_text}</span>`;
+  const sample = `<span>${observation.observationCount || 1} spot observation${observation.observationCount === 1 ? '' : 's'} aggregated</span>`;
   return `<strong>${formatValue(observation.value)} ${parameter.unit}</strong><time>${dateText}</time><span>${source}</span>${raw}${sample}<em class="${observation.ers_point_status}">${formatStatus(observation.ers_point_status)}</em>`;
 }
 
@@ -1111,7 +1052,7 @@ function drawDetailChart(data, site, parameter, record) {
     .attr('role', 'img')
     .attr('aria-label', `${parameter.label} observations at ${site.short_name} from ${displayDateFormat(state.rangeStart)} to ${displayDateFormat(state.rangeEnd)}`);
   svg.append('title').text(`${parameter.label} at ${site.short_name}`);
-  svg.append('desc').text('Daily sensor summaries and spot observations compared with the applicable ERS objective.');
+  svg.append('desc').text('Aggregated spot observations compared with the applicable ERS objective.');
 
   if (Number.isFinite(objective?.lower) && Number.isFinite(objective?.upper)) {
     svg.append('rect')
@@ -1134,11 +1075,7 @@ function drawDetailChart(data, site, parameter, record) {
   svg.append('g')
     .attr('class', 'detail-axis')
     .attr('transform', `translate(0,${height - margin.bottom})`)
-    .call(d3.axisBottom(x).ticks(width < 310 ? 3 : 4).tickFormat(
-      state.selectedResolution === 'hourly' && state.rangeEnd - state.rangeStart <= 1000 * 60 * 60 * 24 * 10
-        ? d3.timeFormat('%d %b %H:%M')
-        : d3.timeFormat('%b'),
-    ));
+    .call(d3.axisBottom(x).ticks(width < 310 ? 3 : 5).tickFormat(state.selectedResolution === 'yearly' ? d3.timeFormat('%Y') : d3.timeFormat('%b %Y')));
   svg.append('g')
     .attr('class', 'detail-axis')
     .attr('transform', `translate(${margin.left},0)`)
@@ -1231,9 +1168,10 @@ function updateDetail(data) {
     return;
   }
   if (viewMode === 'multi' && state.detailMode !== 'plot') {
+    const boundaryNote = site.insideBoundary ? '' : ' · Outside displayed basin polygon';
     detail.innerHTML = `
       <h3>${site.short_name}</h3>
-      <p class="detail-coordinate">Site ${site.site_id} · ${site.ers_segment}</p>
+      <p class="detail-coordinate">Site ${site.site_id} · ${site.ers_segment}${boundaryNote}</p>
       <div class="detail-plot-heading"><strong>Temporal threshold states</strong><span>${displayDateFormat(state.rangeStart)}–${displayDateFormat(state.rangeEnd)} · ${state.selectedResolution}</span></div>
       <div class="multi-detail-overview"></div>
       <p class="multi-state-legend"><span><i style="background:#c95050"></i>Exceeds</span><span><i style="background:#b8d9c4"></i>Does not exceed</span><span><i class="missing"></i>No data / no objective</span></p>
@@ -1243,13 +1181,14 @@ function updateDetail(data) {
   }
   const siteRecord = data.availability.sites[site.site_id];
   const record = siteRecord?.parameters?.[state.selectedParameter];
-  const assessment = record?.ers_assessment;
+  const assessment = latestAnnualAssessment(data, site.site_id, state.selectedParameter);
   const status = assessment?.status || 'unavailable';
   const showPlot = state.detailMode === 'plot';
+  const boundaryNote = site.insideBoundary ? '' : ' · Outside displayed basin polygon';
   detail.innerHTML = `
-    <div class="detail-status"><span class="condition-pill ${status}">${formatStatus(status)}</span><span>Site ${site.site_id}</span></div>
+    <div class="detail-status"><span class="condition-pill ${status}">${formatAnnualStatus(status)}</span><span>Site ${site.site_id}</span></div>
     <h3>${site.short_name}</h3>
-    <p class="detail-coordinate">${site.ers_segment} · ${site.latitude.toFixed(4)}°, ${site.longitude.toFixed(4)}°</p>
+    <p class="detail-coordinate">${site.ers_segment} · ${site.latitude.toFixed(4)}°, ${site.longitude.toFixed(4)}°${boundaryNote}</p>
     <div class="detail-reading">
       <span>${parameter.label}</span>
       <strong>${record ? formatValue(record.summary_value) : 'No data'} <small>${record?.unit || parameter.unit}</small></strong>
@@ -1257,15 +1196,13 @@ function updateDetail(data) {
     </div>
     ${record ? `<dl class="availability-list">
       <div><dt>ERS objective</dt><dd>${formatObjective(parameter, assessment.objective)}</dd></div>
-      <div><dt>Annual statistic</dt><dd>${assessmentText(parameter, assessment)}</dd></div>
+      <div><dt>${assessment.year ? `${assessment.year} annual ERS statistic` : 'Annual ERS statistic'}</dt><dd>${assessmentText(parameter, assessment)}</dd></div>
       <div><dt>Spot samples</dt><dd>${record.spot_count.toLocaleString()}</dd></div>
-      <div><dt>Sensor records</dt><dd>${record.continuous_count.toLocaleString()}</dd></div>
-      <div><dt>Daily summaries</dt><dd>${record.daily_count.toLocaleString()}</dd></div>
     </dl>` : ''}
     ${showPlot ? `<section class="detail-plot-section">
       <div class="detail-plot-heading"><strong>Temporal detail</strong><span>${displayDateFormat(state.rangeStart)}–${displayDateFormat(state.rangeEnd)} · hover to inspect</span></div>
       <div id="detail-chart"></div>
-      <div class="detail-chart-key"><span><i class="daily"></i>${state.selectedResolution === 'monthly' ? 'Monthly mean' : state.selectedResolution === 'hourly' ? 'Hourly mean' : 'Daily mean'}</span><span><i class="spot"></i>${state.selectedResolution === 'monthly' ? 'Monthly spot mean' : 'Spot'}</span><span><i class="objective"></i>ERS objective</span></div>
+      <div class="detail-chart-key"><span><i class="spot"></i>${resolutionLabel(state.selectedResolution)} spot mean</span><span><i class="objective"></i>ERS objective</span></div>
     </section>` : '<p class="detail-action-hint">Click a matrix plot to open its detailed temporal inspection here.</p>'}
   `;
   if (viewMode === 'multi' && showPlot) {
@@ -1277,7 +1214,7 @@ function updateDetail(data) {
     detail.prepend(back);
   }
   if (isGrid && showPlot) detail.querySelector('.detail-coordinate').after(detail.querySelector('.detail-plot-section'));
-  if (showPlot) requestAnimationFrame(() => drawDetailChart(data, site, parameter, record));
+  if (showPlot) requestAnimationFrame(() => drawDetailChart(data, site, parameter, record ? { ...record, ers_assessment: assessment } : record));
 }
 
 function updateLinkedViews(data, { detail = true } = {}) {
@@ -1298,13 +1235,14 @@ function updateLinkedViews(data, { detail = true } = {}) {
   data.map?.markerEntries.forEach(({ element, site }) => {
     element.hidden = state.mapDisplayMode === 'temporal' || !state.selectedSites.has(site.site_id);
     const group = d3.select(element);
-    const record = data.availability.sites[site.site_id]?.parameters?.[parameter];
+    const assessment = latestAnnualAssessment(data, site.site_id, parameter);
+    const status = assessment.status;
     group
       .classed('hovered', site.site_id === state.hoveredSite)
       .classed('selected', site.site_id === state.selectedSite)
-      .classed('unavailable', !record || record.ers_assessment?.status === 'unavailable');
+      .classed('unavailable', status === 'unavailable');
     group.select('.site-dot')
-      .attr('fill', STATUS_COLOURS[record?.ers_assessment?.status || 'unavailable']);
+      .attr('fill', STATUS_COLOURS[status]);
   });
   data.matrix?.rows
     .classed('hovered', (site) => site.site_id === state.hoveredSite)
@@ -1314,7 +1252,7 @@ function updateLinkedViews(data, { detail = true } = {}) {
   if (isGrid) {
     document.querySelector('.ers-legend-group').hidden = true;
     const legend = document.querySelector('.temporal-map-legend'); legend.hidden = false;
-    legend.textContent = viewMode === 'multi' ? 'Time ↑ · Red: exceeds · Pale green: does not exceed · Hatched: no data / no objective · screening of selected-resolution values, not annual ERS status' : 'Shared value scale · line: sensor · dots: spot';
+    legend.textContent = viewMode === 'multi' ? 'Time ↑ · Red: exceeds · Pale green: does not exceed · Hatched: no data / no objective · provisional screening of aggregated spot observations' : 'Shared value and time scales · points: aggregated spot observations';
   }
   if (detail) updateDetail(data);
 }
@@ -1393,14 +1331,14 @@ function positionTooltip(data, site, event) {
   const bounds = mapStage.getBoundingClientRect();
   const latest = (data.temporalView?.latestByCell || data.latestByCell).get(cellKey(site.site_id, state.selectedParameter));
   const parameter = getParameter(data, state.selectedParameter);
-  const record = data.availability.sites[site.site_id]?.parameters?.[state.selectedParameter];
-  const status = record?.ers_assessment?.status || 'unavailable';
+  const assessment = latestAnnualAssessment(data, site.site_id, state.selectedParameter);
+  const status = assessment.status;
   tooltip.innerHTML = `
     <strong>${site.short_name}</strong>
     <span>${parameter.short_label}: ${latest ? `${formatValue(latest.value)} ${latest.unit}` : 'No data'}</span>
     <time>${latest ? formatObservationTime(latest) : 'No observation timestamp'}</time>
-    <span>${site.ers_segment}</span>
-    <em class="${status}">${formatStatus(status)}</em>`;
+    <span>${site.ers_segment}${site.insideBoundary ? '' : ' · Outside displayed basin polygon'}</span>
+    <em class="${status}">${assessment.year ? `${assessment.year} · ${formatAnnualStatus(status)}` : formatAnnualStatus(status)}</em>`;
   const x = Math.min(event.clientX - bounds.left + 14, bounds.width - 210);
   const y = Math.max(event.clientY - bounds.top - 16, 16);
   tooltip.style.transform = `translate(${x}px, ${y}px)`;

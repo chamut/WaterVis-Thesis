@@ -36,7 +36,7 @@ export function drawComparison({data,state,colours,onRemove}) {
    if(!s.rows.length) reading.textContent='No data in selected period';
    else {
     const r=s.rows[d3.bisector(r=>r.dateValue||r.datetimeValue).center(s.rows,date)];
-    reading.textContent=d3.format('.4~g')(r.value)+' '+p.unit+' · '+d3.timeFormat('%d %b %Y %H:%M')(r.dateValue||r.datetimeValue)+' · '+(r.dateValue?'sensor':'spot');
+    reading.textContent=d3.format('.4~g')(r.value)+' '+p.unit+' · '+d3.timeFormat('%b %Y')(r.dateValue||r.datetimeValue)+' · aggregated spot observations';
    }
    line.append(name,reading);tip.append(line);
   }

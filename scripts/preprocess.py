@@ -1,4 +1,4 @@
-"""Build browser-sized Goulburn 2024 files without modifying the downloads."""
+"""Build browser-sized Goulburn 2015–2024 spot-data files without changing the download."""
 
 from __future__ import annotations
 
@@ -16,11 +16,12 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 WORKSPACE_ROOT = PROJECT_ROOT.parent
-SOURCE_DIR = WORKSPACE_ROOT / "Data" / "goulburn 2024 additional"
+SOURCE_DIR = WORKSPACE_ROOT / "Data" / "goulburn 10 years 8"
 ERS_DIR = WORKSPACE_ROOT / "Data" / "ERS data vic"
 BOUNDARY_ARCHIVE = WORKSPACE_ROOT / "Data" / "Basin boundaries.zip"
 OUTPUT_DIR = PROJECT_ROOT / "public" / "data"
-TARGET_YEAR = "2024"
+STUDY_START = datetime(2015, 1, 1)
+STUDY_END = datetime(2024, 12, 31, 23, 59, 59)
 
 PARAMETERS = {
     "DO": {"label": "Dissolved oxygen saturation", "short_label": "DO", "unit": "% saturation (estimated)", "ers_statistic": "25th percentile and maximum"},
@@ -86,6 +87,18 @@ def canonical_parameter(name: str) -> str | None:
     if lower == "ph":
         return "PH"
     return None
+
+
+def normalise_site_id(value: str) -> str:
+    return value.strip().strip('"').strip()
+
+
+def valid_for_display(row: dict) -> bool:
+    try:
+        quality = int(row["Quality"].strip())
+    except (TypeError, ValueError):
+        return False
+    return quality < 151 and row["Qualifier"].strip().upper() != "NV"
 
 
 def parse_dms(value: str) -> float:
@@ -230,11 +243,11 @@ def classify_point(segment: str, parameter_code: str, value: float | None) -> st
     return "within"
 
 
-def assess_series(segment: str, parameter_code: str, values: list[float]) -> dict:
+def assess_series(segment: str, parameter_code: str, values: list[float], minimum_count: int = 1) -> dict:
     objective = ERS_THRESHOLDS.get(segment, {}).get(parameter_code)
     stats = {"p25": quantile(values, 0.25), "median": quantile(values, 0.5), "p75": quantile(values, 0.75), "max": max(values) if values else None}
-    if not objective or not values:
-        return {"status": "unavailable", "objective": objective, "statistics": stats}
+    if not objective or len(values) < minimum_count:
+        return {"status": "unavailable", "objective": objective, "statistics": stats, "sample_count": len(values), "minimum_count": minimum_count}
     passes = True
     if "lower" in objective:
         passes &= stats[objective["lower_stat"]] >= objective["lower"]
@@ -244,6 +257,8 @@ def assess_series(segment: str, parameter_code: str, values: list[float]) -> dic
         "status": "within" if passes else "outside",
         "objective": objective,
         "statistics": {key: None if value is None else round(value, 5) for key, value in stats.items()},
+        "sample_count": len(values),
+        "minimum_count": minimum_count,
     }
 
 
@@ -320,7 +335,7 @@ def extract_goulburn_boundary() -> dict:
 
 def write_csv(path: Path, fieldnames: list[str], rows: list[dict]) -> None:
     with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames, extrasaction="ignore")
+        writer = csv.DictWriter(handle, fieldnames=fieldnames, extrasaction="ignore", lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 
@@ -333,160 +348,135 @@ def main() -> None:
 
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     metadata_rows = list(read_csv(SOURCE_DIR / "SW Metadata.csv"))
-    metadata_by_site = {row["Site ID"].strip(): row for row in metadata_rows}
+    metadata_by_site = {normalise_site_id(row["Site ID"]): row for row in metadata_rows}
     quality_definitions = {row["Quality"].strip(): row["Text"].strip() for row in read_csv(SOURCE_DIR / "Quality codes.csv")}
     ers_features = load_ers_features()
     site_context = {}
     for row in metadata_rows:
-        site_id = row["Site ID"].strip()
+        site_id = normalise_site_id(row["Site ID"])
         latitude = parse_dms(row["Latitude"])
         longitude = parse_dms(row["Longitude"])
-        site_context[site_id] = {"latitude": latitude, "longitude": longitude, "elevation": float(row["Elevation (m)"] or 0), "segment": assign_ers_segment(longitude, latitude, ers_features)}
+        site_context[site_id] = {
+            "latitude": latitude,
+            "longitude": longitude,
+            "elevation": float(row["Elevation (m)"] or 0),
+            "segment": assign_ers_segment(longitude, latitude, ers_features),
+        }
 
-    source_path = SOURCE_DIR / "data.0.csv"
-    do_sites = set()
-    with source_path.open("r", encoding="cp1252", newline="") as handle:
-        for row in csv.DictReader(handle):
-            if "dissolved oxygen" in row["Parameter"].strip().lower():
-                do_sites.add(row["Site ID"].strip())
+    source_rows = list(read_csv(SOURCE_DIR / "data.0.csv"))
+    observed_quality_codes = Counter(row["Quality"].strip() for row in source_rows)
+    study_rows = []
+    excluded_period_rows = 0
+    for row in source_rows:
+        timestamp = datetime.strptime(row["Datetime"].strip(), "%Y/%m/%d %H:%M:%S")
+        if not (STUDY_START <= timestamp <= STUDY_END):
+            excluded_period_rows += 1
+            continue
+        row = dict(row)
+        row["_timestamp"] = timestamp
+        row["_site_id"] = normalise_site_id(row["Site ID"])
+        study_rows.append(row)
 
-    temperatures = {}
-    with source_path.open("r", encoding="cp1252", newline="") as handle:
-        for row in csv.DictReader(handle):
-            site_id = row["Site ID"].strip()
-            if site_id in do_sites and row["Parameter"].strip() == "Water Temperature":
-                temperatures[(site_id, row["Data Type"].strip(), row["Datetime"].strip())] = float(row["Value"])
+    valid_rows = [row for row in study_rows if valid_for_display(row)]
+    keyed = {(row["_site_id"], row["Datetime"].strip(), row["Parameter"].strip()): row for row in valid_rows}
+    temperatures = {(site_id, timestamp): float(row["Value"]) for (site_id, timestamp, parameter), row in keyed.items() if parameter == "Water Temperature"}
+    direct_tn = {(site_id, timestamp): row for (site_id, timestamp, parameter), row in keyed.items() if parameter == "Nitrogen as Total"}
+    tkn = {(site_id, timestamp): row for (site_id, timestamp, parameter), row in keyed.items() if parameter == "Nitrogen as Total Kjeldahl (TKN)"}
+    nox = {(site_id, timestamp): row for (site_id, timestamp, parameter), row in keyed.items() if parameter == "Nitrogen as NOx"}
 
-    total_rows = 0
-    boundary_rows = 0
-    target_site_ids = set()
     spot_rows = []
-    daily = {}
-    hourly = {}
     cell_raw = {}
-    observed_quality_codes = Counter()
+    target_site_ids = set()
     do_saturation_rows = 0
     do_unpaired_rows = 0
+    do_implausible_rows = 0
+    direct_tn_rows = 0
+    derived_tn_rows = 0
 
-    with source_path.open("r", encoding="cp1252", newline="") as handle:
-        for row in csv.DictReader(handle):
-            total_rows += 1
-            parameter_code = canonical_parameter(row["Parameter"])
-            if parameter_code is None:
-                continue
-            site_id = row["Site ID"].strip()
-            date_time = row["Datetime"].strip()
-            data_type = row["Data Type"].strip()
-            raw_value = float(row["Value"])
-            quality_code = row["Quality"].strip()
-            raw_unit = row["Unit of Measurement"].strip()
-            context = site_context[site_id]
-            display_value = raw_value
-            temperature = None
-            if parameter_code == "DO":
-                temperature = temperatures.get((site_id, data_type, date_time))
-                if temperature is None:
-                    display_value = None
-                    do_unpaired_rows += 1
-                else:
-                    display_value = dissolved_oxygen_saturation(raw_value, temperature, context["elevation"])
-                    do_saturation_rows += 1
-
-            target_site_ids.add(site_id)
-            observed_quality_codes[quality_code] += 1
-            cell_key = (site_id, parameter_code)
-            cell = cell_raw.setdefault(cell_key, {"spot_count": 0, "continuous_count": 0, "date_min": date_time, "date_max": date_time, "spot_values": []})
-            cell["date_min"] = min(cell["date_min"], date_time)
-            cell["date_max"] = max(cell["date_max"], date_time)
-            if not date_time.startswith(TARGET_YEAR + "/"):
-                boundary_rows += 1
-                continue
-
-            point_status = classify_point(context["segment"], parameter_code, display_value)
-            if data_type == "Quality":
-                cell["spot_count"] += 1
-                if display_value is not None:
-                    cell["spot_values"].append(display_value)
-                spot_rows.append({
-                    "site_id": site_id, "site_name": row["Name"].strip(), "datetime": iso_datetime(date_time),
-                    "parameter_code": parameter_code, "parameter_name": PARAMETERS[parameter_code]["label"],
-                    "value": "" if display_value is None else f"{display_value:.6g}", "unit": PARAMETERS[parameter_code]["unit"],
-                    "raw_value": f"{raw_value:g}", "raw_unit": raw_unit,
-                    "temperature_c": "" if temperature is None else f"{temperature:g}", "ers_point_status": point_status,
-                    "qualifier": row["Qualifier"].strip(), "quality_code": quality_code,
-                    "quality_text": quality_definitions.get(quality_code, "Unknown code"),
-                })
-                continue
-            if data_type != "Quantity":
-                continue
-            cell["continuous_count"] += 1
-            day = date_time[:10].replace("/", "-")
-            hour = f"{day}T{date_time[11:13]}:00:00"
-            for bucket in (
-                daily.setdefault((site_id, parameter_code, day), new_daily_bucket()),
-                hourly.setdefault((site_id, parameter_code, hour), new_daily_bucket()),
-            ):
-                bucket["n_total"] += 1
-                bucket["qualities"][quality_code] += 1
-                if quality_code in DISPLAY_QUALITY_CODES and display_value is not None:
-                    bucket["n_usable"] += 1
-                    bucket["sum"] += display_value
-                    bucket["min"] = min(bucket["min"], display_value)
-                    bucket["max"] = max(bucket["max"], display_value)
-                    bucket["raw_sum"] += raw_value
-                    if temperature is not None:
-                        bucket["temperature_sum"] += temperature
-                        bucket["temperature_count"] += 1
-
-    daily_rows = []
-    daily_values_by_cell = {}
-    for (site_id, parameter_code, day), bucket in sorted(daily.items()):
-        count = bucket["n_usable"]
-        mean = bucket["sum"] / count if count else None
-        if mean is not None:
-            daily_values_by_cell.setdefault((site_id, parameter_code), []).append(mean)
-        segment = site_context[site_id]["segment"]
-        daily_rows.append({
-            "site_id": site_id, "date": day, "parameter_code": parameter_code, "parameter_name": PARAMETERS[parameter_code]["label"],
-            "unit": PARAMETERS[parameter_code]["unit"], "value_mean": "" if mean is None else f"{mean:.6g}",
-            "value_min": "" if count == 0 else f"{bucket['min']:.6g}", "value_max": "" if count == 0 else f"{bucket['max']:.6g}",
-            "raw_value_mean": "" if count == 0 else f"{bucket['raw_sum'] / count:.6g}",
-            "raw_unit": "ppm" if parameter_code == "DO" else PARAMETERS[parameter_code]["unit"],
-            "temperature_c": "" if not bucket["temperature_count"] else f"{bucket['temperature_sum'] / bucket['temperature_count']:.6g}",
-            "ers_point_status": classify_point(segment, parameter_code, mean), "n_total": bucket["n_total"], "n_usable": count,
-            "n_flagged": bucket["n_total"] - count,
-            "quality_codes": ";".join(f"{code}:{number}" for code, number in sorted(bucket["qualities"].items(), key=lambda item: int(item[0]))),
+    def add_observation(source: dict, parameter_code: str, display_value: float, raw_value: float, raw_unit: str, temperature: float | None = None, provenance: str = "measured") -> None:
+        site_id = source["_site_id"]
+        context = site_context[site_id]
+        date_time = source["Datetime"].strip()
+        quality_code = source["Quality"].strip() if provenance == "measured" else "derived"
+        quality_text = quality_definitions.get(quality_code, "Derived from valid TKN and NOx observations")
+        target_site_ids.add(site_id)
+        cell = cell_raw.setdefault((site_id, parameter_code), {"spot_count": 0, "date_min": date_time, "date_max": date_time, "spot_values": [], "values_by_year": {}})
+        cell["spot_count"] += 1
+        cell["date_min"] = min(cell["date_min"], date_time)
+        cell["date_max"] = max(cell["date_max"], date_time)
+        cell["spot_values"].append(display_value)
+        cell["values_by_year"].setdefault(str(source["_timestamp"].year), []).append(display_value)
+        spot_rows.append({
+            "site_id": site_id,
+            "site_name": source["Name"].strip(),
+            "datetime": source["_timestamp"].isoformat(),
+            "parameter_code": parameter_code,
+            "parameter_name": PARAMETERS[parameter_code]["label"],
+            "value": f"{display_value:.6g}",
+            "unit": PARAMETERS[parameter_code]["unit"],
+            "raw_value": f"{raw_value:g}",
+            "raw_unit": raw_unit,
+            "temperature_c": "" if temperature is None else f"{temperature:g}",
+            "ers_point_status": classify_point(context["segment"], parameter_code, display_value),
+            "qualifier": source["Qualifier"].strip() if provenance == "measured" else "derived",
+            "quality_code": quality_code,
+            "quality_text": quality_text,
+            "provenance": provenance,
         })
 
-    hourly_rows = []
-    for (site_id, parameter_code, hour), bucket in sorted(hourly.items()):
-        count = bucket["n_usable"]
-        mean = bucket["sum"] / count if count else None
-        segment = site_context[site_id]["segment"]
-        hourly_rows.append({
-            "site_id": site_id, "datetime": hour, "parameter_code": parameter_code,
-            "parameter_name": PARAMETERS[parameter_code]["label"], "unit": PARAMETERS[parameter_code]["unit"],
-            "value_mean": "" if mean is None else f"{mean:.6g}",
-            "value_min": "" if count == 0 else f"{bucket['min']:.6g}", "value_max": "" if count == 0 else f"{bucket['max']:.6g}",
-            "raw_value_mean": "" if count == 0 else f"{bucket['raw_sum'] / count:.6g}",
-            "raw_unit": "ppm" if parameter_code == "DO" else PARAMETERS[parameter_code]["unit"],
-            "temperature_c": "" if not bucket["temperature_count"] else f"{bucket['temperature_sum'] / bucket['temperature_count']:.6g}",
-            "ers_point_status": classify_point(segment, parameter_code, mean), "n_total": bucket["n_total"], "n_usable": count,
-            "n_flagged": bucket["n_total"] - count,
-            "quality_codes": ";".join(f"{code}:{number}" for code, number in sorted(bucket["qualities"].items(), key=lambda item: int(item[0]))),
-        })
+    for row in valid_rows:
+        parameter_code = canonical_parameter(row["Parameter"])
+        if parameter_code not in {"DO", "TP", "TURB", "PH"}:
+            continue
+        raw_value = float(row["Value"])
+        if parameter_code == "DO":
+            if raw_value < 0 or raw_value > 25:
+                do_implausible_rows += 1
+                continue
+            temperature = temperatures.get((row["_site_id"], row["Datetime"].strip()))
+            if temperature is None:
+                do_unpaired_rows += 1
+                continue
+            display_value = dissolved_oxygen_saturation(raw_value, temperature, site_context[row["_site_id"]]["elevation"])
+            do_saturation_rows += 1
+            add_observation(row, parameter_code, display_value, raw_value, row["Unit of Measurement"].strip(), temperature)
+        else:
+            add_observation(row, parameter_code, raw_value, raw_value, row["Unit of Measurement"].strip())
+
+    nitrogen_keys = sorted(set(direct_tn) | (set(tkn) & set(nox)))
+    for key in nitrogen_keys:
+        if key in direct_tn:
+            row = direct_tn[key]
+            value = float(row["Value"])
+            add_observation(row, "TN", value, value, row["Unit of Measurement"].strip(), provenance="measured")
+            direct_tn_rows += 1
+        else:
+            tkn_row = tkn[key]
+            value = float(tkn_row["Value"]) + float(nox[key]["Value"])
+            add_observation(tkn_row, "TN", value, value, "mg/L", provenance="TKN + NOx")
+            derived_tn_rows += 1
 
     sites_rows = []
-    for source in metadata_rows:
-        site_id = source["Site ID"].strip()
+    for site_id in sorted(target_site_ids):
+        source = metadata_by_site[site_id]
         context = site_context[site_id]
         sites_rows.append({
-            "site_id": site_id, "name": source["Name"].strip(), "short_name": source["Short Name"].strip() or source["Name"].strip(),
-            "latitude": f"{context['latitude']:.7f}", "longitude": f"{context['longitude']:.7f}",
-            "source_crs": source["Geographic Coordinate System"].strip(), "easting": source["Easting"].strip(),
-            "northing": source["Northing"].strip(), "zone": source["Zone"].strip(), "elevation_m": f"{context['elevation']:g}",
-            "ers_segment": context["segment"], "active": source["Active"].strip().lower(), "cease_date": source["Cease date"].strip(),
-            "basin": source["Basin"].strip(), "site_types": source["Site types"].strip(), "has_target_data_2024": str(site_id in target_site_ids).lower(),
+            "site_id": site_id,
+            "name": source["Name"].strip(),
+            "short_name": source["Short Name"].strip() or source["Name"].strip(),
+            "latitude": f"{context['latitude']:.7f}",
+            "longitude": f"{context['longitude']:.7f}",
+            "source_crs": source["Geographic Coordinate System"].strip(),
+            "easting": source["Easting"].strip(),
+            "northing": source["Northing"].strip(),
+            "zone": source["Zone"].strip(),
+            "elevation_m": f"{context['elevation']:g}",
+            "ers_segment": context["segment"],
+            "active": source["Active"].strip().lower(),
+            "cease_date": source["Cease date"].strip(),
+            "basin": source["Basin"].strip(),
+            "site_types": source["Site types"].strip(),
+            "has_target_data": "true",
         })
 
     availability_sites = {}
@@ -496,58 +486,82 @@ def main() -> None:
             raw = cell_raw.get((site_id, parameter_code))
             if not raw:
                 continue
-            daily_values = daily_values_by_cell.get((site_id, parameter_code), [])
-            spot_values = raw["spot_values"]
-            summary_values = daily_values or spot_values
-            regimes = []
-            if raw["continuous_count"]:
-                regimes.append("continuous")
-            if raw["spot_count"]:
-                regimes.append("spot")
-            assessment = assess_series(site_context[site_id]["segment"], parameter_code, summary_values)
+            values = raw["spot_values"]
+            annual_assessments = {
+                year: assess_series(site_context[site_id]["segment"], parameter_code, year_values, minimum_count=11)
+                for year, year_values in sorted(raw["values_by_year"].items())
+            }
+            eligible_years = [year for year, result in annual_assessments.items() if result["status"] != "unavailable"]
+            latest_assessment = annual_assessments[max(eligible_years)] if eligible_years else assess_series(site_context[site_id]["segment"], parameter_code, [], minimum_count=11)
             site_parameters[parameter_code] = {
-                "regime": "+".join(regimes), "unit": PARAMETERS[parameter_code]["unit"], "spot_count": raw["spot_count"],
-                "continuous_count": raw["continuous_count"], "daily_count": len(daily_values), "date_min": raw["date_min"],
-                "date_max": raw["date_max"], "summary_value": round(statistics.median(summary_values), 5) if summary_values else None,
-                "summary_source": "daily sensor summaries" if daily_values else "spot observations", "ers_assessment": assessment,
+                "regime": "spot",
+                "unit": PARAMETERS[parameter_code]["unit"],
+                "spot_count": raw["spot_count"],
+                "continuous_count": 0,
+                "daily_count": 0,
+                "date_min": raw["date_min"],
+                "date_max": raw["date_max"],
+                "summary_value": round(statistics.median(values), 5),
+                "summary_source": "spot observations",
+                "ers_assessment": latest_assessment,
+                "annual_ers_assessments": annual_assessments,
             }
         metadata = metadata_by_site[site_id]
         availability_sites[site_id] = {
-            "name": metadata["Short Name"].strip() or metadata["Name"].strip(), "active": metadata["Active"].strip().lower() == "true",
-            "ers_segment": site_context[site_id]["segment"], "parameters": site_parameters,
+            "name": metadata["Short Name"].strip() or metadata["Name"].strip(),
+            "active": metadata["Active"].strip().lower() == "true",
+            "ers_segment": site_context[site_id]["segment"],
+            "parameters": site_parameters,
         }
 
     availability = {
-        "title": "Goulburn 2024 availability and provisional ERS assessment", "generated_at": datetime.now(timezone.utc).isoformat(),
-        "year": 2024, "source_rows": total_rows, "excluded_boundary_rows": boundary_rows,
+        "title": "Goulburn 2015–2024 spot-observation availability and provisional ERS screening",
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "period": {"start": "2015-01-01", "end": "2024-12-31"},
+        "source_rows": len(source_rows),
+        "excluded_period_rows": excluded_period_rows,
         "parameters": [dict(code=code, **definition) for code, definition in PARAMETERS.items()],
         "temporal_resolutions": {
-            "daily": {"available": True, "source": "continuous_daily.csv"},
-            "monthly": {"available": True, "source": "client aggregation of daily summaries"},
-            "hourly": {"available": True, "source": "continuous_hourly.csv", "loading": "on demand"},
+            "monthly": {"available": True, "source": "client aggregation of spot observations"},
+            "seasonal": {"available": True, "source": "client aggregation of spot observations; Australian meteorological seasons"},
+            "yearly": {"available": True, "source": "client aggregation of spot observations"},
         },
         "ers": {
             "source": "EPA Victoria Environment Reference Standard, Table 5.8",
             "source_url": "https://www.epa.vic.gov.au/sites/default/files/2025-05/consolidated-ERS.pdf",
-            "assessment_note": "Provisional annual comparison using daily sensor summaries where available, otherwise spot observations.",
+            "assessment_note": "Provisional annual screening only. Table 5.8 percentile statistics are calculated separately for each calendar year and require at least 11 observations; objectives remain segment-specific.",
             "do_note": "DO percent saturation is estimated from paired DO concentration, water temperature and site elevation; salinity and measured barometric pressure were unavailable.",
+            "tn_note": "Direct total nitrogen is used where available; otherwise TN is derived from paired TKN + NOx at the same site and timestamp.",
             "thresholds": ERS_THRESHOLDS,
         },
-        "quality_policy": {"note": "Provisional display filter; raw downloads are unchanged.", "included": sorted(DISPLAY_QUALITY_CODES, key=int), "excluded": sorted(EXCLUDED_QUALITY_CODES, key=int)},
+        "quality_policy": {"note": "Records with quality codes below 151 are retained except NV qualifiers; raw downloads are unchanged."},
         "sites": availability_sites,
     }
 
-    write_csv(OUTPUT_DIR / "spot_observations.csv", ["site_id", "site_name", "datetime", "parameter_code", "parameter_name", "value", "unit", "raw_value", "raw_unit", "temperature_c", "ers_point_status", "qualifier", "quality_code", "quality_text"], sorted(spot_rows, key=lambda row: (row["site_id"], row["parameter_code"], row["datetime"])))
-    write_csv(OUTPUT_DIR / "continuous_daily.csv", ["site_id", "date", "parameter_code", "parameter_name", "unit", "value_mean", "value_min", "value_max", "raw_value_mean", "raw_unit", "temperature_c", "ers_point_status", "n_total", "n_usable", "n_flagged", "quality_codes"], daily_rows)
-    write_csv(OUTPUT_DIR / "continuous_hourly.csv", ["site_id", "datetime", "parameter_code", "parameter_name", "unit", "value_mean", "value_min", "value_max", "raw_value_mean", "raw_unit", "temperature_c", "ers_point_status", "n_total", "n_usable", "n_flagged", "quality_codes"], hourly_rows)
-    write_csv(OUTPUT_DIR / "sites.csv", ["site_id", "name", "short_name", "latitude", "longitude", "source_crs", "easting", "northing", "zone", "elevation_m", "ers_segment", "active", "cease_date", "basin", "site_types", "has_target_data_2024"], sites_rows)
+    spot_fields = ["site_id", "site_name", "datetime", "parameter_code", "parameter_name", "value", "unit", "raw_value", "raw_unit", "temperature_c", "ers_point_status", "qualifier", "quality_code", "quality_text", "provenance"]
+    write_csv(OUTPUT_DIR / "spot_observations.csv", spot_fields, sorted(spot_rows, key=lambda row: (row["site_id"], row["parameter_code"], row["datetime"])))
+    write_csv(OUTPUT_DIR / "continuous_daily.csv", ["site_id", "date", "parameter_code", "parameter_name", "unit", "value_mean", "value_min", "value_max", "raw_value_mean", "raw_unit", "temperature_c", "ers_point_status", "n_total", "n_usable", "n_flagged", "quality_codes"], [])
+    write_csv(OUTPUT_DIR / "continuous_hourly.csv", ["site_id", "datetime", "parameter_code", "parameter_name", "unit", "value_mean", "value_min", "value_max", "raw_value_mean", "raw_unit", "temperature_c", "ers_point_status", "n_total", "n_usable", "n_flagged", "quality_codes"], [])
+    write_csv(OUTPUT_DIR / "sites.csv", ["site_id", "name", "short_name", "latitude", "longitude", "source_crs", "easting", "northing", "zone", "elevation_m", "ers_segment", "active", "cease_date", "basin", "site_types", "has_target_data"], sites_rows)
     (OUTPUT_DIR / "availability.json").write_text(json.dumps(availability, indent=2), encoding="utf-8")
     (OUTPUT_DIR / "goulburn_boundary.geojson").write_text(json.dumps(extract_goulburn_boundary(), separators=(",", ":")), encoding="utf-8")
     validation = {
-        "source_measurement_rows": total_rows, "target_sites": len(target_site_ids), "ers_sites_assigned": sum(site_id in site_context for site_id in target_site_ids),
-        "spot_rows": len(spot_rows), "daily_rows": len(daily_rows), "hourly_rows": len(hourly_rows), "do_saturation_rows": do_saturation_rows, "do_unpaired_rows": do_unpaired_rows,
-        "excluded_2025_boundary_rows": boundary_rows, "observed_quality_codes": dict(sorted(observed_quality_codes.items(), key=lambda item: int(item[0]))),
-        "undefined_quality_codes": sorted(code for code in observed_quality_codes if code not in quality_definitions), "source_files_modified": False,
+        "source_measurement_rows": len(source_rows),
+        "study_period_rows": len(study_rows),
+        "target_sites": len(target_site_ids),
+        "ers_sites_assigned": sum(site_id in site_context for site_id in target_site_ids),
+        "spot_rows": len(spot_rows),
+        "daily_rows": 0,
+        "hourly_rows": 0,
+        "do_saturation_rows": do_saturation_rows,
+        "do_unpaired_rows": do_unpaired_rows,
+        "do_implausible_rows": do_implausible_rows,
+        "direct_tn_rows": direct_tn_rows,
+        "derived_tn_rows": derived_tn_rows,
+        "excluded_period_rows": excluded_period_rows,
+        "observed_quality_codes": dict(sorted(observed_quality_codes.items(), key=lambda item: int(item[0]))),
+        "undefined_quality_codes": sorted(code for code in observed_quality_codes if code not in quality_definitions),
+        "source_files_modified": False,
     }
     (OUTPUT_DIR / "validation.json").write_text(json.dumps(validation, indent=2), encoding="utf-8")
     print(json.dumps(validation, indent=2))

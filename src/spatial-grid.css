@@ -64,3 +64,21 @@
 .multi-state-legend i{width:12px;height:12px;display:inline-block;border:1px solid #aab8b0}
 .multi-state-legend .missing{background:repeating-linear-gradient(135deg,#edf0ee 0 3px,#aab8b0 3px 4px)}
 .multi-overview-back{background:white;border:1px solid var(--line);border-radius:4px;color:var(--ink);padding:6px 9px;margin-bottom:8px;cursor:pointer}
+
+/* A shared cyan outline identifies hover; measurement and comparison colours stay intact. */
+:root { --linked-hover:#087dcc; --linked-hover-wash:#e5f5ff; }
+.spatial-card.hovered {
+  z-index:6;
+  background:#f4fbff;
+  border-color:var(--linked-hover);
+  outline:calc(2 * var(--hover-pixel,1px)) solid var(--linked-hover);
+  outline-offset:calc(1 * var(--hover-pixel,1px));
+  box-shadow:0 0 0 calc(4 * var(--hover-pixel,1px)) #28a9ec24,
+             0 0 calc(12 * var(--hover-pixel,1px)) #169fe854;
+}
+.spatial-card.hovered .spatial-card-heading { color:#075d91; font-weight:700; }
+.mini-hover-ring { fill:#35b5f01a; stroke:var(--linked-hover); stroke-width:2; filter:drop-shadow(0 0 4px #169fe880); }
+.mini-site.hovered { stroke:white; stroke-width:1.8; filter:drop-shadow(0 0 3px #169fe880); }
+.matrix-row.hovered { position:relative; z-index:1; background:var(--linked-hover-wash); box-shadow:inset 4px 0 var(--linked-hover),inset 0 1px #087dcc80,inset 0 -1px #087dcc80,0 0 9px #169fe830; }
+.matrix-row.hovered .row-label { background:var(--linked-hover-wash); color:#075d91; }
+.matrix-row.hovered .chart-cell { background:#e8f6ff; }
