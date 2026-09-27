@@ -508,7 +508,7 @@ function setupCompactWorkspace(data) {
   }
   toolbar.before(links);
   if (viewMode === 'grid') { document.querySelector('.analysis-workspace').classList.add('single-grid'); document.querySelector('.matrix-panel').hidden = true; }
-  if (isGrid) document.querySelector('.method-note').innerHTML = '<strong>How to read this</strong><p>Click a site or parameter for temporal detail. Turn on Compare sites to compare up to five sites. Values are means of available spot observations at the selected aggregation.</p><p>The mini-map dots retain actual geographic coordinates. The rectangle shows the schematic grid viewport; it is not an exact geographic selection boundary.</p>';
+  if (isGrid) document.querySelector('.method-note').innerHTML = '<strong>How to read this</strong><p>Click a site or parameter for temporal detail. Turn on Compare sites to compare up to five sites. Values are means of available spot observations at the selected aggregation.</p><p>The mini-map dots retain actual geographic coordinates. The rectangle encloses the geographic locations of the site cards currently visible in the grid.</p>';
   const temporalLegend = document.createElement('p');
   temporalLegend.className = 'temporal-map-legend';
   temporalLegend.hidden = true;

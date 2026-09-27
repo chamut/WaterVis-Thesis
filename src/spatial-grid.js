@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { GRID_POSITIONS, WORLD, zoomAt, viewportWorld, fitCamera } from './grid-navigation.js';
+import { GRID_POSITIONS, WORLD, zoomAt, enclosingAspectBounds, fitCamera } from './grid-navigation.js';
 import { sensorSegments, pixelSample, sharedDomain } from './temporal-map-model.js';
 import './spatial-grid.css';
 
@@ -20,7 +20,7 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
  document.querySelector('.map-panel h2').textContent='Approximate geographic positions · N ↑';
  const viewport=stage.querySelector('.spatial-viewport'),layer=stage.querySelector('.spatial-cards');
  const mini=document.createElement('section');mini.className='shared-minimap';
- mini.innerHTML='<header><strong>Geographic context</strong><span>N ↑</span></header><svg tabindex="0" role="group" aria-label="Linked mini-map. Drag viewport rectangle to pan. Click a site for details."></svg><div class="mini-controls"><button data-action="in" aria-label="Mini-map zoom in">+</button><button data-action="out" aria-label="Mini-map zoom out">−</button><button data-action="reset">Reset</button></div><p>Schematic viewport · dots show actual site locations. Highlighted dots are visible in the grid.</p>';
+ mini.innerHTML='<header><strong>Geographic context</strong><span>N ↑</span></header><svg tabindex="0" role="group" aria-label="Linked mini-map. Drag the visible-site rectangle to pan. Click a site for details."></svg><div class="mini-controls"><button data-action="in" aria-label="Mini-map zoom in">+</button><button data-action="out" aria-label="Mini-map zoom out">−</button><button data-action="reset">Reset</button></div><p>Dots show actual site locations. The rectangle encloses sites currently visible in the grid.</p>';
  workspace.append(mini);
  const svg=d3.select(mini.querySelector('svg'));
  const sites=data.sites.filter(s=>s.hasData),entries=new Map();
@@ -36,10 +36,11 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
  let camera=fitCamera(viewport.clientWidth,viewport.clientHeight),visible=new Set(),dragging=false,moved=false,lastKey='',projection,frame,worldX,worldY,dots,hoverRing;
  function focus(id){const point=GRID_POSITIONS.get(id);if(!point)return;camera.x=viewport.clientWidth/2-point[0]*camera.zoom;camera.y=viewport.clientHeight/2-point[1]*camera.zoom;layout()}
  function updateMini(){
-  if(!projection)return;
-  const bounds=viewportWorld(camera,viewport.clientWidth,viewport.clientHeight);
-  // Do not shrink or clamp the rectangle: that would distort the camera mapping.
-  frame.attr('x',worldX(bounds.x)).attr('y',worldY(bounds.y)).attr('width',worldX(bounds.x+bounds.width)-worldX(bounds.x)).attr('height',worldY(bounds.y+bounds.height)-worldY(bounds.y));
+ if(!projection)return;
+  const visiblePoints=sites.filter(site=>visible.has(site.site_id)&&state.selectedSites.has(site.site_id)).map(site=>projection([site.longitude,site.latitude])).filter(point=>point?.every(Number.isFinite));
+  const visibleBounds=enclosingAspectBounds(visiblePoints,viewport.clientWidth/viewport.clientHeight);
+  frame.attr('display',visibleBounds?null:'none');
+  if(visibleBounds)frame.attr('x',visibleBounds.x).attr('y',visibleBounds.y).attr('width',visibleBounds.width).attr('height',visibleBounds.height);
   dots.classed('hovered',s=>s.site_id===state.hoveredSite).attr('display',s=>state.selectedSites.has(s.site_id)?null:'none').attr('opacity',s=>s.site_id===state.hoveredSite||visible.has(s.site_id)?1:.25)
    .attr('r',s=>s.site_id===state.hoveredSite||s.site_id===state.selectedSite?5:3.3)
    .attr('fill',s=>state.compareMode&&state.comparedSites?.has(s.site_id)?['#d7191c','#e78b25','#8b7613','#258cc0','#2c3b91'][state.comparedSites.get(s.site_id)]:'#168aad')
@@ -52,7 +53,14 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
   const el=svg.node(),w=el.clientWidth||320,h=el.clientHeight||250;svg.attr('viewBox',`0 0 ${w} ${h}`);svg.selectAll('*').remove();
   projection=d3.geoMercator().fitExtent([[16,14],[w-16,h-22]],data.boundary);
   const bounds=d3.geoPath(projection).bounds(data.boundary);
-  worldX=d3.scaleLinear().domain([0,WORLD.width]).range([bounds[0][0],bounds[1][0]]);worldY=d3.scaleLinear().domain([0,WORLD.height]).range([bounds[0][1],bounds[1][1]]);
+  // Calibrate the schematic camera against the occupied grid and the same
+  // sites' geographic positions. Mapping the entire virtual WORLD to the
+  // basin boundary makes the mini-map rectangle drift and use the wrong scale
+  // because the cards intentionally occupy only part of that virtual canvas.
+  const linked=sites.map(site=>({grid:GRID_POSITIONS.get(site.site_id),map:projection([site.longitude,site.latitude])})).filter(item=>item.grid&&item.map?.every(Number.isFinite));
+  const gridX=d3.extent(linked,item=>item.grid[0]),gridY=d3.extent(linked,item=>item.grid[1]);
+  const mapX=d3.extent(linked,item=>item.map[0]),mapY=d3.extent(linked,item=>item.map[1]);
+  worldX=d3.scaleLinear().domain(gridX).range(mapX);worldY=d3.scaleLinear().domain(gridY).range(mapY);
   svg.append('path').datum(data.boundary).attr('d',d3.geoPath(projection)).attr('class','mini-basin-fill').attr('fill','#fff');
   const nw=projection([144.6594971209363,-35.96275386870387]),se=projection([146.6590695918188,-37.67907102202982]);
   svg.append('image').attr('href',import.meta.env.BASE_URL+'data/goulburn_watercourses.png').attr('x',nw[0]).attr('y',nw[1]).attr('width',se[0]-nw[0]).attr('height',se[1]-nw[1]).attr('opacity',.7);

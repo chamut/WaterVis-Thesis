@@ -21,6 +21,16 @@ export function zoomAt(camera, next, x, y) {
 export function viewportWorld(camera,width,height) {
  return {x:-camera.x/camera.zoom,y:-camera.y/camera.zoom,width:width/camera.zoom,height:height/camera.zoom};
 }
+export function enclosingAspectBounds(points,aspect,padding=7,minWidth=48) {
+ if(!points.length)return null;
+ const ratio=Number.isFinite(aspect)&&aspect>0?aspect:1;
+ const xs=points.map(point=>point[0]),ys=points.map(point=>point[1]);
+ const cx=(Math.min(...xs)+Math.max(...xs))/2,cy=(Math.min(...ys)+Math.max(...ys))/2;
+ let width=Math.max(Math.max(...xs)-Math.min(...xs)+padding*2,minWidth);
+ let height=Math.max(Math.max(...ys)-Math.min(...ys)+padding*2,minWidth/ratio);
+ if(width/height<ratio)width=height*ratio;else height=width/ratio;
+ return {x:cx-width/2,y:cy-height/2,width,height};
+}
 export function fitCamera(width,height) {
  const zoom=Math.max(.08,Math.min(1,(width-30)/WORLD.width,(height-30)/WORLD.height));
  return {zoom,x:(width-WORLD.width*zoom)/2,y:(height-WORLD.height*zoom)/2};
