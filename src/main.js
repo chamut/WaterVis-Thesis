@@ -607,6 +607,7 @@ function setupCompactWorkspace(data) {
     sortNote.hidden = state.matrixCollapsed;
     matrixToggle.textContent = state.matrixCollapsed ? 'Show panel' : 'Minimize';
     matrixToggle.setAttribute('aria-expanded', String(!state.matrixCollapsed));
+    if (!state.matrixCollapsed && state.selectedSite) scrollMatrixToSite(state.selectedSite);
     data.temporalMap?.scheduleLayout();
   });
   const select = sortControl.querySelector('select');
@@ -912,7 +913,7 @@ function createMap(data) {
       .on('pointerenter focus', (event) => setHoveredSite(data, site.site_id, event))
       .on('pointermove', (event) => positionTooltip(data, site, event))
       .on('pointerleave blur', () => setHoveredSite(data, null))
-      .on('click', (event) => selectSite(data, site.site_id, event, 'site'));
+      .on('click', (event) => selectLinkedTarget(data, { siteId: site.site_id, event, allowRelated: true }));
     return { element, site };
   });
 
@@ -992,6 +993,7 @@ function createMatrix(data) {
     .data(sites, (site) => site.site_id)
     .join('div')
     .attr('class', 'matrix-row matrix-grid')
+    .attr('id', (site) => `matrix-row-${site.site_id}`)
     .attr('data-site-id', (site) => site.site_id)
     .on('pointerenter focusin', (event, site) => setHoveredSite(data, site.site_id, event))
     .on('pointerleave', () => setHoveredSite(data, null))
@@ -999,7 +1001,7 @@ function createMatrix(data) {
   rows.append('button')
     .attr('type', 'button')
     .attr('class', 'row-label')
-    .on('click', (event, site) => selectSite(data, site.site_id, event, 'site'))
+    .on('click', (event, site) => selectLinkedTarget(data, { siteId: site.site_id, event }))
     .html((site) => `<strong>${site.short_name}</strong><span>${site.site_id}${site.active ? '' : ' · inactive'}</span>`);
 
   if (!sites.length) {
@@ -1016,7 +1018,11 @@ function createMatrix(data) {
       .attr('data-parameter', ({ parameter }) => parameter.code)
       .style('--parameter-colour', ({ parameter }) => PARAMETER_COLOURS[parameter.code])
       .attr('aria-label', ({ site: itemSite, parameter }) => `Inspect ${parameter.label} at ${itemSite.short_name}`)
-      .on('click', (event, item) => selectPlot(data, item.site.site_id, item.parameter.code, event));
+      .on('click', (event, item) => selectLinkedTarget(data, {
+        siteId: item.site.site_id,
+        parameterCode: item.parameter.code,
+        event,
+      }));
 
     cells.each(function drawCell({ site: currentSite, parameter }) {
       const key = cellKey(currentSite.site_id, parameter.code);
@@ -1289,7 +1295,7 @@ function updateDetail(data) {
       <p class="detail-coordinate">Site ${site.site_id} · ${site.ers_segment}${boundaryNote}</p>
       <div class="detail-plot-heading"><strong>Temporal threshold states</strong><span>${displayDateFormat(state.rangeStart)}–${displayDateFormat(state.rangeEnd)} · ${state.selectedResolution}</span></div>
       <div class="multi-detail-overview"></div>
-      <p class="multi-state-legend"><span><i style="background:#c95050"></i>Exceeds</span><span><i style="background:#b8d9c4"></i>Does not exceed</span><span><i class="missing"></i>No data / no objective</span></p>
+      <p class="multi-state-legend"><span><i style="background:#c1121f"></i>Exceeds</span><span><i class="parameter-colours"></i>Does not exceed · parameter colour</span><span><i class="missing"></i>No data / no objective</span></p>
       <p class="detail-action-hint">Time runs from bottom to top. Click a parameter to inspect its values. These states screen the selected-resolution data, not annual ERS status.</p>`;
     data.grid?.renderOverview(detail.querySelector('.multi-detail-overview'), site);
     return;
@@ -1324,7 +1330,8 @@ function updateDetail(data) {
     const back = document.createElement('button');
     back.type = 'button';
     back.className = 'multi-overview-back';
-    back.textContent = '← All selected parameters';
+    back.textContent = '← Back to all parameters';
+    back.setAttribute('aria-label', 'Back to all parameter threshold states');
     back.onclick = () => { state.detailMode = 'site'; updateLinkedViews(data); };
     detail.prepend(back);
   }
@@ -1375,7 +1382,7 @@ function updateLinkedViews(data, { detail = true } = {}) {
   if (isGrid) {
     document.querySelector('.ers-legend-group').hidden = true;
     const legend = document.querySelector('.temporal-map-legend'); legend.hidden = false;
-    legend.textContent = viewMode === 'multi' ? 'Time ↑ · Red: exceeds · Pale green: does not exceed · Hatched: no data / no objective · provisional screening of aggregated spot observations' : 'Shared value and time scales · points: aggregated spot observations';
+    legend.textContent = viewMode === 'multi' ? 'Time ↑ · Red: exceeds · Parameter colour: does not exceed · Black: no data / no objective · provisional screening of aggregated spot observations' : 'Shared value and time scales · points: aggregated spot observations';
   }
   if (detail) updateDetail(data);
 }
@@ -1408,11 +1415,31 @@ function focusMapOnSite(data, siteId) {
   });
 }
 
+function scrollMatrixToSite(siteId) {
+  if (!siteId || state.matrixCollapsed) return;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const scroller = document.querySelector('.matrix-scroll');
+    const row = document.querySelector(`.matrix-row[data-site-id="${siteId}"]`);
+    if (!scroller || !row || scroller.hidden) return;
+    const scrollerRect = scroller.getBoundingClientRect();
+    const rowRect = row.getBoundingClientRect();
+    const top = Math.max(0, scroller.scrollTop
+      + rowRect.top - scrollerRect.top
+      - (scroller.clientHeight - rowRect.height) / 2);
+    scroller.setAttribute('aria-activedescendant', row.id);
+    // Keep navigation local to the lower panel. Native smooth scrolling can
+    // promote an ancestor page scroll in Safari when the selected row is far
+    // away, so update this dedicated scroller directly.
+    scroller.scrollTop = top;
+  }));
+}
+
 function toggleComparedSite(data, id) {
   if (state.comparedSites.has(id)) state.comparedSites.delete(id);
   else if (state.comparedSites.size < 5) { let slot=0; while ([...state.comparedSites.values()].includes(slot)) slot++; state.comparedSites.set(id,slot); }
   else { document.querySelector('.compare-sites').textContent = 'Maximum 5 sites — remove one first'; return; }
   updateLinkedViews(data);
+  scrollMatrixToSite(id);
 }
 
 function selectRelatedSites(data, siteId) {
@@ -1425,41 +1452,37 @@ function selectRelatedSites(data, siteId) {
   state.compareMode = true;
   data.syncSiteFilter?.();
   focusMapOnSite(data, siteId);
+  scrollMatrixToSite(siteId);
 }
 
-function selectSite(data, siteId, event, mode = 'site') {
+function selectLinkedTarget(data, {
+  siteId,
+  parameterCode = null,
+  event = null,
+  allowRelated = false,
+}) {
   event?.preventDefault();
-  if (state.relatedSelectionMode && event?.currentTarget?.classList?.contains('site-marker')) {
+  if (allowRelated && state.relatedSelectionMode) {
     selectRelatedSites(data, siteId);
     return;
   }
   if (state.compareMode) { toggleComparedSite(data, siteId); return; }
-  const togglingOff = viewMode !== 'multi' && state.selectedSite === siteId && state.detailMode === mode;
+  const detailMode = parameterCode ? 'plot' : 'site';
+  const togglingOff = viewMode !== 'multi'
+    && state.selectedSite === siteId
+    && state.detailMode === detailMode
+    && (!parameterCode || state.selectedParameter === parameterCode);
   state.selectedSite = togglingOff ? null : siteId;
-  state.detailMode = mode;
-  updateLinkedViews(data);
-  document.querySelector('.detail-panel').scrollTop = 0;
-  if (state.selectedSite) focusMapOnSite(data, state.selectedSite);
-  if (state.selectedSite) {
-    document.querySelector(`.matrix-row[data-site-id="${siteId}"]`)?.scrollIntoView({ block: 'nearest' });
+  if (parameterCode) {
+    state.selectedParameter = parameterCode;
+    if (viewMode === 'multi') state.selectedParameters.add(parameterCode);
   }
-}
-
-function selectPlot(data, siteId, parameterCode, event) {
-  event?.preventDefault();
-  if (state.compareMode) { toggleComparedSite(data, siteId); return; }
-  const togglingOff = state.selectedSite === siteId
-    && state.selectedParameter === parameterCode
-    && state.detailMode === 'plot';
-  state.selectedSite = togglingOff ? null : siteId;
-  state.selectedParameter = parameterCode;
-  if (viewMode === 'multi') state.selectedParameters.add(parameterCode);
-  state.detailMode = 'plot';
+  state.detailMode = detailMode;
   updateLinkedViews(data);
   document.querySelector('.detail-panel').scrollTop = 0;
   if (state.selectedSite) {
     focusMapOnSite(data, state.selectedSite);
-    document.querySelector(`.matrix-row[data-site-id="${siteId}"]`)?.scrollIntoView({ block: 'nearest' });
+    scrollMatrixToSite(siteId);
   }
 }
 
@@ -1498,7 +1521,15 @@ async function init() {
       if (key !== allSitesViewKey) { allSitesView = buildTemporalView(data, true); allSitesViewKey = key; }
       return allSitesView;
     };
-    if (isGrid) data.grid = createSpatialGrid({data,state,colours:PARAMETER_COLOURS,multi:viewMode === 'multi',allTemporal,onHover:id=>setHoveredSite(data,id),onSelect:(id,code,event)=>code==null?selectSite(data,id,event,'site'):selectPlot(data,id,code,event)});
+    if (isGrid) data.grid = createSpatialGrid({
+      data,
+      state,
+      colours: PARAMETER_COLOURS,
+      multi: viewMode === 'multi',
+      allTemporal,
+      onHover: (id) => setHoveredSite(data, id),
+      onSelect: (siteId, parameterCode, event) => selectLinkedTarget(data, { siteId, parameterCode, event }),
+    });
     else data.temporalMap = createTemporalMap({
       data, state, colours: PARAMETER_COLOURS,
       temporalView: () => {
@@ -1507,9 +1538,12 @@ async function init() {
         return allSitesView;
       },
       onHover: (siteId) => setHoveredSite(data, siteId),
-      onSelect: (siteId, event) => state.relatedSelectionMode
-        ? selectRelatedSites(data, siteId)
-        : selectPlot(data, siteId, state.selectedParameter, event),
+      onSelect: (siteId, event) => selectLinkedTarget(data, {
+        siteId,
+        parameterCode: state.selectedParameter,
+        event,
+        allowRelated: true,
+      }),
     });
     createMatrix(data);
     updateTemporalSummary(data);

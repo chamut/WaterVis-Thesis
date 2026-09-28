@@ -1,19 +1,34 @@
 // Shared camera geometry for both schematic grids. Map dots stay geographic.
+//
+// Method: the numbered positions are measured from the approved 20-slot sketch.
+// Site coordinates were independently affine-normalised to the sketch extent,
+// then assigned one-to-one to the slots by minimum-cost point-set matching.
+// This adapts the assignment principle from Meulemans et al. (2021); it is not
+// their full shape-decomposition and mosaic-cartogram pipeline.
 export const SKETCH_SITES = [
- // Preserve the approved positions for the 16 displayed sites shared with the earlier
- // dataset. Only the four new sites use provisional empty slots.
- ['405297',295,327],['405232',463,401],
- ['405276',722,454],
- ['405204',908,575],['405270',798,630],
- ['405200',681,803],['405234',1154,980],['405240',550,1190],
- ['405212',550,1270],['405201',720,1220],['405214',1220,1260],
- ['405203',1050,1370],['405219',1340,1480],['405209',870,1450],
- ['405205',730,1550],['405264',1220,1590],
- // New in the displayed 20-site, 2015–2024 extract; revisit these four placements.
- ['405246',900,810],['405237',1050,840],['405251',1320,1080],['405231',650,1410],
+ // slot, site id, measured x, measured y (card top-left in the sketch)
+ [1,'405297',150,180], [2,'405232',345,200], [3,'405276',510,215],
+ [4,'405204',660,280], [5,'405270',600,365], [6,'405246',600,470],
+ [7,'405200',470,470], [8,'405237',735,535], [9,'405234',830,615],
+ [10,'405240',263,650], [11,'405212',263,720], [12,'405201',425,715],
+ [13,'405251',940,680], [14,'405214',1165,720], [15,'405231',570,815],
+ [16,'405205',727,890], [17,'405209',885,825], [18,'405203',1030,785],
+ [19,'405219',1175,850], [20,'405264',1170,945],
 ];
-export const GRID_POSITIONS = new Map(SKETCH_SITES.map(([id,x,y]) => [id, [(x-8)*2.4,(y-187)*2.4]]));
-export const WORLD = { width:3264, height:3800 };
+const GRID_SCALE = 2.4;
+const GRID_PADDING = 30;
+const CARD_WIDTH = 240;
+const CARD_HEIGHT = 160;
+const minSketchX = Math.min(...SKETCH_SITES.map(([, , x]) => x));
+const minSketchY = Math.min(...SKETCH_SITES.map(([, , , y]) => y));
+export const GRID_POSITIONS = new Map(SKETCH_SITES.map(([,id,x,y]) => [id, [
+ GRID_PADDING+(x-minSketchX)*GRID_SCALE,
+ GRID_PADDING+(y-minSketchY)*GRID_SCALE,
+]]));
+export const WORLD = {
+ width:Math.ceil(Math.max(...GRID_POSITIONS.values().map(([x])=>x))+CARD_WIDTH+GRID_PADDING),
+ height:Math.ceil(Math.max(...GRID_POSITIONS.values().map(([,y])=>y))+CARD_HEIGHT+GRID_PADDING),
+};
 export function zoomAt(camera, next, x, y) {
  const zoom=Math.max(.08,Math.min(3,next));
  return {zoom,x:x-(x-camera.x)/camera.zoom*zoom,y:y-(y-camera.y)/camera.zoom*zoom};
