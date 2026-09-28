@@ -13,6 +13,18 @@
   #app .analysis-workspace > * { min-width:0; min-height:0; }
   #app .map-stage { min-height:0; }
   #app .compact-toolbar { min-width:0; flex-wrap:wrap; gap:6px 8px; padding:6px 12px; }
+  #app .compact-menu summary,
+  #app .compact-toolbar .summary-chip-button,
+  #app .compact-toolbar .compare-sites,
+  #app .compact-toolbar .watercourse-select {
+    height:34px;
+    min-height:34px;
+    padding:5px 10px;
+    font-size:12px;
+    line-height:1.2;
+    white-space:nowrap;
+  }
+  #app .compact-toolbar .summary-chip-button strong { font:inherit; font-weight:600; }
   #app .map-display-toggle { flex-shrink:0; }
   #app .matrix-grid { grid-template-columns:minmax(110px,150px) repeat(var(--parameter-count),minmax(0,1fr)); }
   #app #matrix { min-width:0; }
@@ -21,4 +33,13 @@
   #app .site-sort-control select { font-size:12px; min-height:28px; }
   #app .matrix-toggle { min-height:28px; }
   #app .chart-cell svg { width:100%; }
+  #app .grid-workspace .map-panel > .panel-heading {
+    height:30px;
+    padding:5px 10px;
+  }
+  #app .grid-workspace .map-panel > .panel-heading h2 {
+    font-size:12px;
+    line-height:18px;
+  }
+  #app .grid-workspace .spatial-viewport { inset:30px 0 30px; }
 }

@@ -48,7 +48,7 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
   placeLasagnaTooltip(event.clientX||target.right,event.clientY||target.top);
  };
  const mini=document.createElement('section');mini.className='shared-minimap';
- mini.innerHTML='<header><strong>Geographic context</strong><span>N ↑</span></header><svg tabindex="0" role="group" aria-label="Linked mini-map. Pan or zoom the geography beneath the fixed viewport. Click a site to select it."></svg><div class="mini-controls"><button data-action="in" aria-label="Mini-map zoom in">+</button><button data-action="out" aria-label="Mini-map zoom out">−</button><button data-action="reset">Reset</button></div><p>Dots show actual site locations. Click a dot to select its site; the fixed rectangle represents the main grid viewport.</p>';
+ mini.innerHTML='<header><strong>Geographic context</strong><span>N ↑</span></header><svg tabindex="0" role="group" aria-label="Linked mini-map. Pan or zoom the geography. Click a site to select it."></svg><div class="mini-controls"><button data-action="in" aria-label="Mini-map zoom in">+</button><button data-action="out" aria-label="Mini-map zoom out">−</button><button data-action="reset">Reset</button></div><p>Dots show actual site locations. Click a dot to select its site.</p>';
  workspace.append(mini);
  const svg=d3.select(mini.querySelector('svg'));
  const sites=data.sites.filter(s=>s.hasData),entries=new Map();
@@ -62,8 +62,8 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
   entries.set(site.site_id,{card,plot,site});
  }
  const defaultCamera=()=>fitCamera(viewport.clientWidth,viewport.clientHeight);
- let camera=defaultCamera(),visible=new Set(),dragging=false,moved=false,lastKey='',projection,frame,worldX,worldY,dots,dotHits,hoverRing,mapGroup,frameBox,miniTransform={sx:1,sy:1,tx:0,ty:0};
- function focus(id){const point=GRID_POSITIONS.get(id);if(!point)return;camera.x=viewport.clientWidth/2-point[0]*camera.zoom;camera.y=viewport.clientHeight/2-point[1]*camera.zoom;layout()}
+ let camera=defaultCamera(),cameraTouched=false,visible=new Set(),dragging=false,moved=false,lastKey='',projection,frame,worldX,worldY,dots,dotHits,hoverRing,mapGroup,frameBox,miniTransform={sx:1,sy:1,tx:0,ty:0};
+ function focus(id){const point=GRID_POSITIONS.get(id);if(!point)return;cameraTouched=true;camera.x=viewport.clientWidth/2-point[0]*camera.zoom;camera.y=viewport.clientHeight/2-point[1]*camera.zoom;layout()}
  function updateMini(){
   if(!projection||!frameBox)return;
   // Keep the rectangle as a stable representation of the main grid viewport.
@@ -171,21 +171,21 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
   for(const [id,{card}] of entries){card.classList.toggle('hovered',state.hoveredSite===id);card.classList.toggle('selected',state.selectedSite===id||(state.compareMode&&state.comparedSites?.has(id)));}
   layout();
  }
- function action(name){if(name==='in'||name==='out')camera=zoomAt(camera,camera.zoom*(name==='in'?1.2:1/1.2),viewport.clientWidth/2,viewport.clientHeight/2);else if(name==='reset')camera=defaultCamera();else{camera.x+=({left:160,right:-160}[name]||0);camera.y+=({up:130,down:-130}[name]||0)}layout()}
+ function action(name){if(name==='reset'){cameraTouched=false;camera=defaultCamera()}else{cameraTouched=true;if(name==='in'||name==='out')camera=zoomAt(camera,camera.zoom*(name==='in'?1.2:1/1.2),viewport.clientWidth/2,viewport.clientHeight/2);else{camera.x+=({left:160,right:-160}[name]||0);camera.y+=({up:130,down:-130}[name]||0)}}layout()}
  for(const control of [stage.querySelector('.spatial-navigation'),mini.querySelector('.mini-controls')])control.addEventListener('click',e=>{if(e.target.dataset.action)action(e.target.dataset.action)});
  viewport.addEventListener('keydown',e=>{const name={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down','+':'in','-':'out'}[e.key];if(name&&e.target===viewport){e.preventDefault();action(name)}});
  let start;viewport.addEventListener('pointerdown',e=>{if(e.button!==0)return;dragging=true;moved=false;start={x:e.clientX,y:e.clientY,camera:{...camera}}});
- viewport.addEventListener('pointermove',e=>{if(!dragging)return;const dx=e.clientX-start.x,dy=e.clientY-start.y;if(Math.hypot(dx,dy)>5||moved){moved=true;viewport.setPointerCapture(e.pointerId);camera={...start.camera,x:start.camera.x+dx,y:start.camera.y+dy};layout()}});
+ viewport.addEventListener('pointermove',e=>{if(!dragging)return;const dx=e.clientX-start.x,dy=e.clientY-start.y;if(Math.hypot(dx,dy)>5||moved){cameraTouched=true;moved=true;viewport.setPointerCapture(e.pointerId);camera={...start.camera,x:start.camera.x+dx,y:start.camera.y+dy};layout()}});
  for(const event of ['pointerup','pointercancel'])viewport.addEventListener(event,()=>{dragging=false;setTimeout(()=>moved=false,0)});
- viewport.addEventListener('wheel',e=>{e.preventDefault();const r=viewport.getBoundingClientRect();if(e.ctrlKey)camera=zoomAt(camera,camera.zoom*Math.exp(-e.deltaY*.012),e.clientX-r.left,e.clientY-r.top);else{camera.x-=e.deltaX;camera.y-=e.deltaY}layout()},{passive:false});
+ viewport.addEventListener('wheel',e=>{e.preventDefault();cameraTouched=true;const r=viewport.getBoundingClientRect();if(e.ctrlKey)camera=zoomAt(camera,camera.zoom*Math.exp(-e.deltaY*.012),e.clientX-r.left,e.clientY-r.top);else{camera.x-=e.deltaX;camera.y-=e.deltaY}layout()},{passive:false});
  const miniEl=svg.node();let miniDrag;
  const point=e=>{const r=miniEl.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
  const gridPoint=p=>({x:worldX.invert((p.x-miniTransform.tx)/miniTransform.sx),y:worldY.invert((p.y-miniTransform.ty)/miniTransform.sy)});
- miniEl.addEventListener('pointerdown',e=>{if(e.button!==0)return;if(e.target.closest('.mini-site-hit')){e.preventDefault();return}const p=point(e),g=gridPoint(p);if(!e.target.classList.contains('mini-viewport-rectangle')){camera.x=viewport.clientWidth/2-g.x*camera.zoom;camera.y=viewport.clientHeight/2-g.y*camera.zoom;layout()}miniDrag={p:gridPoint(p),camera:{...camera}};miniEl.setPointerCapture(e.pointerId)});
+ miniEl.addEventListener('pointerdown',e=>{if(e.button!==0)return;if(e.target.closest('.mini-site-hit')){e.preventDefault();return}cameraTouched=true;const p=point(e),g=gridPoint(p);if(!e.target.classList.contains('mini-viewport-rectangle')){camera.x=viewport.clientWidth/2-g.x*camera.zoom;camera.y=viewport.clientHeight/2-g.y*camera.zoom;layout()}miniDrag={p:gridPoint(p),camera:{...camera}};miniEl.setPointerCapture(e.pointerId)});
  miniEl.addEventListener('pointermove',e=>{if(!miniDrag||!miniEl.hasPointerCapture(e.pointerId))return;const p=gridPoint(point(e));camera={...miniDrag.camera,x:miniDrag.camera.x-(p.x-miniDrag.p.x)*camera.zoom,y:miniDrag.camera.y-(p.y-miniDrag.p.y)*camera.zoom};layout()});
  for(const type of ['pointerup','pointercancel'])miniEl.addEventListener(type,()=>{miniDrag=null});
- miniEl.addEventListener('wheel',e=>{e.preventDefault();const p=gridPoint(point(e)),ax=p.x*camera.zoom+camera.x,ay=p.y*camera.zoom+camera.y;camera=zoomAt(camera,camera.zoom*Math.exp(-e.deltaY*.005),ax,ay);layout()},{passive:false});
+ miniEl.addEventListener('wheel',e=>{e.preventDefault();cameraTouched=true;const p=gridPoint(point(e)),ax=p.x*camera.zoom+camera.x,ay=p.y*camera.zoom+camera.y;camera=zoomAt(camera,camera.zoom*Math.exp(-e.deltaY*.005),ax,ay);layout()},{passive:false});
  miniEl.addEventListener('keydown',e=>{if(e.target!==miniEl)return;const name={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down','+':'in','-':'out'}[e.key];if(name){e.preventDefault();action(name)}});
- const observer=new ResizeObserver(()=>{drawMini();layout()});observer.observe(viewport);observer.observe(miniEl);
+ const observer=new ResizeObserver(()=>{if(!cameraTouched)camera=defaultCamera();drawMini();layout()});observer.observe(viewport);observer.observe(miniEl);
  drawMini();update();return {update,focus,renderOverview:(host,site)=>{host.replaceChildren();const view=allTemporal();for(const code of state.selectedParameters)drawGlyph(host,site,code,view,"detail")},resize:()=>{drawMini();layout()},scheduleLayout:layout};
 }
