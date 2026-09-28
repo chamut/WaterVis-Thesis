@@ -107,6 +107,26 @@ footer { padding:7px 12px; gap:12px; border-top:1px solid var(--line); font-size
   .matrix-title-row { flex-wrap:wrap; }
   .has-threshold-legend .analysis-workspace { height:calc(100dvh - 208px); }
 }
+@media(max-height:1000px) and (min-width:641px) {
+  .masthead { min-height:40px; padding:6px 14px; }
+  h1 { font-size:16px; }
+  .subtitle { font-size:11px; }
+  .view-links { gap:6px; padding:4px 12px; font-size:12px; }
+  .view-links a { padding:4px 8px; }
+  .compact-toolbar { gap:8px; min-height:48px; padding:6px 12px; }
+  .compact-menu summary,.compact-toolbar .summary-chip-button { min-height:32px; padding:5px 9px; font-size:12px; }
+  .compare-sites,.watercourse-select { min-height:32px; padding:6px 8px; font-size:12px; }
+  .map-display-toggle button { min-height:28px; padding:4px 8px; font-size:12px; }
+  .compact-toolbar .ers-legend { font-size:11px; }
+  .analysis-workspace { min-height:0; grid-template-rows:minmax(250px,1fr) minmax(210px,.82fr); }
+  .matrix-title-row { min-height:35px; padding:5px 10px; }
+  .site-sort-note { padding:3px 10px; font-size:11px; }
+  .matrix-row { min-height:46px; }
+  .chart-cell svg { height:40px; }
+  .row-label strong,.row-label span,.column-heading span,.corner-label { font-size:11px; }
+  .column-heading strong { font-size:12px; }
+  footer { padding:5px 10px; font-size:10px; }
+}
 @media(max-width:640px) {
   .masthead > div:first-child { flex-wrap:wrap; gap:4px 12px; }
   .compact-menu { position:static; }

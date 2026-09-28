@@ -859,7 +859,36 @@ function createMap(data) {
   ];
   const map = new maplibregl.Map({
     container: 'map',
-    style: 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json',
+    // Keep the basemap definition self-contained so Safari and GitHub Pages do
+    // not depend on CARTO's external vector-style resources.
+    style: {
+      version: 8,
+      sources: {
+        'esri-light-gray': {
+          type: 'raster',
+          tiles: [
+            'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+          ],
+          tileSize: 256,
+          attribution: 'Tiles &copy; Esri',
+        },
+        'esri-light-gray-reference': {
+          type: 'raster',
+          tiles: [
+            'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+          ],
+          tileSize: 256,
+        },
+      },
+      layers: [
+        { id: 'esri-light-gray', type: 'raster', source: 'esri-light-gray' },
+        {
+          id: 'esri-light-gray-reference',
+          type: 'raster',
+          source: 'esri-light-gray-reference',
+        },
+      ],
+    },
     center: [145.66, -36.82],
     zoom: 6.4,
     minZoom: 5,
@@ -872,9 +901,6 @@ function createMap(data) {
 
   const resetView = (duration = 0) => map.fitBounds(bounds, { padding: 38, duration });
   map.on('load', () => {
-    map.getStyle().layers
-      .filter((layer) => layer.source === 'carto' && layer['source-layer'] === 'waterway')
-      .forEach((layer) => map.setLayoutProperty(layer.id, 'visibility', 'none'));
     map.addSource('goulburn-basin', { type: 'geojson', data: data.boundary });
     map.addLayer({
       id: 'goulburn-basin-fill',
