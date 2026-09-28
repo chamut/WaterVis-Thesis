@@ -12,6 +12,7 @@ h1 { margin:0; font-size:18px; line-height:1.3; letter-spacing:-.025em; }
 .threshold-legend-heading strong { font-size:13px; }
 .threshold-legend-heading small { color:#61766d; font-size:10px; }
 .threshold-time-direction,.threshold-legend-item { display:inline-flex; align-items:center; gap:7px; white-space:nowrap; }
+.threshold-legend-info { margin-left:auto; }
 .threshold-time-direction { padding-right:16px; border-right:1px solid #bdcec4; color:#405c51; font-weight:600; }
 .threshold-time-direction i { display:grid; place-items:center; width:20px; height:26px; border-radius:10px; background:#d7e8de; color:#1f7051; font-size:18px; font-style:normal; line-height:1; }
 .threshold-swatch { display:inline-block; width:25px; height:13px; border:1px solid #81968c; border-radius:3px; box-shadow:inset 0 0 0 1px #fff8; }

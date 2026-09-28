@@ -579,6 +579,11 @@ function setupCompactWorkspace(data) {
       <span class="threshold-legend-item"><i class="threshold-swatch exceeds" aria-hidden="true"></i>Exceeds</span>
       <span class="threshold-legend-item"><i class="threshold-swatch parameter-colours" aria-hidden="true"></i>Does not exceed</span>
       <span class="threshold-legend-item"><i class="threshold-swatch no-data" aria-hidden="true"></i>No data / no objective</span>`;
+    const ersInfo = document.querySelector('.ers-info');
+    if (ersInfo) {
+      ersInfo.classList.add('threshold-legend-info');
+      thresholdLegend.append(ersInfo);
+    }
     toolbar.after(thresholdLegend);
     app.classList.add('has-threshold-legend');
   }
