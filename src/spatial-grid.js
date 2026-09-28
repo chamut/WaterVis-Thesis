@@ -61,12 +61,7 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
   card.addEventListener('focusin',e=>{onHover(site.site_id);if(e.target.matches(':focus-visible')){const r=card.getBoundingClientRect(),v=viewport.getBoundingClientRect();if(r.left<v.left||r.right>v.right||r.top<v.top||r.bottom>v.bottom)focus(site.site_id)}});card.addEventListener('focusout',e=>{if(!card.contains(e.relatedTarget))onHover(null)});
   entries.set(site.site_id,{card,plot,site});
  }
- const defaultCamera=()=>{
-  const width=viewport.clientWidth,height=viewport.clientHeight,fitted=fitCamera(width,height);
-  if(width<=760||fitted.zoom>=.3)return fitted;
-  const zoom=.3;
-  return {zoom,x:(width-WORLD.width*zoom)/2,y:(height-WORLD.height*zoom)/2};
- };
+ const defaultCamera=()=>fitCamera(viewport.clientWidth,viewport.clientHeight);
  let camera=defaultCamera(),visible=new Set(),dragging=false,moved=false,lastKey='',projection,frame,worldX,worldY,dots,dotHits,hoverRing,mapGroup,frameBox,miniTransform={sx:1,sy:1,tx:0,ty:0};
  function focus(id){const point=GRID_POSITIONS.get(id);if(!point)return;camera.x=viewport.clientWidth/2-point[0]*camera.zoom;camera.y=viewport.clientHeight/2-point[1]*camera.zoom;layout()}
  function updateMini(){
