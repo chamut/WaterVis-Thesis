@@ -3,7 +3,7 @@ import {sensorSegments,pixelSample} from './temporal-map-model.js';
 const COLORS=['#d7191c','#e78b25','#8b7613','#258cc0','#2c3b91'];
 const SHAPES=[d3.symbolCircle,d3.symbolSquare,d3.symbolTriangle,d3.symbolDiamond,d3.symbolCross];
 export function drawComparison({data,state,colours,onRemove}) {
- const host=document.querySelector('#site-detail');host.innerHTML='<h3>Compare sites</h3><div class="comparison-legend"></div><div class="comparison-chart"><div class="comparison-tip" role="status" hidden></div></div><p class="comparison-hint">Hover to inspect · Select up to five sites</p>';
+ const host=document.querySelector('#site-detail');host.innerHTML='<h3>Compare sites</h3><div class="comparison-legend"></div><div class="comparison-chart"></div><div class="comparison-tip" role="status" hidden></div><p class="comparison-hint">Hover to inspect · Select up to five sites</p>';
  const p=data.availability.parameters.find(p=>p.code===state.selectedParameter),series=[...state.comparedSites].map(([id,slot])=>({site:data.sites.find(s=>s.site_id===id),slot,sensor:data.temporalView.continuous.filter(r=>r.site_id===id&&r.parameter_code===p.code),spot:data.temporalView.spot.filter(r=>r.site_id===id&&r.parameter_code===p.code&&Number.isFinite(r.value))}));
  const all=series.flatMap(s=>[...s.sensor,...s.spot]).filter(r=>Number.isFinite(r.value));
  const parameter=document.createElement('div');parameter.className='comparison-parameter';parameter.style.setProperty('--comparison-parameter-colour',colours[p.code]);
@@ -42,8 +42,6 @@ export function drawComparison({data,state,colours,onRemove}) {
   }
   if(!prepared.length)tip.textContent='Select sites to compare';
   tip.hidden=false;
-  // Keep the readout inside the plot, on the opposite side of the pointer.
-  tip.style.left=px>w/2?'8px':'auto';tip.style.right=px>w/2?'auto':'8px';
  }
  const hide=()=>{tip.hidden=true;guide.attr('visibility','hidden')};
  let keyboardX=(w+36)/2;

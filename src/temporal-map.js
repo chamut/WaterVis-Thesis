@@ -87,7 +87,8 @@ export function createTemporalMap({ data, state, colours, temporalView, onHover,
     const continuous = view.continuous.filter((row) => row.parameter_code === code);
     const spot = view.spot.filter((row) => row.parameter_code === code);
     const objectives = data.sites.filter((site) => site.hasData).map((site) => data.availability.ers.thresholds[site.ers_segment]?.[code]);
-    const domain = sharedDomain(continuous, spot, objectives);
+    const shared = sharedDomain(continuous, spot, objectives);
+    const domain = [0, Math.max(1, shared[1])];
     const x = d3.scaleTime().domain([state.rangeStart, state.rangeEnd]).range([margin.left + 3, WIDTH - margin.right - 3]);
     const y = d3.scaleLinear().domain(domain).range([PLOT_HEIGHT - margin.bottom - 3, margin.top + 3]);
     const sensorBySite = d3.group(continuous, (row) => row.site_id);

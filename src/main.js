@@ -8,6 +8,7 @@ import { createSpatialGrid } from './spatial-grid.js';
 import { drawComparison } from './site-comparison.js';
 import { createTemporalMap } from './temporal-map.js';
 import { parseMeasurement } from './temporal-map-model.js';
+import { relatedSites } from './site-selection.js';
 
 const PARAMETER_COLOURS = {
   DO: '#168aad',
@@ -17,12 +18,18 @@ const PARAMETER_COLOURS = {
   PH: '#2f9e67',
 };
 
+// Retain these records in the downloaded source files, but exclude them from
+// the natural-watercourse prototype: their official site names identify them
+// as artificial drainage sites. Two also fall outside the displayed polygon.
+const EXCLUDED_DISPLAY_SITE_IDS = new Set(['405720', '405730', '405758', '405779']);
+
 const viewMode = location.pathname.includes('multiparameter-grid-matrix') ? 'multi' : location.pathname.includes('spatial-grid-minimap') ? 'grid' : 'main';
 const isGrid = viewMode !== 'main';
 const state = {
   selectedParameters: new Set(['DO','TN','TP','TURB','PH']),
   comparedSites: new Map(),
   compareMode: false,
+  relatedSelectionMode: false,
   hoveredSite: null,
   selectedSite: null,
   selectedParameter: 'DO',
@@ -109,7 +116,7 @@ async function loadData() {
   if (!sitesRaw.length || !availability?.parameters?.length) {
     throw new Error('The generated site or availability data is empty.');
   }
-  const sites = sitesRaw.map((row) => ({
+  const sites = sitesRaw.filter((row) => !EXCLUDED_DISPLAY_SITE_IDS.has(row.site_id)).map((row) => ({
     ...row,
     latitude: number(row.latitude),
     longitude: number(row.longitude),
@@ -118,7 +125,8 @@ async function loadData() {
     elevation: number(row.elevation_m),
     insideBoundary: d3.geoContains(boundary, [number(row.longitude), number(row.latitude)]),
   }));
-  const spot = spotRaw.map((row) => ({
+  const displayedSiteIds = new Set(sites.map((site) => site.site_id));
+  const spot = spotRaw.filter((row) => displayedSiteIds.has(row.site_id)).map((row) => ({
     ...row,
     value: number(row.value),
     rawValue: number(row.raw_value),
@@ -259,8 +267,8 @@ function renderShell(data) {
   app.innerHTML = `
     <header class="masthead">
       <div>
-        <p class="eyebrow">Thesis prototype · Goulburn basin · 2015–2024</p>
-        <h1>Water Quality Explorer</h1>
+        <p class="eyebrow">Prototype · Goulburn Basin · 2015–2024</p>
+        <h1>WaterVis</h1>
         <p class="subtitle">Linked spatial overview and site-by-parameter time series</p>
       </div>
       <div class="summary-chips" aria-label="Dataset summary">
@@ -273,7 +281,7 @@ function renderShell(data) {
           </section>
         </div>
         <span><strong>${parameters.length}</strong> parameters</span>
-        <span><strong>${data.validation.spot_rows.toLocaleString()}</strong> spot samples</span>
+        <span><strong>${data.spot.length.toLocaleString()}</strong> spot samples</span>
         <span><strong>10</strong> years</span>
       </div>
     </header>
@@ -284,15 +292,16 @@ function renderShell(data) {
         <h2 id="temporal-heading">Temporal view</h2>
       </div>
       <div class="resolution-buttons" role="group" aria-label="Temporal resolution">
-        <button type="button" data-resolution="monthly" aria-pressed="true">Monthly</button>
-        <button type="button" data-resolution="seasonal" aria-pressed="false">Seasonal</button>
-        <button type="button" data-resolution="yearly" aria-pressed="false">Yearly</button>
+        <button type="button" data-resolution="monthly" aria-label="Monthly aggregation" aria-pressed="true">Monthly</button>
+        <button type="button" data-resolution="seasonal" aria-label="Seasonal aggregation" aria-pressed="false">Seasonal</button>
+        <button type="button" data-resolution="yearly" aria-label="Yearly aggregation" aria-pressed="false">Yearly</button>
       </div>
       <div class="date-range-controls">
         <label>From<input type="date" id="range-start" min="2015-01-01" max="2024-12-31" value="${dateInputFormat(state.rangeStart)}"></label>
         <span aria-hidden="true">→</span>
         <label>To<input type="date" id="range-end" min="2015-01-01" max="2024-12-31" value="${dateInputFormat(state.rangeEnd)}"></label>
-        <button type="button" class="range-reset">Full period</button>
+        <button type="button" class="range-latest" data-range-preset="latest-year" aria-label="Show latest year">Latest year</button>
+        <button type="button" class="range-reset" aria-label="Show full period">Full period</button>
       </div>
       <p class="temporal-summary" aria-live="polite">Monthly · 2015–2024</p>
     </section>
@@ -333,6 +342,11 @@ function renderShell(data) {
               <p class="ers-segment-note"><b>A and B are geographic groups, not better/worse grades.</b> Each segment has its own parameter objectives.</p>
               <p class="ers-current-segments"><b>Sites in this view:</b> ${displayedSegmentSummary}.</p>
               <a href="${data.availability.ers.source_url}" target="_blank" rel="noreferrer">EPA ERS clauses 17 and Table 5.8 ↗</a>
+            </div>
+            <div class="ers-info-section">
+              <strong>Time, aggregation, and ERS</strong>
+              <p class="ers-segment-note"><b>The ERS objective does not change each month or year.</b> It is fixed for the site's river segment and parameter in this prototype. What changes is the observed data used for comparison.</p>
+              <p class="ers-segment-note">Monthly, seasonal, and yearly charts show the mean of available spot observations in each interval. Marker colour uses the required ERS statistic from the latest complete calendar year inside the selected range; a partial-year range therefore has no annual marker assessment.</p>
             </div>
           </section>
         </div>
@@ -399,9 +413,9 @@ function renderShell(data) {
         <div><dt>Coverage</dt><dd>1 Jan 2015–31 Dec 2024</dd></div>
         <div><dt>Monitoring sites</dt><dd>${targetSites.length} (${activeCount} active)</dd></div>
         <div><dt>Source measurements</dt><dd>${data.validation.source_measurement_rows.toLocaleString()} rows</dd></div>
-        <div><dt>Usable prototype observations</dt><dd>${data.validation.spot_rows.toLocaleString()} spot records</dd></div>
+        <div><dt>Usable prototype observations</dt><dd>${data.spot.length.toLocaleString()} spot records</dd></div>
       </dl>
-      <p class="ribbon-note">Provisional screening with <a href="${data.availability.ers.source_url}" target="_blank" rel="noreferrer">ERS Table 5.8</a> · all ${data.validation.ers_sites_assigned} displayed sites spatially assigned · DO saturation estimated where temperature is paired · TN uses direct total nitrogen or paired TKN + NOx · Not an official ERS assessment or final WQI</p>
+      <p class="ribbon-note">Provisional screening with <a href="${data.availability.ers.source_url}" target="_blank" rel="noreferrer">ERS Table 5.8</a> · all ${targetSites.length} displayed natural watercourse sites spatially assigned · four drainage sites excluded · DO saturation estimated where temperature is paired · TN uses direct total nitrogen or paired TKN + NOx · Not an official ERS assessment or final WQI</p>
     </section>
   `;
 
@@ -475,9 +489,15 @@ function setupCompactWorkspace(data) {
     toolbar.append(wrapper);
     return wrapper;
   }
-  menu('<span id="compact-period">Monthly · 2015–2024</span> ▾', document.querySelector('.temporal-controls'), 'time-menu');
-  toolbar.append(document.querySelector('.site-filter-control'));
+  const timeMenu = menu('<span id="compact-period">Monthly · 2015–2024</span> ▾', document.querySelector('.temporal-controls'), 'time-menu');
+  timeMenu.querySelector('summary').dataset.toolbarHelp = 'Choose the date range and monthly, seasonal, or yearly aggregation.';
+  const siteFilterControl = document.querySelector('.site-filter-control');
+  siteFilterControl.querySelector('.site-filter-trigger').dataset.toolbarHelp = 'Choose which monitoring sites appear in the views.';
+  toolbar.append(siteFilterControl);
   const parameterMenu = menu('<span id="compact-parameter">DO · Map</span> ▾', document.querySelector('.parameter-buttons'), 'parameter-menu');
+  parameterMenu.querySelector('summary').dataset.toolbarHelp = isGrid
+    ? 'View the water-quality parameters represented in this grid.'
+    : 'Choose the water-quality parameter shown on the map.';
   parameterMenu.addEventListener('click', (event) => {
     if (viewMode !== 'multi' && event.target.closest('.parameter-button')) parameterMenu.open = false;
   });
@@ -486,6 +506,8 @@ function setupCompactWorkspace(data) {
   mapDisplay.setAttribute('role', 'group');
   mapDisplay.setAttribute('aria-label', 'Map display');
   mapDisplay.innerHTML = '<button type="button" data-map-display="markers" aria-pressed="true">Markers</button><button type="button" data-map-display="temporal" aria-pressed="false">Temporal charts</button>';
+  mapDisplay.querySelector('[data-map-display="markers"]').dataset.toolbarHelp = 'Show sites as ERS status markers.';
+  mapDisplay.querySelector('[data-map-display="temporal"]').dataset.toolbarHelp = 'Show a small temporal chart at each site.';
   mapDisplay.addEventListener('click', (event) => {
     const mode = event.target.dataset.mapDisplay;
     if (!mode || mode === state.mapDisplayMode) return;
@@ -495,13 +517,47 @@ function setupCompactWorkspace(data) {
     updateLinkedViews(data, { detail: false });
     data.temporalMap?.scheduleLayout();
   });
-  toolbar.append(document.querySelector('.ers-legend-group'));
-  toolbar.append(mapDisplay);
+  const ersLegendGroup = document.querySelector('.ers-legend-group');
+  const ersInfoButton = ersLegendGroup.querySelector('.ers-info-button');
+  if (ersInfoButton) ersInfoButton.dataset.toolbarHelp = 'Explain how observations are compared with ERS objectives.';
+  toolbar.append(ersLegendGroup);
   mapDisplay.hidden = isGrid;
   const compare = document.createElement('button');
   compare.className = 'compare-sites'; compare.type = 'button'; compare.textContent = 'Compare sites · 0/5'; compare.setAttribute('aria-pressed', 'false');
-  compare.onclick = () => { state.compareMode = !state.compareMode; updateLinkedViews(data); };
+  compare.dataset.toolbarHelp = 'Select up to five sites to compare in one temporal chart.';
+  compare.onclick = () => {
+    state.compareMode = !state.compareMode;
+    if (state.compareMode) state.relatedSelectionMode = false;
+    updateLinkedViews(data);
+  };
   toolbar.append(compare);
+  const watercourseSelect = document.createElement('button');
+  watercourseSelect.className = 'watercourse-select';
+  watercourseSelect.type = 'button';
+  watercourseSelect.textContent = 'Related sites · Off';
+  watercourseSelect.setAttribute('aria-pressed', 'false');
+  watercourseSelect.dataset.toolbarHelp = 'Select a site to keep up to five related sites: the same named watercourse first, then nearest neighbours. Exploratory only; flow connectivity is not verified.';
+  watercourseSelect.dataset.tooltipLong = 'true';
+  watercourseSelect.onclick = () => {
+    state.relatedSelectionMode = !state.relatedSelectionMode;
+    if (state.relatedSelectionMode) {
+      state.compareMode = false;
+    } else {
+      state.selectedSites = new Set(data.sites.filter((site) => site.hasData).map((site) => site.site_id));
+      state.comparedSites.clear();
+      state.compareMode = false;
+      state.selectedSite = null;
+      data.syncSiteFilter?.();
+      return;
+    }
+    updateLinkedViews(data);
+  };
+  const relatedControl = document.createElement('div');
+  relatedControl.className = 'related-sites-control';
+  relatedControl.append(watercourseSelect);
+  toolbar.append(relatedControl);
+  relatedControl.hidden = isGrid;
+  toolbar.append(mapDisplay);
   const links = document.createElement('nav'); links.className = 'view-links'; links.setAttribute('aria-label', 'Views');
   for (const [mode, path, label] of [['main','','Geographic map'],['grid','previews/spatial-grid-minimap-preview.html','Temporal grid'],['multi','previews/multiparameter-grid-matrix-preview.html','Multi-parameter grid']]) {
     const link = document.createElement('a'); link.href = import.meta.env.BASE_URL + path; link.textContent = label; if (mode === viewMode) link.setAttribute('aria-current','page'); links.append(link);
@@ -513,9 +569,10 @@ function setupCompactWorkspace(data) {
   temporalLegend.className = 'temporal-map-legend';
   temporalLegend.hidden = true;
   toolbar.append(temporalLegend);
+  setupToolbarHelp(toolbar);
   document.querySelector('.parameter-bar').remove();
   document.querySelector('.masthead .eyebrow').remove();
-  document.querySelector('.subtitle').textContent = 'Goulburn basin · 2015–2024';
+  document.querySelector('.subtitle').textContent = 'Prototype · Goulburn Basin · 2015–2024';
   const snapshot = document.createElement('details');
   snapshot.className = 'compact-dataset';
   snapshot.innerHTML = '<summary>Dataset and methodology</summary>';
@@ -598,6 +655,52 @@ function setupCompactWorkspace(data) {
   document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeMenus(event); });
 }
 
+function setupToolbarHelp(toolbar) {
+  const tooltip = document.createElement('div');
+  tooltip.className = 'toolbar-help-tooltip';
+  tooltip.id = 'toolbar-help-tooltip';
+  tooltip.setAttribute('role', 'tooltip');
+  tooltip.hidden = true;
+  document.body.append(tooltip);
+  let activeTarget = null;
+
+  const show = (target) => {
+    if (!target?.dataset.toolbarHelp || target.disabled) return;
+    activeTarget = target;
+    tooltip.textContent = target.dataset.toolbarHelp;
+    tooltip.classList.toggle('long', target.dataset.tooltipLong === 'true');
+    tooltip.hidden = false;
+    target.setAttribute('aria-describedby', tooltip.id);
+    const rect = target.getBoundingClientRect();
+    const tooltipRect = tooltip.getBoundingClientRect();
+    const left = Math.min(
+      window.innerWidth - tooltipRect.width - 10,
+      Math.max(10, rect.left + (rect.width - tooltipRect.width) / 2),
+    );
+    const below = rect.bottom + 8;
+    const top = below + tooltipRect.height <= window.innerHeight - 10
+      ? below
+      : Math.max(10, rect.top - tooltipRect.height - 8);
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top = `${top}px`;
+  };
+  const hide = (target) => {
+    if (target && target !== activeTarget) return;
+    activeTarget?.removeAttribute('aria-describedby');
+    activeTarget = null;
+    tooltip.hidden = true;
+  };
+  toolbar.addEventListener('pointerover', (event) => show(event.target.closest('[data-toolbar-help]')));
+  toolbar.addEventListener('pointerout', (event) => {
+    const target = event.target.closest('[data-toolbar-help]');
+    if (target && !target.contains(event.relatedTarget)) hide(target);
+  });
+  toolbar.addEventListener('focusin', (event) => show(event.target.closest('[data-toolbar-help]')));
+  toolbar.addEventListener('focusout', (event) => hide(event.target.closest('[data-toolbar-help]')));
+  window.addEventListener('scroll', () => hide(), { passive: true });
+  window.addEventListener('resize', () => hide(), { passive: true });
+}
+
 function updateTemporalSummary(data, message = null) {
   const summary = document.querySelector('.temporal-summary');
   if (!summary) return;
@@ -667,6 +770,11 @@ function setupTemporalControls(data) {
     endInput.value = '2024-12-31';
     applyRange('reset');
   });
+  document.querySelector('[data-range-preset="latest-year"]').addEventListener('click', () => {
+    startInput.value = '2024-01-01';
+    endInput.value = '2024-12-31';
+    applyRange('preset');
+  });
 }
 
 function setupSiteFilter(data) {
@@ -679,8 +787,7 @@ function setupSiteFilter(data) {
     control.dataset.open = String(open);
     trigger.setAttribute('aria-expanded', String(open));
   };
-  const updateFilter = () => {
-    state.selectedSites = new Set(checkboxes.filter((checkbox) => checkbox.checked).map((checkbox) => checkbox.value));
+  const renderSelection = () => {
     basinCheckboxes.forEach((basinCheckbox) => {
       const basinSites = checkboxes.filter((checkbox) => checkbox.dataset.basin === basinCheckbox.dataset.basin);
       const checked = basinSites.filter((checkbox) => checkbox.checked).length;
@@ -694,6 +801,14 @@ function setupSiteFilter(data) {
       : `Showing ${selectedCount} of ${totalSites} sites`;
     if (state.selectedSite && !state.selectedSites.has(state.selectedSite)) state.selectedSite = null;
     refreshTemporalViews(data);
+  };
+  const updateFilter = () => {
+    state.selectedSites = new Set(checkboxes.filter((checkbox) => checkbox.checked).map((checkbox) => checkbox.value));
+    renderSelection();
+  };
+  data.syncSiteFilter = () => {
+    checkboxes.forEach((checkbox) => { checkbox.checked = state.selectedSites.has(checkbox.value); });
+    renderSelection();
   };
   trigger.addEventListener('click', (event) => {
     event.stopPropagation();
@@ -1222,6 +1337,14 @@ function updateLinkedViews(data, { detail = true } = {}) {
   const currentParameter = getParameter(data, parameter);
   document.querySelector('#compact-parameter').textContent = viewMode === 'multi' ? `${state.selectedParameters.size} parameters · Grid` : `${currentParameter.short_label} · ${currentParameter.unit}`;
   const compare = document.querySelector('.compare-sites'); compare.textContent = `Compare sites · ${state.comparedSites.size}/5`; compare.setAttribute('aria-pressed', String(state.compareMode));
+  const watercourseSelect = document.querySelector('.watercourse-select');
+  if (watercourseSelect) {
+    watercourseSelect.textContent = state.relatedSelectionMode ? 'Related sites · Click a site' : 'Related sites · Off';
+    watercourseSelect.setAttribute('aria-pressed', String(state.relatedSelectionMode));
+  }
+  document.querySelectorAll('[data-map-display]').forEach((button) => {
+    button.setAttribute('aria-pressed', String(button.dataset.mapDisplay === state.mapDisplayMode));
+  });
   app.style.setProperty('--current-parameter', PARAMETER_COLOURS[parameter]);
   d3.selectAll('.parameter-button').attr('aria-pressed', (item) => viewMode === 'multi' ? state.selectedParameters.has(item.code) : item.code === parameter);
   d3.selectAll('.column-heading').classed('selected-parameter', (item) => item.code === parameter);
@@ -1292,8 +1415,24 @@ function toggleComparedSite(data, id) {
   updateLinkedViews(data);
 }
 
+function selectRelatedSites(data, siteId) {
+  const matches = relatedSites(data.sites, siteId, 5);
+  if (!matches.length) return;
+  state.selectedSites = new Set(matches.map((site) => site.site_id));
+  state.comparedSites = new Map(matches.map((site, index) => [site.site_id, index]));
+  state.selectedSite = siteId;
+  state.detailMode = 'site';
+  state.compareMode = true;
+  data.syncSiteFilter?.();
+  focusMapOnSite(data, siteId);
+}
+
 function selectSite(data, siteId, event, mode = 'site') {
   event?.preventDefault();
+  if (state.relatedSelectionMode && event?.currentTarget?.classList?.contains('site-marker')) {
+    selectRelatedSites(data, siteId);
+    return;
+  }
   if (state.compareMode) { toggleComparedSite(data, siteId); return; }
   const togglingOff = viewMode !== 'multi' && state.selectedSite === siteId && state.detailMode === mode;
   state.selectedSite = togglingOff ? null : siteId;
@@ -1368,7 +1507,9 @@ async function init() {
         return allSitesView;
       },
       onHover: (siteId) => setHoveredSite(data, siteId),
-      onSelect: (siteId, event) => selectPlot(data, siteId, state.selectedParameter, event),
+      onSelect: (siteId, event) => state.relatedSelectionMode
+        ? selectRelatedSites(data, siteId)
+        : selectPlot(data, siteId, state.selectedParameter, event),
     });
     createMatrix(data);
     updateTemporalSummary(data);

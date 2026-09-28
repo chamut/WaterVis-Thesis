@@ -1,15 +1,15 @@
 // Shared camera geometry for both schematic grids. Map dots stay geographic.
 export const SKETCH_SITES = [
- // Preserve the approved positions for the 20 sites shared with the earlier
+ // Preserve the approved positions for the 16 displayed sites shared with the earlier
  // dataset. Only the four new sites use provisional empty slots.
- ['405297',295,327],['405232',463,401],['405720',575,403],
- ['405779',791,327],['405758',903,327],['405276',722,454],
- ['405204',908,575],['405270',798,630],['405730',781,710],
+ ['405297',295,327],['405232',463,401],
+ ['405276',722,454],
+ ['405204',908,575],['405270',798,630],
  ['405200',681,803],['405234',1154,980],['405240',550,1190],
  ['405212',550,1270],['405201',720,1220],['405214',1220,1260],
  ['405203',1050,1370],['405219',1340,1480],['405209',870,1450],
  ['405205',730,1550],['405264',1220,1590],
- // New in the 24-site, 2015–2024 extract; revisit these four placements.
+ // New in the displayed 20-site, 2015–2024 extract; revisit these four placements.
  ['405246',900,810],['405237',1050,840],['405251',1320,1080],['405231',650,1410],
 ];
 export const GRID_POSITIONS = new Map(SKETCH_SITES.map(([id,x,y]) => [id, [(x-8)*2.4,(y-187)*2.4]]));

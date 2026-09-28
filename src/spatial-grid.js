@@ -17,6 +17,7 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
  workspace.classList.add('grid-workspace');
  const stage=document.querySelector('.map-stage');
  stage.innerHTML='<div class="spatial-viewport" tabindex="0" aria-label="Spatial grid. Drag or use arrow keys to pan; pinch to zoom."><div class="spatial-cards"></div></div><div class="spatial-navigation" aria-label="Grid navigation"><button data-action="in" aria-label="Zoom in">+</button><output></output><button data-action="out" aria-label="Zoom out">−</button><button data-action="reset">Reset</button><button data-action="left" aria-label="Pan left">←</button><button data-action="up" aria-label="Pan up">↑</button><button data-action="down" aria-label="Pan down">↓</button><button data-action="right" aria-label="Pan right">→</button></div><div class="spatial-status" role="status"></div><div class="map-tooltip" role="status"></div>';
+ stage.classList.toggle('multi-spatial',multi);
  document.querySelector('.map-panel h2').textContent='Approximate geographic positions · N ↑';
  const viewport=stage.querySelector('.spatial-viewport'),layer=stage.querySelector('.spatial-cards');
  const mini=document.createElement('section');mini.className='shared-minimap';
@@ -80,7 +81,7 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
    if(x>=0&&x<=w&&y>=0&&y<=h)visible.add(id);
   }
   stage.querySelector('output').textContent=Math.round(camera.zoom*100)+'%';
-  stage.querySelector('.spatial-status').textContent=state.selectedSites.size?`${visible.size} of ${state.selectedSites.size} sites in view · Drag to pan · Pinch to zoom`:'No sites selected. Choose sites in the toolbar.';
+  if(!multi)stage.querySelector('.spatial-status').textContent=state.selectedSites.size?`${visible.size} of ${state.selectedSites.size} sites in view · Drag to pan · Pinch to zoom`:'No sites selected. Choose sites in the toolbar.';
   updateMini();
  }
  function drawTemporal(plot,site,code,view,domain){
@@ -108,8 +109,7 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
   s.append('rect').attr('x',5).attr('y',2).attr('width',32).attr('height',3).attr('fill',colours[code]);s.append('text').attr('x',21).attr('y',17).attr('text-anchor','middle').text(p.short_label);
   const fmt=d3.format('.4~g'),dateFmt=d3.timeFormat('%d %b %Y %H:%M'),bounds=objective?[Number.isFinite(objective.lower)?'≥ '+fmt(objective.lower):null,Number.isFinite(objective.upper)?'≤ '+fmt(objective.upper):null].filter(Boolean).join(' and '):'Unavailable';
   const description=d=>`${site.short_name} · ${p.short_label} · ${dateFmt(new Date(d.a))} — ${dateFmt(new Date(d.b-1))} · ${{outside:'Exceeds',within:'Does not exceed',missing:'No data',unknown:'No objective'}[d.status]} · ${d.values.length?'Range '+fmt(d3.min(d.values))+'–'+fmt(d3.max(d.values))+' '+p.unit:'No observations'} · ${d.spot} aggregated spot value${d.spot===1?'':'s'} · Bounds ${bounds}${d.count>1?' · '+d.count+' time intervals combined for display':''}`;
-  s.selectAll('.time-state').data(groups).join('rect').attr('class','time-state').attr('x',5).attr('y',d=>y(d.b)).attr('width',32).attr('height',d=>Math.max(.5,y(d.a)-y(d.b)-(bins.length<=31?.4:0))).attr('fill',d=>d.status==='outside'?'#c95050':d.status==='within'?'#b8d9c4':`url(#${patternId})`).on('pointermove',(event,d)=>{button.title=description(d);stage.querySelector('.spatial-status').textContent=description(d)}).append('title').text(description);
-  button.onfocus=()=>{stage.querySelector('.spatial-status').textContent=`${p.label} · ${state.selectedResolution} states · earliest at bottom, latest at top · click for temporal detail`};
+  s.selectAll('.time-state').data(groups).join('rect').attr('class','time-state').attr('x',5).attr('y',d=>y(d.b)).attr('width',32).attr('height',d=>Math.max(.5,y(d.a)-y(d.b)-(bins.length<=31?.4:0))).attr('fill',d=>d.status==='outside'?'#c95050':d.status==='within'?'#b8d9c4':`url(#${patternId})`).on('pointermove',(event,d)=>{button.title=description(d)}).append('title').text(description);
   s.append('text').attr('x',21).attr('y',110).attr('text-anchor','middle').text('Time ↑');
  }
  function update(){
