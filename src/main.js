@@ -564,6 +564,19 @@ function setupCompactWorkspace(data) {
     const link = document.createElement('a'); link.href = import.meta.env.BASE_URL + path; link.textContent = label; if (mode === viewMode) link.setAttribute('aria-current','page'); links.append(link);
   }
   toolbar.before(links);
+  if (viewMode === 'multi') {
+    const thresholdLegend = document.createElement('aside');
+    thresholdLegend.className = 'threshold-legend-bar';
+    thresholdLegend.setAttribute('aria-label', 'Temporal threshold-state legend');
+    thresholdLegend.innerHTML = `
+      <span class="threshold-legend-heading"><strong>Threshold state over time</strong><small>Provisional screening · aggregated spot observations</small></span>
+      <span class="threshold-time-direction" aria-label="Time runs from bottom to top"><i aria-hidden="true">↑</i> Time</span>
+      <span class="threshold-legend-item"><i class="threshold-swatch exceeds" aria-hidden="true"></i>Exceeds</span>
+      <span class="threshold-legend-item"><i class="threshold-swatch parameter-colours" aria-hidden="true"></i>Does not exceed</span>
+      <span class="threshold-legend-item"><i class="threshold-swatch no-data" aria-hidden="true"></i>No data / no objective</span>`;
+    toolbar.after(thresholdLegend);
+    app.classList.add('has-threshold-legend');
+  }
   if (viewMode === 'grid') { document.querySelector('.analysis-workspace').classList.add('single-grid'); document.querySelector('.matrix-panel').hidden = true; }
   if (isGrid) document.querySelector('.method-note').innerHTML = '<strong>How to read this</strong><p>Click a site or parameter for temporal detail. Turn on Compare sites to compare up to five sites. Values are means of available spot observations at the selected aggregation.</p><p>The mini-map dots retain actual geographic coordinates. The rectangle encloses the geographic locations of the site cards currently visible in the grid.</p>';
   const temporalLegend = document.createElement('p');
@@ -1381,8 +1394,9 @@ function updateLinkedViews(data, { detail = true } = {}) {
   data.grid?.update();
   if (isGrid) {
     document.querySelector('.ers-legend-group').hidden = true;
-    const legend = document.querySelector('.temporal-map-legend'); legend.hidden = false;
-    legend.textContent = viewMode === 'multi' ? 'Time ↑ · Red: exceeds · Parameter colour: does not exceed · Black: no data / no objective · provisional screening of aggregated spot observations' : 'Shared value and time scales · points: aggregated spot observations';
+    const legend = document.querySelector('.temporal-map-legend');
+    legend.hidden = viewMode === 'multi';
+    if (viewMode === 'grid') legend.textContent = 'Shared value and time scales · points: aggregated spot observations';
   }
   if (detail) updateDetail(data);
 }
