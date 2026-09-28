@@ -1,6 +1,14 @@
 /* Measure the header rather than assuming a fixed toolbar/legend height. */
 @media (min-width:761px) {
   #app { min-width:0; width:100%; }
+  #app .view-links {
+    min-height:30px;
+    gap:5px;
+    padding:2px 12px;
+    font-size:11px;
+    line-height:16px;
+  }
+  #app .view-links a { padding:3px 7px; }
   #app .analysis-workspace:not(.detail-above) {
     height:var(--workspace-fit-height,65dvh);
     min-height:0;
@@ -34,12 +42,25 @@
   #app .matrix-toggle { min-height:28px; }
   #app .chart-cell svg { width:100%; }
   #app .grid-workspace .map-panel > .panel-heading {
-    height:30px;
-    padding:5px 10px;
+    height:28px;
+    min-height:28px;
+    padding:4px 9px;
   }
   #app .grid-workspace .map-panel > .panel-heading h2 {
-    font-size:12px;
-    line-height:18px;
+    font-size:11px;
+    line-height:16px;
   }
-  #app .grid-workspace .spatial-viewport { inset:30px 0 30px; }
+  #app .grid-workspace .compact-detail-heading {
+    min-height:28px;
+    height:28px;
+    margin-bottom:8px;
+    padding:3px 9px;
+  }
+  #app .grid-workspace .compact-detail-heading strong { font-size:10px; }
+  #app .grid-workspace .compact-detail-heading button {
+    width:24px;
+    height:24px;
+    font-size:15px;
+  }
+  #app .grid-workspace .spatial-viewport { inset:28px 0 30px; }
 }
