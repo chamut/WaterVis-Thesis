@@ -10,6 +10,7 @@ import { drawComparison } from './site-comparison.js';
 import { createTemporalMap } from './temporal-map.js';
 import { parseMeasurement } from './temporal-map-model.js';
 import { relatedSites } from './site-selection.js';
+import './viewport-fit.css';
 
 // Emit the GeoJSON/vector worker as a production asset with the deployment base.
 maplibregl.setWorkerUrl(mapWorkerUrl);
@@ -1564,6 +1565,19 @@ async function init() {
     state.selectedSites = new Set(data.sites.filter((site) => site.hasData).map((site) => site.site_id));
     data.temporalView = buildTemporalView(data);
     renderShell(data);
+    const workspace = document.querySelector('.analysis-workspace');
+    const fitWorkspace = () => {
+      const top = workspace.getBoundingClientRect().top + window.scrollY;
+      const footer = document.querySelector('footer');
+      const available = window.innerHeight - top - (footer?.offsetHeight || 0);
+      app.style.setProperty('--workspace-fit-height', `${Math.max(200, available)}px`);
+    };
+    const chromeObserver = new ResizeObserver(fitWorkspace);
+    for (const element of app.children) {
+      if (element !== workspace) chromeObserver.observe(element);
+    }
+    window.addEventListener('resize', fitWorkspace);
+    fitWorkspace();
     if (!isGrid) createMap(data);
     let allSitesViewKey = null;
     let allSitesView = null;

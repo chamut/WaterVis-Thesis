@@ -1,0 +1,24 @@
+/* Measure the header rather than assuming a fixed toolbar/legend height. */
+@media (min-width:761px) {
+  #app { min-width:0; width:100%; }
+  #app .analysis-workspace:not(.detail-above) {
+    height:var(--workspace-fit-height,65dvh);
+    min-height:0;
+    min-width:0;
+    grid-template-rows:minmax(0,1fr) minmax(0,.7fr);
+  }
+  #app .analysis-workspace.matrix-collapsed:not(.detail-above) {
+    grid-template-rows:minmax(0,1fr) auto;
+  }
+  #app .analysis-workspace > * { min-width:0; min-height:0; }
+  #app .map-stage { min-height:0; }
+  #app .compact-toolbar { min-width:0; flex-wrap:wrap; gap:6px 8px; padding:6px 12px; }
+  #app .map-display-toggle { flex-shrink:0; }
+  #app .matrix-grid { grid-template-columns:minmax(110px,150px) repeat(var(--parameter-count),minmax(0,1fr)); }
+  #app #matrix { min-width:0; }
+  #app .column-heading { min-height:40px; overflow:hidden; }
+  #app .matrix-title-row { gap:6px 10px; padding:5px 10px; }
+  #app .site-sort-control select { font-size:12px; min-height:28px; }
+  #app .matrix-toggle { min-height:28px; }
+  #app .chart-cell svg { width:100%; }
+}
