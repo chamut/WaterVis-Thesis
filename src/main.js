@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import * as maplibregl from 'maplibre-gl';
+import mapWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import './styles.css';
 import './compact.css';
@@ -9,6 +10,9 @@ import { drawComparison } from './site-comparison.js';
 import { createTemporalMap } from './temporal-map.js';
 import { parseMeasurement } from './temporal-map-model.js';
 import { relatedSites } from './site-selection.js';
+
+// Emit the GeoJSON/vector worker as a production asset with the deployment base.
+maplibregl.setWorkerUrl(mapWorkerUrl);
 
 const PARAMETER_COLOURS = {
   DO: '#168aad',
@@ -899,49 +903,6 @@ function createMap(data) {
     touchPitch: false,
   });
 
-  // Keep the basin outline as a lightweight DOM overlay as well as a map
-  // layer. This remains visible while a hosted raster style is still settling.
-  const basinOverlay = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  basinOverlay.setAttribute('aria-hidden', 'true');
-  Object.assign(basinOverlay.style, {
-    position: 'absolute',
-    inset: '0',
-    width: '100%',
-    height: '100%',
-    pointerEvents: 'none',
-  });
-  const basinOverlayPath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-  basinOverlayPath.setAttribute('fill', '#b8dbc7');
-  basinOverlayPath.setAttribute('fill-opacity', '0.16');
-  basinOverlayPath.setAttribute('stroke', '#3e704f');
-  basinOverlayPath.setAttribute('stroke-width', '1.8');
-  basinOverlayPath.setAttribute('stroke-opacity', '0.88');
-  basinOverlayPath.setAttribute('fill-rule', 'evenodd');
-  basinOverlay.append(basinOverlayPath);
-  map.getCanvasContainer().append(basinOverlay);
-
-  const updateBasinOverlay = () => {
-    const { width, height } = map.getContainer().getBoundingClientRect();
-    basinOverlay.setAttribute('viewBox', `0 0 ${width} ${height}`);
-    const geometries = data.boundary.features.flatMap((feature) => {
-      const geometry = feature.geometry;
-      if (geometry?.type === 'Polygon') return [geometry.coordinates];
-      if (geometry?.type === 'MultiPolygon') return geometry.coordinates;
-      return [];
-    });
-    const path = geometries
-      .flatMap((polygon) => polygon.map((ring) => {
-        const commands = ring.map(([longitude, latitude], index) => {
-          const point = map.project([longitude, latitude]);
-          return `${index ? 'L' : 'M'}${point.x.toFixed(1)},${point.y.toFixed(1)}`;
-        });
-        return `${commands.join('')}Z`;
-      }))
-      .join('');
-    basinOverlayPath.setAttribute('d', path);
-  };
-  map.on('render', updateBasinOverlay);
-
   const resetView = (duration = 0) => map.fitBounds(bounds, { padding: 38, duration });
   const addGeographicContext = () => {
     if (map.getSource('goulburn-basin')) return;
@@ -979,7 +940,6 @@ function createMap(data) {
       paint: { 'line-color': '#3e704f', 'line-width': 1.6, 'line-opacity': 0.82 },
     });
     resetView();
-    updateBasinOverlay();
   };
 
   // An inline raster style can finish loading before a production bundle has
