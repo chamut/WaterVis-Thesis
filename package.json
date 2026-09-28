@@ -10,7 +10,8 @@
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
     "data": "python3 scripts/preprocess.py",
-    "grid-layout": "node scripts/derive-grid-layout.mjs"
+    "grid-layout": "node scripts/derive-grid-layout.mjs",
+    "watercourses": "node scripts/build-watercourses.mjs"
   },
   "dependencies": {
     "d3": "7.9.0",

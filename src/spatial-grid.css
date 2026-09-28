@@ -96,6 +96,13 @@
 .matrix-row.hovered { position:relative; z-index:1; background:var(--linked-hover-wash); box-shadow:inset 4px 0 var(--linked-hover),inset 0 1px #087dcc80,inset 0 -1px #087dcc80,0 0 9px #169fe830; }
 .matrix-row.hovered .row-label { background:var(--linked-hover-wash); color:#075d91; }
 .matrix-row.hovered .chart-cell { background:#e8f6ff; }
+.matrix-row.selected { position:relative; z-index:2; background:#d9effc; box-shadow:inset 6px 0 #087dcc,inset 0 2px #168aad,inset 0 -2px #168aad,0 0 12px #168aad42; }
+.matrix-row.selected .row-label { background:#d9effc; color:#075d91; }
+.matrix-row.selected .row-label strong { color:#064f7c; font-weight:700; }
+.matrix-row.selected .row-label span { color:#17678e; }
+.matrix-row.selected .chart-cell { background:#edf8fe; }
+.matrix-row.selected.hovered { background:#cceaff; box-shadow:inset 6px 0 #066eaa,inset 0 2px #087dcc,inset 0 -2px #087dcc,0 0 15px #087dcc66; }
+.matrix-row.selected.hovered .row-label,.matrix-row.selected.hovered .chart-cell { background:#e2f4ff; }
 .multi-spatial .spatial-viewport{bottom:0}
 .multi-spatial .spatial-status{display:none}
 .multi-spatial .spatial-navigation{bottom:8px}

@@ -109,9 +109,8 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
   frameBox={x:(w-frameWidth)/2,y:(h-frameHeight)/2,width:frameWidth,height:frameHeight};
   mapGroup=svg.append('g').attr('class','mini-geography');
   mapGroup.append('path').datum(data.boundary).attr('d',d3.geoPath(projection)).attr('class','mini-basin-fill').attr('fill','#fff').attr('vector-effect','non-scaling-stroke');
-  const nw=projection([144.6594971209363,-35.96275386870387]),se=projection([146.6590695918188,-37.67907102202982]);
-  mapGroup.append('image').attr('href',import.meta.env.BASE_URL+'data/goulburn_watercourses.png').attr('x',nw[0]).attr('y',nw[1]).attr('width',se[0]-nw[0]).attr('height',se[1]-nw[1]).attr('opacity',.7);
-  // Draw the boundary above the river raster so it remains legible.
+  mapGroup.append('path').datum(data.watercourses).attr('class','mini-watercourses').attr('d',d3.geoPath(projection)).attr('fill','none').attr('stroke','#94c4e0').attr('stroke-width',.75).attr('stroke-opacity',.82).attr('vector-effect','non-scaling-stroke').attr('pointer-events','none');
+  // Draw the boundary above the watercourse network so it remains legible.
   mapGroup.append('path').datum(data.boundary).attr('class','mini-basin-outline').attr('d',d3.geoPath(projection)).attr('fill','none').attr('stroke','#829e8b').attr('stroke-width',2).attr('stroke-linejoin','round').attr('pointer-events','none').attr('vector-effect','non-scaling-stroke');
   frame=svg.append('rect').attr('class','mini-viewport-rectangle').attr('fill','#168aad').attr('fill-opacity',.07).attr('stroke','#168aad').attr('stroke-dasharray','4 3').attr('stroke-width',1.5).attr('pointer-events','none');
   dots=mapGroup.selectAll('.mini-site').data(sites).join('ellipse').attr('class',s=>'mini-site'+(s.insideBoundary?'':' outside-boundary')).attr('data-site-id',s=>s.site_id).attr('cx',s=>projection([s.longitude,s.latitude])[0]).attr('cy',s=>projection([s.longitude,s.latitude])[1]).attr('stroke',s=>s.insideBoundary?'white':'#6b4f18').attr('stroke-dasharray',s=>s.insideBoundary?null:'2 1').attr('pointer-events','none');

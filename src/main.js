@@ -106,11 +106,12 @@ function formatObjective(parameter, objective) {
 }
 
 async function loadData() {
-  const [sitesRaw, spotRaw, availability, boundary, validation] = await Promise.all([
+  const [sitesRaw, spotRaw, availability, boundary, watercourses, validation] = await Promise.all([
     d3.csv(import.meta.env.BASE_URL + 'data/sites.csv'),
     d3.csv(import.meta.env.BASE_URL + 'data/spot_observations.csv'),
     d3.json(import.meta.env.BASE_URL + 'data/availability.json'),
     d3.json(import.meta.env.BASE_URL + 'data/goulburn_boundary.geojson'),
+    d3.json(import.meta.env.BASE_URL + 'data/goulburn_watercourses.geojson'),
     d3.json(import.meta.env.BASE_URL + 'data/validation.json'),
   ]);
   if (!sitesRaw.length || !availability?.parameters?.length) {
@@ -147,7 +148,7 @@ async function loadData() {
     };
     if (!latestByCell.has(key) || observation.date > latestByCell.get(key).date) latestByCell.set(key, observation);
   });
-  return { sites, spot, daily: [], hourly: [], latestByCell, availability, boundary, validation };
+  return { sites, spot, daily: [], hourly: [], latestByCell, availability, boundary, watercourses, validation };
 }
 
 function dateInSelectedRange(date) {
@@ -415,7 +416,7 @@ function renderShell(data) {
         <div><dt>Source measurements</dt><dd>${data.validation.source_measurement_rows.toLocaleString()} rows</dd></div>
         <div><dt>Usable prototype observations</dt><dd>${data.spot.length.toLocaleString()} spot records</dd></div>
       </dl>
-      <p class="ribbon-note">Provisional screening with <a href="${data.availability.ers.source_url}" target="_blank" rel="noreferrer">ERS Table 5.8</a> · all ${targetSites.length} displayed natural watercourse sites spatially assigned · four drainage sites excluded · DO saturation estimated where temperature is paired · TN uses direct total nitrogen or paired TKN + NOx · Not an official ERS assessment or final WQI</p>
+      <p class="ribbon-note">Provisional screening with <a href="${data.availability.ers.source_url}" target="_blank" rel="noreferrer">ERS Table 5.8</a> · all ${targetSites.length} displayed natural watercourse sites spatially assigned · <a href="https://discover.data.vic.gov.au/dataset/vicmap-hydro-watercourse-line" target="_blank" rel="noreferrer">Vicmap Hydro watercourses</a> · four drainage sites excluded · DO saturation estimated where temperature is paired · TN uses direct total nitrogen or paired TKN + NOx · Not an official ERS assessment or final WQI</p>
     </section>
   `;
 
@@ -838,15 +839,10 @@ function setupSiteFilter(data) {
 }
 
 function createMap(data) {
-  const watercourseBounds = {
-    west: 144.6594971209363,
-    south: -37.67907102202982,
-    east: 146.6590695918188,
-    north: -35.96275386870387,
-  };
+  const [[west, south], [east, north]] = d3.geoBounds(data.boundary);
   const bounds = [
-    [watercourseBounds.west, watercourseBounds.south],
-    [watercourseBounds.east, watercourseBounds.north],
+    [west, south],
+    [east, north],
   ];
   const map = new maplibregl.Map({
     container: 'map',
@@ -873,21 +869,25 @@ function createMap(data) {
       source: 'goulburn-basin',
       paint: { 'fill-color': '#b8dbc7', 'fill-opacity': 0.16 },
     });
-    map.addSource('goulburn-watercourses', {
-      type: 'image',
-      url: import.meta.env.BASE_URL + 'data/goulburn_watercourses.png',
-      coordinates: [
-        [watercourseBounds.west, watercourseBounds.north],
-        [watercourseBounds.east, watercourseBounds.north],
-        [watercourseBounds.east, watercourseBounds.south],
-        [watercourseBounds.west, watercourseBounds.south],
-      ],
-    });
+    map.addSource('goulburn-watercourses', { type: 'geojson', data: data.watercourses });
     map.addLayer({
       id: 'goulburn-watercourses',
-      type: 'raster',
+      type: 'line',
       source: 'goulburn-watercourses',
-      paint: { 'raster-opacity': 0.46 },
+      paint: {
+        'line-color': [
+          'match', ['get', 'hierarchy'],
+          'H', '#73a9d2',
+          'M', '#8fc0df',
+          '#b5d7e9',
+        ],
+        'line-width': [
+          'interpolate', ['linear'], ['zoom'],
+          6, ['match', ['get', 'hierarchy'], 'H', 1.25, 'M', 0.9, 0.55],
+          12, ['match', ['get', 'hierarchy'], 'H', 3, 'M', 2, 1.2],
+        ],
+        'line-opacity': 0.82,
+      },
     });
     map.addLayer({
       id: 'goulburn-basin-outline',
