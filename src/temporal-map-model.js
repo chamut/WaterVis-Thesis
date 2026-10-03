@@ -22,7 +22,29 @@ export function sharedDomain(continuous, spot, objectives) {
   for (const objective of objectives) { add(objective?.lower); add(objective?.upper); }
   if (!Number.isFinite(low)) return [0, 1];
   const padding = (high - low || Math.max(Math.abs(low) * .1, 1)) * .08;
-  return [low - padding, high + padding];
+  return [0, Math.max(high + padding, 1e-6)];
+}
+
+// One value scale per parameter and selected time range, shared by every site and view.
+export function parameterAxisDomain(data, view, code) {
+  const continuous = view.continuous.filter((row) => row.parameter_code === code);
+  const spot = view.spot.filter((row) => row.parameter_code === code);
+  const objectives = data.sites.filter((site) => site.hasData)
+    .map((site) => data.availability.ers.thresholds[site.ers_segment]?.[code]);
+  return d3.scaleLinear().domain(sharedDomain(continuous, spot, objectives)).nice(4).domain();
+}
+
+export function timeAxisFormat(start, end) {
+  return d3.timeFormat(start.getFullYear() === end.getFullYear() ? '%b' : '%Y');
+}
+
+export function timeAxisInterval(start, end, tickCount) {
+  if (start.getFullYear() === end.getFullYear()) {
+    const months = end.getMonth() - start.getMonth() + 1;
+    return d3.timeMonth.every(Math.max(1, Math.ceil(months / tickCount)));
+  }
+  const years = end.getFullYear() - start.getFullYear() + 1;
+  return d3.timeYear.every(Math.max(1, Math.ceil(years / tickCount)));
 }
 
 function sameOrNextInterval(previous, next, resolution) {

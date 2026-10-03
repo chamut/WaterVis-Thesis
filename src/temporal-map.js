@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import { sharedDomain, sensorSegments, pixelSample, placeCards } from './temporal-map-model.js';
+import { parameterAxisDomain, sensorSegments, pixelSample, placeCards, timeAxisFormat } from './temporal-map-model.js';
 import { comparisonColour } from './visual-encodings.js';
 import './temporal-map.css';
 
@@ -90,9 +90,7 @@ export function createTemporalMap({ data, state, colours, temporalView, onHover,
     const parameter = data.availability.parameters.find((item) => item.code === code);
     const continuous = view.continuous.filter((row) => row.parameter_code === code);
     const spot = view.spot.filter((row) => row.parameter_code === code);
-    const objectives = data.sites.filter((site) => site.hasData).map((site) => data.availability.ers.thresholds[site.ers_segment]?.[code]);
-    const shared = sharedDomain(continuous, spot, objectives);
-    const domain = [0, Math.max(1, shared[1])];
+    const domain = parameterAxisDomain(data, view, code);
     const x = d3.scaleTime().domain([state.rangeStart, state.rangeEnd]).range([margin.left + 3, WIDTH - margin.right - 3]);
     const y = d3.scaleLinear().domain(domain).range([PLOT_HEIGHT - margin.bottom - 3, margin.top + 3]);
     const sensorBySite = d3.group(continuous, (row) => row.site_id);
@@ -124,7 +122,8 @@ export function createTemporalMap({ data, state, colours, temporalView, onHover,
       svg.append('g').attr('class', 'map-chart-y').attr('transform', `translate(${margin.left},0)`).call(d3.axisLeft(y).tickValues(domain).tickFormat(numberLabel).tickSize(0).tickPadding(3));
       svg.select('.map-chart-y .domain').remove();
       svg.append('line').attr('class', 'map-chart-baseline').attr('x1', margin.left).attr('x2', WIDTH - margin.right).attr('y1', y(domain[0])).attr('y2', y(domain[0]));
-      [state.rangeStart, state.rangeEnd].forEach((date, index) => svg.append('text').attr('class', 'map-chart-date').attr('x', x(date)).attr('y', PLOT_HEIGHT - 3).attr('text-anchor', index ? 'end' : 'start').text(dateLabel(date)));
+      const axisDateLabel = timeAxisFormat(state.rangeStart, state.rangeEnd);
+      [state.rangeStart, state.rangeEnd].forEach((date, index) => svg.append('text').attr('class', 'map-chart-date').attr('x', x(date)).attr('y', PLOT_HEIGHT - 3).attr('text-anchor', index ? 'end' : 'start').text(axisDateLabel(date)));
       const plot = svg.append('g').attr('clip-path', `url(#${clipId})`);
       const objective = data.availability.ers.thresholds[site.ers_segment]?.[code];
       [objective?.lower, objective?.upper].filter(Number.isFinite).forEach((value) => plot.append('line').attr('class', 'map-chart-objective').attr('x1', margin.left).attr('x2', WIDTH - margin.right).attr('y1', y(value)).attr('y2', y(value)));

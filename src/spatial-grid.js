@@ -1,7 +1,7 @@
 import * as d3 from 'd3';
 import {DATA_COLOUR,EXCEEDS_COLOUR,UNAVAILABLE_COLOUR,comparisonColour} from './visual-encodings.js';
 import { GRID_POSITIONS, WORLD, zoomAt, viewportWorld, fitCamera } from './grid-navigation.js';
-import { sensorSegments, pixelSample, sharedDomain } from './temporal-map-model.js';
+import { sensorSegments, pixelSample, parameterAxisDomain, timeAxisFormat } from './temporal-map-model.js';
 import './spatial-grid.css';
 
 function seasonStart(date) {
@@ -142,7 +142,7 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
   const continuous=view.continuous.filter(r=>r.site_id===site.site_id&&r.parameter_code===code),spot=view.spot.filter(r=>r.site_id===site.site_id&&r.parameter_code===code&&Number.isFinite(r.value));
   const s=d3.select(button).append('svg').attr('viewBox','0 0 220 116'),x=d3.scaleTime().domain([state.rangeStart,state.rangeEnd]).range([36,214]),y=d3.scaleLinear().domain(domain).range([90,10]);
   s.append('g').attr('transform','translate(36,0)').call(d3.axisLeft(y).ticks(2).tickFormat(d3.format('.3~g')).tickSize(0));
-  s.append('g').attr('transform','translate(0,90)').call(d3.axisBottom(x).ticks(2).tickFormat(d3.timeFormat('%Y')).tickSize(0));
+  s.append('g').attr('transform','translate(0,90)').call(d3.axisBottom(x).tickValues([state.rangeStart, state.rangeEnd]).tickFormat(timeAxisFormat(state.rangeStart,state.rangeEnd)).tickSize(0));
   const segments=sensorSegments(continuous,state.selectedResolution).map(a=>pixelSample(a,x));
   for(const a of segments){s.append('path').datum(a).attr('d',d3.line().x(r=>x(r.dateValue)).y(r=>y(r.value))).attr('fill','none').attr('stroke',colours[code]);if(a.length===1)s.append('circle').attr('cx',x(a[0].dateValue)).attr('cy',y(a[0].value)).attr('r',2).attr('fill',colours[code]);}
   s.selectAll('.spot').data(spot).join('circle').attr('class','spot').attr('cx',r=>x(r.datetimeValue)).attr('cy',r=>y(r.value)).attr('r',2).attr('fill',colours[code]);
@@ -176,7 +176,7 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
   const codes=multi?[...state.selectedParameters]:[state.selectedParameter];
   const key=[state.selectedResolution,+state.rangeStart,+state.rangeEnd,codes.join(',')].join('|');
   if(key!==lastKey){lastKey=key;const view=allTemporal();
-   const domains=new Map(codes.map(code=>[code,sharedDomain(view.continuous.filter(r=>r.parameter_code===code),view.spot.filter(r=>r.parameter_code===code),[])]));
+   const domains=new Map(codes.map(code=>[code,parameterAxisDomain(data,view,code)]));
    for(const {plot,site} of entries.values()){plot.replaceChildren();if(multi){appendSharedTimeAxis(plot);for(const code of codes)drawGlyph(plot,site,code,view)}else drawTemporal(plot,site,codes[0],view,domains.get(codes[0]));}
   }
   for(const [id,{card}] of entries){const colour=comparisonColour(state,id);card.classList.toggle('hovered',state.hoveredSite===id);card.classList.toggle('selected',!state.compareMode&&state.selectedSite===id);card.classList.toggle('compared',Boolean(colour));card.style.setProperty('--comparison-colour',colour||'transparent');}

@@ -8,7 +8,7 @@ import { createSidebarResize } from './sidebar-resize.js';
 import { createSpatialGrid } from './spatial-grid.js';
 import { drawComparison } from './site-comparison.js';
 import { createTemporalMap } from './temporal-map.js';
-import { parseMeasurement } from './temporal-map-model.js';
+import { parameterAxisDomain, parseMeasurement, timeAxisFormat, timeAxisInterval } from './temporal-map-model.js';
 import { relatedSites } from './site-selection.js';
 import {
   DATA_COLOUR,
@@ -999,24 +999,9 @@ function createMatrix(data) {
   const spotByCell = d3.group(temporalView.spot, (row) => cellKey(row.site_id, row.parameter_code));
   const yearDomain = [state.rangeStart, state.rangeEnd];
 
-  const yDomains = new Map(parameters.map((parameter) => {
-    const values = [
-      ...temporalView.continuous.filter((row) => row.parameter_code === parameter.code).map((row) => row.value),
-      ...temporalView.spot.filter((row) => row.parameter_code === parameter.code).map((row) => row.value),
-    ].filter(Number.isFinite).sort(d3.ascending);
-    let low = d3.quantileSorted(values, 0.02);
-    let high = d3.quantileSorted(values, 0.98);
-    if (!Number.isFinite(low) || !Number.isFinite(high)) [low, high] = [0, 1];
-    const objectiveValues = Object.values(data.availability.ers.thresholds)
-      .flatMap((segment) => [segment[parameter.code]?.lower, segment[parameter.code]?.upper])
-      .filter(Number.isFinite);
-    if (objectiveValues.length) {
-      low = Math.min(low, d3.min(objectiveValues));
-      high = Math.max(high, d3.max(objectiveValues));
-    }
-    if (low === high) high = low + 1;
-    return [parameter.code, [low, high]];
-  }));
+  const yDomains = new Map(parameters.map((parameter) => [
+    parameter.code, parameterAxisDomain(data, data.allTemporal(), parameter.code),
+  ]));
 
   const matrix = d3.select('#matrix');
   matrix.selectAll('*').remove();
@@ -1091,7 +1076,7 @@ function createMatrix(data) {
       const height = 72;
       const margin = { top: 8, right: 8, bottom: 14, left: 8 };
       const x = d3.scaleTime().domain(yearDomain).range([margin.left, width - margin.right]);
-      const y = d3.scaleLinear().domain(yDomains.get(parameter.code)).nice().range([height - margin.bottom, margin.top]).clamp(true);
+      const y = d3.scaleLinear().domain(yDomains.get(parameter.code)).range([height - margin.bottom, margin.top]);
       const svg = cell.append('svg').attr('viewBox', `0 0 ${width} ${height}`).attr('aria-hidden', 'true');
 
       const objective = data.availability.sites[currentSite.site_id]?.parameters?.[parameter.code]?.ers_assessment?.objective;
@@ -1212,13 +1197,8 @@ function drawDetailChart(data, site, parameter, record) {
     .domain([state.rangeStart, state.rangeEnd])
     .range([margin.left, width - margin.right]);
   const objective = record?.ers_assessment?.objective;
-  const values = observations.flatMap((row) => [row.value, row.min, row.max]).filter(Number.isFinite);
-  if (Number.isFinite(objective?.lower)) values.push(objective.lower);
-  if (Number.isFinite(objective?.upper)) values.push(objective.upper);
-  let [low, high] = d3.extent(values);
-  if (low === high) [low, high] = [low - 1, high + 1];
-  const padding = (high - low) * 0.08;
-  const y = d3.scaleLinear().domain([low - padding, high + padding]).nice().range([height - margin.bottom, margin.top]);
+  const y = d3.scaleLinear().domain(parameterAxisDomain(data, data.allTemporal(), parameter.code))
+    .range([height - margin.bottom, margin.top]);
 
   const svg = d3.select(container).append('svg')
     .attr('class', 'detail-chart-svg')
@@ -1249,7 +1229,7 @@ function drawDetailChart(data, site, parameter, record) {
   svg.append('g')
     .attr('class', 'detail-axis')
     .attr('transform', `translate(0,${height - margin.bottom})`)
-    .call(d3.axisBottom(x).ticks(width < 310 ? 3 : 5).tickFormat(state.selectedResolution === 'yearly' ? d3.timeFormat('%Y') : d3.timeFormat('%b %Y')));
+    .call(d3.axisBottom(x).ticks(timeAxisInterval(state.rangeStart, state.rangeEnd, width < 310 ? 3 : 5)).tickFormat(timeAxisFormat(state.rangeStart, state.rangeEnd)));
   svg.append('g')
     .attr('class', 'detail-axis')
     .attr('transform', `translate(${margin.left},0)`)
@@ -1319,7 +1299,9 @@ function updateDetail(data) {
   if (state.compareMode) {
     document.querySelector('.detail-panel').hidden = false;
     document.querySelector('.analysis-workspace').classList.remove('no-detail');
-    drawComparison({data,state,colours:PARAMETER_COLOURS,onRemove:id=>{state.comparedSites.delete(id);updateLinkedViews(data);}});
+    drawComparison({data,state,colours:PARAMETER_COLOURS,
+      axisDomain:parameterAxisDomain(data, data.allTemporal(), state.selectedParameter),
+      onRemove:id=>{state.comparedSites.delete(id);updateLinkedViews(data);}});
     return;
   }
   const site = getFocusSite(data);
@@ -1606,6 +1588,7 @@ async function init() {
       if (key !== allSitesViewKey) { allSitesView = buildTemporalView(data, true); allSitesViewKey = key; }
       return allSitesView;
     };
+    data.allTemporal = allTemporal;
     if (isGrid) data.grid = createSpatialGrid({
       data,
       state,

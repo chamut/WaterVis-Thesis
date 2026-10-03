@@ -1,8 +1,8 @@
 import * as d3 from 'd3';
-import {sensorSegments,pixelSample} from './temporal-map-model.js';
+import {sensorSegments,pixelSample,timeAxisFormat,timeAxisInterval} from './temporal-map-model.js';
 import {COMPARISON_COLOURS as COLORS} from './visual-encodings.js';
 const SHAPES=[d3.symbolCircle,d3.symbolSquare,d3.symbolTriangle,d3.symbolDiamond,d3.symbolCross];
-export function drawComparison({data,state,colours,onRemove}) {
+export function drawComparison({data,state,colours,axisDomain,onRemove}) {
  const host=document.querySelector('#site-detail');host.innerHTML='<h3>Compare sites</h3><div class="comparison-legend"></div><div class="comparison-chart"></div><div class="comparison-tip" role="status" hidden></div><p class="comparison-hint">Hover to inspect · Click the plot to pin a date · Select up to five sites</p>';
  const p=data.availability.parameters.find(p=>p.code===state.selectedParameter),series=[...state.comparedSites].map(([id,slot])=>({site:data.sites.find(s=>s.site_id===id),slot,sensor:data.temporalView.continuous.filter(r=>r.site_id===id&&r.parameter_code===p.code),spot:data.temporalView.spot.filter(r=>r.site_id===id&&r.parameter_code===p.code&&Number.isFinite(r.value))}));
  const all=series.flatMap(s=>[...s.sensor,...s.spot]).filter(r=>Number.isFinite(r.value));
@@ -11,9 +11,9 @@ export function drawComparison({data,state,colours,onRemove}) {
  const parameterUnit=document.createElement('span');parameterUnit.textContent=p.unit;
  parameter.append(parameterName,parameterUnit);host.querySelector('h3').after(parameter);
  const title=document.createElement('p');title.className='comparison-subtitle';title.textContent=state.selectedResolution+' · '+d3.timeFormat('%d %b %Y')(state.rangeStart)+' — '+d3.timeFormat('%d %b %Y')(state.rangeEnd);parameter.after(title);
- const w=Math.max(248,host.clientWidth),h=180,x=d3.scaleTime().domain([state.rangeStart,state.rangeEnd]).range([48,w-12]);let [lo,hi]=d3.extent(all,r=>r.value);lo=Number.isFinite(lo)?Math.min(0,lo):0;hi=Number.isFinite(hi)?hi:1;const y=d3.scaleLinear().domain([lo,hi+(hi-lo||1)*.08]).nice().range([h-35,22]);
+ const w=Math.max(248,host.clientWidth),h=180,x=d3.scaleTime().domain([state.rangeStart,state.rangeEnd]).range([48,w-12]);const y=d3.scaleLinear().domain(axisDomain).range([h-35,22]);
  const svg=d3.select(host.querySelector('.comparison-chart')).append('svg').attr('viewBox',`0 0 ${w} ${h}`).attr('width',w).attr('height',h).attr('role','img').attr('aria-label','Comparison of '+p.label+' at selected sites');
- svg.append('g').attr('transform','translate(48,0)').call(d3.axisLeft(y).ticks(4).tickFormat(d3.format('.3~g')));svg.append('g').attr('transform',`translate(0,${h-35})`).call(d3.axisBottom(x).ticks(3).tickFormat(d3.timeFormat('%d %b')));
+ svg.append('g').attr('transform','translate(48,0)').call(d3.axisLeft(y).ticks(4).tickFormat(d3.format('.3~g')));svg.append('g').attr('transform',`translate(0,${h-35})`).call(d3.axisBottom(x).ticks(timeAxisInterval(state.rangeStart,state.rangeEnd,3)).tickFormat(timeAxisFormat(state.rangeStart,state.rangeEnd)));
  for(const s of series){
   const button=document.createElement('button');button.type='button';button.textContent=['●','■','▲','◆','✚'][s.slot]+' '+s.site.short_name+' ×';button.style.color=COLORS[s.slot];button.setAttribute('aria-label','Remove '+s.site.short_name+' from comparison');button.onclick=()=>onRemove(s.site.site_id);host.querySelector('.comparison-legend').append(button);
   const segments=sensorSegments(s.sensor,state.selectedResolution).map(a=>pixelSample(a,x));
