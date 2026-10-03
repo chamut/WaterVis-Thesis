@@ -1206,7 +1206,9 @@ function drawDetailChart(data, site, parameter, record) {
     .attr('role', 'img')
     .attr('aria-label', `${parameter.label} observations at ${site.short_name} from ${displayDateFormat(state.rangeStart)} to ${displayDateFormat(state.rangeEnd)}`);
   svg.append('title').text(`${parameter.label} at ${site.short_name}`);
-  svg.append('desc').text('Aggregated spot observations compared with the applicable ERS objective.');
+  svg.append('desc').text(Number.isFinite(objective?.lower) && Number.isFinite(objective?.upper)
+    ? 'The pale green horizontal band shows the lower-to-upper ERS objective range. Orange marks show aggregated spot observations.'
+    : 'Aggregated spot observations compared with the applicable ERS upper objective.');
 
   if (Number.isFinite(objective?.lower) && Number.isFinite(objective?.upper)) {
     svg.append('rect')
@@ -1338,6 +1340,7 @@ function updateDetail(data) {
   const siteRecord = data.availability.sites[site.site_id];
   const record = siteRecord?.parameters?.[state.selectedParameter];
   const assessment = latestAnnualAssessment(data, site.site_id, state.selectedParameter);
+  const hasObjectiveRange = Number.isFinite(assessment?.objective?.lower) && Number.isFinite(assessment?.objective?.upper);
   const status = assessment?.status || 'unavailable';
   const showPlot = state.detailMode === 'plot';
   const boundaryNote = site.insideBoundary ? '' : ' · Outside displayed basin polygon';
@@ -1358,7 +1361,7 @@ function updateDetail(data) {
     ${showPlot ? `<section class="detail-plot-section">
       <div class="detail-plot-heading"><strong>Temporal detail</strong><span>${displayDateFormat(state.rangeStart)}–${displayDateFormat(state.rangeEnd)} · hover to inspect</span></div>
       <div id="detail-chart"></div>
-      <div class="detail-chart-key"><span><i class="spot"></i>${resolutionLabel(state.selectedResolution)} spot mean</span><span><i class="objective"></i>ERS objective</span></div>
+      <div class="detail-chart-key"><span><i class="spot"></i>${resolutionLabel(state.selectedResolution)} spot mean</span><span><i class="objective${hasObjectiveRange ? ' range' : ''}"></i>ERS ${hasObjectiveRange ? 'objective range' : 'upper objective'}</span></div>
     </section>` : '<p class="detail-action-hint">Click a matrix plot to open its detailed temporal inspection here.</p>'}
   `;
   if (viewMode === 'multi' && showPlot) {

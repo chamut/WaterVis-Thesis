@@ -196,8 +196,8 @@ h3 { margin-bottom: 6px; font-size: 22px; line-height: 1.15; }
 .axis-title { font-size:10px; font-weight:500; }
 .detail-grid path { display:none; }
 .detail-grid line { stroke:#e4e9e5; }
-.detail-objective-band { fill:#89958f; opacity:.12; }
-.detail-objective-line { stroke:#7f8b85; stroke-width:1.2; stroke-dasharray:4 3; }
+.detail-objective-band { fill:#2f9e67; opacity:.18; }
+.detail-objective-line { stroke:#2f9e67; stroke-width:1.2; stroke-dasharray:4 3; }
 .detail-daily-range { fill:var(--data-colour); opacity:.14; }
 .detail-daily-line { fill:none; stroke:var(--data-colour); stroke-width:1.5; }
 .detail-point { stroke:#fff; stroke-width:.7; }
@@ -218,7 +218,8 @@ h3 { margin-bottom: 6px; font-size: 22px; line-height: 1.15; }
 .detail-chart-key span { display:flex; align-items:center; gap:4px; }
 .detail-chart-key i { display:inline-block; width:13px; height:2px; background:var(--data-colour); }
 .detail-chart-key i.spot { width:7px; height:7px; border-radius:50%; background:var(--data-colour); }
-.detail-chart-key i.objective { background:#7f8b85; opacity:.7; }
+.detail-chart-key i.objective { background:#2f9e67; }
+.detail-chart-key i.objective.range { height:9px; border:1px solid #2f9e67; background:#2f9e6733; }
 
 .matrix-panel { grid-area:matrix; display:flex; min-height:0; flex-direction:column; box-shadow:0 15px 40px rgba(35,68,57,.07); }
 .matrix-title-row { align-items:center; }
@@ -254,8 +255,8 @@ h3 { margin-bottom: 6px; font-size: 22px; line-height: 1.15; }
 .daily-line { fill:none; stroke:var(--data-colour); stroke-width:1.35; vector-effect:non-scaling-stroke; }
 .spot-point { fill:var(--data-colour); stroke:white; stroke-width:.55; }
 .spot-point.outside { fill:var(--exceeds-colour); }
-.ers-objective-band { fill:#89958f; opacity:.12; }
-.ers-objective-line { stroke:#7f8b85; stroke-width:1; stroke-dasharray:3 2; }
+.ers-objective-band { fill:#2f9e67; opacity:.18; }
+.ers-objective-line { stroke:#2f9e67; stroke-width:1; stroke-dasharray:3 2; }
 footer { display:flex; justify-content:space-between; gap:24px; padding:18px 3px 0; color:var(--muted); font-size:10px; }
 .dataset-ribbon { display:grid; grid-template-columns:minmax(165px,.55fr) minmax(620px,2.4fr) minmax(210px,.8fr); align-items:center; gap:22px; padding:16px 18px; margin-top:18px; border:1px solid #cfdad3; border-radius:14px; background:#e6efe9; }
 .ribbon-title .section-kicker { margin-bottom:4px; }
