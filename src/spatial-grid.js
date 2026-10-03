@@ -1,4 +1,5 @@
 import * as d3 from 'd3';
+import {DATA_COLOUR,EXCEEDS_COLOUR,UNAVAILABLE_COLOUR,comparisonColour} from './visual-encodings.js';
 import { GRID_POSITIONS, WORLD, zoomAt, viewportWorld, fitCamera } from './grid-navigation.js';
 import { sensorSegments, pixelSample, sharedDomain } from './temporal-map-model.js';
 import './spatial-grid.css';
@@ -62,7 +63,7 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
   entries.set(site.site_id,{card,plot,site});
  }
  const defaultCamera=()=>fitCamera(viewport.clientWidth,viewport.clientHeight);
- let camera=defaultCamera(),cameraTouched=false,visible=new Set(),dragging=false,moved=false,lastKey='',projection,frame,worldX,worldY,dots,dotHits,hoverRing,mapGroup,frameBox,miniTransform={sx:1,sy:1,tx:0,ty:0};
+ let camera=defaultCamera(),cameraTouched=false,visible=new Set(),dragging=false,moved=false,lastKey='',projection,frame,worldX,worldY,dots,dotHits,hoverRing,selectionRing,comparisonRings,mapGroup,frameBox,miniTransform={sx:1,sy:1,tx:0,ty:0};
  function focus(id){const point=GRID_POSITIONS.get(id);if(!point)return;cameraTouched=true;camera.x=viewport.clientWidth/2-point[0]*camera.zoom;camera.y=viewport.clientHeight/2-point[1]*camera.zoom;layout()}
  function updateMini(){
   if(!projection||!frameBox)return;
@@ -74,18 +75,25 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
   miniTransform={sx:frameBox.width/source.width,sy:frameBox.height/source.height,tx:frameBox.x-source.x*(frameBox.width/source.width),ty:frameBox.y-source.y*(frameBox.height/source.height)};
   mapGroup.attr('transform',`translate(${miniTransform.tx},${miniTransform.ty}) scale(${miniTransform.sx},${miniTransform.sy})`);
   frame.attr('x',frameBox.x).attr('y',frameBox.y).attr('width',frameBox.width).attr('height',frameBox.height);
-  const sx=Math.max(.001,miniTransform.sx),sy=Math.max(.001,miniTransform.sy),strokeScale=Math.sqrt(sx*sy);
-  dots.classed('hovered',s=>s.site_id===state.hoveredSite).classed('selected',s=>s.site_id===state.selectedSite||(state.compareMode&&state.comparedSites?.has(s.site_id))).attr('display',s=>state.selectedSites.has(s.site_id)?null:'none').attr('opacity',s=>s.site_id===state.hoveredSite||visible.has(s.site_id)?1:.25)
-   .attr('rx',s=>(s.site_id===state.selectedSite||(state.compareMode&&state.comparedSites?.has(s.site_id))?6:4)/sx)
-   .attr('ry',s=>(s.site_id===state.selectedSite||(state.compareMode&&state.comparedSites?.has(s.site_id))?6:4)/sy)
-   .attr('stroke-width',s=>(s.site_id===state.selectedSite||(state.compareMode&&state.comparedSites?.has(s.site_id))?2:1.2)/strokeScale)
-   .attr('fill',s=>state.compareMode&&state.comparedSites?.has(s.site_id)?['#d7191c','#e78b25','#8b7613','#258cc0','#2c3b91'][state.comparedSites.get(s.site_id)]:'#168aad')
-   .attr('aria-pressed',s=>String(s.site_id===state.selectedSite||(state.compareMode&&state.comparedSites?.has(s.site_id))));
-  dotHits.attr('display',s=>state.selectedSites.has(s.site_id)?null:'none').attr('rx',10/sx).attr('ry',10/sy)
-   .attr('aria-pressed',s=>String(s.site_id===state.selectedSite||(state.compareMode&&state.comparedSites?.has(s.site_id))));
+  const miniPoint=s=>{const [x,y]=projection([s.longitude,s.latitude]);return [x*miniTransform.sx+miniTransform.tx,y*miniTransform.sy+miniTransform.ty]};
+  dots.classed('hovered',s=>s.site_id===state.hoveredSite).classed('selected',s=>!state.compareMode&&s.site_id===state.selectedSite).attr('display',s=>state.selectedSites.has(s.site_id)?null:'none').attr('opacity',s=>s.site_id===state.hoveredSite||comparisonColour(state,s.site_id)||visible.has(s.site_id)?1:.55)
+   .attr('cx',s=>miniPoint(s)[0]).attr('cy',s=>miniPoint(s)[1]).attr('r',4.5)
+   .attr('stroke',s=>s.insideBoundary?'white':'#6b4f18')
+   .attr('stroke-dasharray',s=>s.insideBoundary?null:'2 1')
+   .attr('stroke-width',1.2)
+   .attr('fill','#168aad')
+   .attr('aria-pressed',s=>String(state.compareMode?state.comparedSites?.has(s.site_id):s.site_id===state.selectedSite));
+  dotHits.attr('display',s=>state.selectedSites.has(s.site_id)?null:'none').attr('cx',s=>miniPoint(s)[0]).attr('cy',s=>miniPoint(s)[1]).attr('r',11)
+   .attr('aria-pressed',s=>String(state.compareMode?state.comparedSites?.has(s.site_id):s.site_id===state.selectedSite));
+  comparisonRings.attr('display',s=>state.selectedSites.has(s.site_id)&&comparisonColour(state,s.site_id)?null:'none')
+   .style('--comparison-colour',s=>comparisonColour(state,s.site_id)||'transparent')
+   .attr('cx',s=>miniPoint(s)[0]).attr('cy',s=>miniPoint(s)[1]);
   const hovered=sites.find(s=>s.site_id===state.hoveredSite&&state.selectedSites.has(s.site_id));
   hoverRing.attr('display',hovered?null:'none').attr('data-site-id',hovered?.site_id||'');
-  if(hovered){const [x,y]=projection([hovered.longitude,hovered.latitude]);hoverRing.attr('cx',x).attr('cy',y).attr('rx',9/sx).attr('ry',9/sy).attr('stroke-width',2/strokeScale);}
+  if(hovered){const [x,y]=miniPoint(hovered);hoverRing.attr('cx',x).attr('cy',y);}
+  const selected=sites.find(s=>!state.compareMode&&s.site_id===state.selectedSite&&state.selectedSites.has(s.site_id));
+  selectionRing.attr('display',selected?null:'none').attr('data-site-id',selected?.site_id||'');
+  if(selected){const [x,y]=miniPoint(selected);selectionRing.attr('cx',x).attr('cy',y);}
  }
  function drawMini(){
   const el=svg.node(),w=el.clientWidth||320,h=el.clientHeight||250;svg.attr('viewBox',`0 0 ${w} ${h}`);svg.selectAll('*').remove();
@@ -108,10 +116,13 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
   // Draw the boundary above the watercourse network so it remains legible.
   mapGroup.append('path').datum(data.boundary).attr('class','mini-basin-outline').attr('d',d3.geoPath(projection)).attr('fill','none').attr('stroke','#829e8b').attr('stroke-width',2).attr('stroke-linejoin','round').attr('pointer-events','none').attr('vector-effect','non-scaling-stroke');
   frame=svg.append('rect').attr('class','mini-viewport-rectangle').attr('fill','#168aad').attr('fill-opacity',.07).attr('stroke','#168aad').attr('stroke-dasharray','4 3').attr('stroke-width',1.5).attr('pointer-events','none');
-  dots=mapGroup.selectAll('.mini-site').data(sites).join('ellipse').attr('class',s=>'mini-site'+(s.insideBoundary?'':' outside-boundary')).attr('data-site-id',s=>s.site_id).attr('cx',s=>projection([s.longitude,s.latitude])[0]).attr('cy',s=>projection([s.longitude,s.latitude])[1]).attr('stroke',s=>s.insideBoundary?'white':'#6b4f18').attr('stroke-dasharray',s=>s.insideBoundary?null:'2 1').attr('pointer-events','none');
+  const markerLayer=svg.append('g').attr('class','mini-marker-layer');
+  dots=markerLayer.selectAll('.mini-site').data(sites).join('circle').attr('class',s=>'mini-site'+(s.insideBoundary?'':' outside-boundary')).attr('data-site-id',s=>s.site_id).attr('pointer-events','none');
   const selectMiniSite=(e,s)=>{e.preventDefault();e.stopPropagation();onSelect(s.site_id,multi?null:state.selectedParameter,e);focus(s.site_id)};
-  dotHits=mapGroup.selectAll('.mini-site-hit').data(sites).join('ellipse').attr('class','mini-site-hit').attr('data-site-id',s=>s.site_id).attr('cx',s=>projection([s.longitude,s.latitude])[0]).attr('cy',s=>projection([s.longitude,s.latitude])[1]).attr('fill','transparent').attr('tabindex',0).attr('role','button').attr('aria-label',s=>`Select ${s.short_name}${s.insideBoundary?'':'; outside displayed basin polygon'}`).on('pointerenter focus',(e,s)=>onHover(s.site_id)).on('pointerleave blur',()=>onHover(null)).on('click',selectMiniSite).on('keydown',(e,s)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectMiniSite(e,s)}});
-  hoverRing=mapGroup.append('ellipse').attr('class','mini-hover-ring').attr('rx',9).attr('ry',9).attr('pointer-events','none').attr('display','none');
+  dotHits=markerLayer.selectAll('.mini-site-hit').data(sites).join('circle').attr('class','mini-site-hit').attr('data-site-id',s=>s.site_id).attr('fill','transparent').attr('tabindex',0).attr('role','button').attr('aria-label',s=>`Select ${s.short_name}${s.insideBoundary?'':'; outside displayed basin polygon'}`).on('pointerenter focus',(e,s)=>onHover(s.site_id)).on('pointerleave blur',()=>onHover(null)).on('click',selectMiniSite).on('keydown',(e,s)=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();selectMiniSite(e,s)}});
+  comparisonRings=markerLayer.selectAll('.mini-comparison-ring').data(sites).join('circle').attr('class','mini-comparison-ring').attr('data-site-id',s=>s.site_id).attr('r',8.5).attr('pointer-events','none').attr('display','none');
+  selectionRing=markerLayer.append('circle').attr('class','mini-selection-ring').attr('r',8.5).attr('pointer-events','none').attr('display','none');
+  hoverRing=markerLayer.append('circle').attr('class','mini-hover-ring').attr('r',9.5).attr('pointer-events','none').attr('display','none');
   updateMini();
  }
  function layout(){
@@ -145,9 +156,9 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
   const add=(r,date,source)=>{const t=+date;if(t<start||t>=end||!Number.isFinite(r.value))return;const index=d3.bisectRight(edges,t)-1,bin=bins[index];if(!bin)return;bin.values.push(...[r.value,r.min,r.max].filter(Number.isFinite));bin[source]++};
   view.continuous.filter(r=>r.site_id===site.site_id&&r.parameter_code===code).forEach(r=>add(r,r.dateValue,'sensor'));
   view.spot.filter(r=>r.site_id===site.site_id&&r.parameter_code===code).forEach(r=>add(r,r.datetimeValue,'spot'));
-  const y=d3.scaleTime().domain([new Date(start),new Date(end)]).range([98,25]),groups=[];
+  const y=d3.scaleTime().domain([new Date(start),new Date(end)]).range([106,25]),groups=[];
   for(const bin of bins){const status=!bin.values.length?'missing':!objective?'unknown':bin.values.some(v=>(Number.isFinite(objective.lower)&&v<objective.lower)||(Number.isFinite(objective.upper)&&v>objective.upper))?'outside':'within',pixel=Math.floor(y(bin.a)),last=groups.at(-1);if(last&&last.pixel===pixel){last.b=bin.b;last.values.push(...bin.values);last.sensor+=bin.sensor;last.spot+=bin.spot;last.count++;if(status==='outside'||last.status==='missing')last.status=status}else groups.push({...bin,status,pixel,count:1})}
-  s.append('rect').attr('x',5).attr('y',2).attr('width',32).attr('height',3).attr('fill',colours[code]);s.append('text').attr('x',21).attr('y',17).attr('text-anchor','middle').text(p.short_label);
+  s.append('rect').attr('x',5).attr('y',2).attr('width',32).attr('height',3).attr('fill',DATA_COLOUR);s.append('text').attr('x',21).attr('y',17).attr('text-anchor','middle').text(p.short_label);
   const fmt=d3.format('.4~g'),dateFmt=d3.timeFormat('%d %b %Y %H:%M'),bounds=objective?[Number.isFinite(objective.lower)?'≥ '+fmt(objective.lower):null,Number.isFinite(objective.upper)?'≤ '+fmt(objective.upper):null].filter(Boolean).join(' and '):'Unavailable';
   const description=d=>({
    period:`${dateFmt(new Date(d.a))} — ${dateFmt(new Date(d.b-1))}`,
@@ -156,19 +167,19 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
    bounds,
   });
   const accessibleDescription=d=>{const info=description(d);return `${site.short_name} · ${p.short_label} · ${info.period} · ${{outside:'Exceeds',within:'Does not exceed',missing:'No data',unknown:'No objective'}[d.status]} · ${info.values} · ${info.observations} · Objective ${info.bounds}`};
-  s.selectAll('.time-state').data(groups).join('rect').attr('class','time-state').attr('tabindex',0).attr('role','img').attr('aria-label',accessibleDescription).attr('x',5).attr('y',d=>y(d.b)).attr('width',32).attr('height',d=>Math.max(.5,y(d.a)-y(d.b)-(bins.length<=31?.4:0))).attr('fill',d=>d.status==='outside'?'#c1121f':d.status==='within'?colours[code]:'#202522')
+  s.selectAll('.time-state').data(groups).join('rect').attr('class',d=>`time-state ${d.status}`).attr('tabindex',0).attr('role','img').attr('aria-label',accessibleDescription).attr('x',5).attr('y',d=>y(d.b)).attr('width',32).attr('height',d=>Math.max(.5,y(d.a)-y(d.b)-(bins.length<=31?.4:0))).attr('fill',d=>d.status==='outside'?EXCEEDS_COLOUR:d.status==='within'?DATA_COLOUR:UNAVAILABLE_COLOUR)
    .on('pointerenter pointermove',(event,d)=>showLasagnaTooltip(event,d,site,p,description(d))).on('pointerleave',hideLasagnaTooltip)
    .on('focus',(event,d)=>showLasagnaTooltip(event,d,site,p,description(d))).on('blur',hideLasagnaTooltip);
-  s.append('text').attr('x',21).attr('y',110).attr('text-anchor','middle').text('Time ↑');
  }
+ function appendSharedTimeAxis(plot){const axis=document.createElement('div');axis.className='shared-time-axis';axis.setAttribute('aria-label','Time runs from bottom to top');axis.innerHTML='<span aria-hidden="true">↑</span><b>TIME</b>';plot.append(axis)}
  function update(){
   const codes=multi?[...state.selectedParameters]:[state.selectedParameter];
   const key=[state.selectedResolution,+state.rangeStart,+state.rangeEnd,codes.join(',')].join('|');
   if(key!==lastKey){lastKey=key;const view=allTemporal();
    const domains=new Map(codes.map(code=>[code,sharedDomain(view.continuous.filter(r=>r.parameter_code===code),view.spot.filter(r=>r.parameter_code===code),[])]));
-   for(const {plot,site} of entries.values()){plot.replaceChildren();if(multi){for(const code of codes)drawGlyph(plot,site,code,view)}else drawTemporal(plot,site,codes[0],view,domains.get(codes[0]));}
+   for(const {plot,site} of entries.values()){plot.replaceChildren();if(multi){appendSharedTimeAxis(plot);for(const code of codes)drawGlyph(plot,site,code,view)}else drawTemporal(plot,site,codes[0],view,domains.get(codes[0]));}
   }
-  for(const [id,{card}] of entries){card.classList.toggle('hovered',state.hoveredSite===id);card.classList.toggle('selected',state.selectedSite===id||(state.compareMode&&state.comparedSites?.has(id)));}
+  for(const [id,{card}] of entries){const colour=comparisonColour(state,id);card.classList.toggle('hovered',state.hoveredSite===id);card.classList.toggle('selected',!state.compareMode&&state.selectedSite===id);card.classList.toggle('compared',Boolean(colour));card.style.setProperty('--comparison-colour',colour||'transparent');}
   layout();
  }
  function action(name){if(name==='reset'){cameraTouched=false;camera=defaultCamera()}else{cameraTouched=true;if(name==='in'||name==='out')camera=zoomAt(camera,camera.zoom*(name==='in'?1.2:1/1.2),viewport.clientWidth/2,viewport.clientHeight/2);else{camera.x+=({left:160,right:-160}[name]||0);camera.y+=({up:130,down:-130}[name]||0)}}layout()}
@@ -187,5 +198,5 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
  miniEl.addEventListener('wheel',e=>{e.preventDefault();cameraTouched=true;const p=gridPoint(point(e)),ax=p.x*camera.zoom+camera.x,ay=p.y*camera.zoom+camera.y;camera=zoomAt(camera,camera.zoom*Math.exp(-e.deltaY*.005),ax,ay);layout()},{passive:false});
  miniEl.addEventListener('keydown',e=>{if(e.target!==miniEl)return;const name={ArrowLeft:'left',ArrowRight:'right',ArrowUp:'up',ArrowDown:'down','+':'in','-':'out'}[e.key];if(name){e.preventDefault();action(name)}});
  const observer=new ResizeObserver(()=>{if(!cameraTouched)camera=defaultCamera();drawMini();layout()});observer.observe(viewport);observer.observe(miniEl);
- drawMini();update();return {update,focus,renderOverview:(host,site)=>{host.replaceChildren();const view=allTemporal();for(const code of state.selectedParameters)drawGlyph(host,site,code,view,"detail")},resize:()=>{drawMini();layout()},scheduleLayout:layout};
+ drawMini();update();return {update,focus,renderOverview:(host,site)=>{host.replaceChildren();appendSharedTimeAxis(host);const view=allTemporal();for(const code of state.selectedParameters)drawGlyph(host,site,code,view,"detail")},resize:()=>{drawMini();layout()},scheduleLayout:layout};
 }

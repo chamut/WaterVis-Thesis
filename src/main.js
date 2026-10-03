@@ -10,18 +10,17 @@ import { drawComparison } from './site-comparison.js';
 import { createTemporalMap } from './temporal-map.js';
 import { parseMeasurement } from './temporal-map-model.js';
 import { relatedSites } from './site-selection.js';
+import {
+  DATA_COLOUR,
+  EXCEEDS_COLOUR,
+  PARAMETER_COLOURS,
+  STATUS_COLOURS,
+  comparisonColour,
+} from './visual-encodings.js';
 import './viewport-fit.css';
 
 // Emit the GeoJSON/vector worker as a production asset with the deployment base.
 maplibregl.setWorkerUrl(mapWorkerUrl);
-
-const PARAMETER_COLOURS = {
-  DO: '#168aad',
-  TN: '#e08b2c',
-  TP: '#9b5de5',
-  TURB: '#d95d68',
-  PH: '#2f9e67',
-};
 
 // Retain these records in the downloaded source files, but exclude them from
 // the natural-watercourse prototype: their official site names identify them
@@ -46,12 +45,6 @@ const state = {
   rangeStart: new Date('2015-01-01T00:00:00'),
   rangeEnd: new Date('2024-12-31T23:59:59'),
   selectedSites: new Set(),
-};
-
-const STATUS_COLOURS = {
-  within: '#2c9b67',
-  outside: '#df5d61',
-  unavailable: '#9ca9a4',
 };
 
 const app = document.querySelector('#app');
@@ -575,9 +568,8 @@ function setupCompactWorkspace(data) {
     thresholdLegend.setAttribute('aria-label', 'Temporal threshold-state legend');
     thresholdLegend.innerHTML = `
       <span class="threshold-legend-heading"><strong>Threshold state over time</strong><small>Provisional screening · aggregated spot observations</small></span>
-      <span class="threshold-time-direction" aria-label="Time runs from bottom to top"><i aria-hidden="true">↑</i> Time</span>
       <span class="threshold-legend-item"><i class="threshold-swatch exceeds" aria-hidden="true"></i>Exceeds</span>
-      <span class="threshold-legend-item"><i class="threshold-swatch parameter-colours" aria-hidden="true"></i>Does not exceed</span>
+      <span class="threshold-legend-item"><i class="threshold-swatch data-colour" aria-hidden="true"></i>Does not exceed</span>
       <span class="threshold-legend-item"><i class="threshold-swatch no-data" aria-hidden="true"></i>No data / no objective</span>`;
     const ersInfo = document.querySelector('.ers-info');
     if (ersInfo) {
@@ -961,7 +953,7 @@ function createMap(data) {
     element.className = 'site-marker';
     element.dataset.siteId = site.site_id;
     element.setAttribute('aria-label', `${site.short_name}, site ${site.site_id}`);
-    element.innerHTML = `<svg viewBox="0 0 30 30" aria-hidden="true"><circle class="site-halo" cx="15" cy="15" r="10"></circle><circle class="site-dot${site.active ? '' : ' inactive'}" cx="15" cy="15" r="5.5"></circle></svg>`;
+    element.innerHTML = `<svg viewBox="0 0 30 30" aria-hidden="true"><circle class="site-halo" cx="15" cy="15" r="12"></circle><circle class="comparison-ring" cx="15" cy="15" r="9"></circle><circle class="status-ring" cx="15" cy="15" r="7"></circle><circle class="site-dot${site.active ? '' : ' inactive'}" cx="15" cy="15" r="5.5"></circle></svg>`;
     new maplibregl.Marker({ element, anchor: 'center' })
       .setLngLat([site.longitude, site.latitude])
       .addTo(map);
@@ -1064,6 +1056,11 @@ function createMatrix(data) {
     matrix.append('div').attr('class', 'matrix-empty').text('Select at least one monitoring site to show temporal plots.');
   }
 
+  matrix.append('div')
+    .attr('class', 'comparison-matrix-empty')
+    .attr('hidden', true)
+    .text('Select sites from the map, grid, or mini-map to compare them here.');
+
   rows.each(function drawRow(site) {
     const row = d3.select(this);
     const cells = row.selectAll('.chart-cell')
@@ -1141,7 +1138,7 @@ function createMatrix(data) {
         svg.append('g').selectAll('circle')
           .data(spot)
           .join('circle')
-          .attr('class', 'spot-point')
+          .attr('class', (item) => `spot-point ${item.ers_point_status || ''}`)
           .attr('cx', (item) => x(item.datetimeValue))
           .attr('cy', (item) => y(item.value))
           .attr('r', 2.2);
@@ -1351,7 +1348,7 @@ function updateDetail(data) {
       <p class="detail-coordinate">Site ${site.site_id} · ${site.ers_segment}${boundaryNote}</p>
       <div class="detail-plot-heading"><strong>Temporal threshold states</strong><span>${displayDateFormat(state.rangeStart)}–${displayDateFormat(state.rangeEnd)} · ${state.selectedResolution}</span></div>
       <div class="multi-detail-overview"></div>
-      <p class="multi-state-legend"><span><i style="background:#c1121f"></i>Exceeds</span><span><i class="parameter-colours"></i>Does not exceed · parameter colour</span><span><i class="missing"></i>No data / no objective</span></p>
+      <p class="multi-state-legend"><span><i class="exceeds"></i>Exceeds</span><span><i class="data-colour"></i>Does not exceed</span><span><i class="missing"></i>No data / no objective</span></p>
       <p class="detail-action-hint">Time runs from bottom to top. Click a parameter to inspect its values. These states screen the selected-resolution data, not annual ERS status.</p>`;
     data.grid?.renderOverview(detail.querySelector('.multi-detail-overview'), site);
     return;
@@ -1414,7 +1411,7 @@ function updateLinkedViews(data, { detail = true } = {}) {
   d3.selectAll('.chart-cell').classed('selected-parameter', function selectedColumn() {
     return this.dataset.parameter === parameter;
   }).classed('selected-cell', function selectedCell(item) {
-    return state.detailMode === 'plot'
+    return !state.compareMode && state.detailMode === 'plot'
       && item?.site?.site_id === state.selectedSite
       && item?.parameter?.code === parameter;
   });
@@ -1423,16 +1420,26 @@ function updateLinkedViews(data, { detail = true } = {}) {
     const group = d3.select(element);
     const assessment = latestAnnualAssessment(data, site.site_id, parameter);
     const status = assessment.status;
+    const compareColour = comparisonColour(state, site.site_id);
+    element.style.setProperty('--comparison-colour', compareColour || 'transparent');
     group
       .classed('hovered', site.site_id === state.hoveredSite)
-      .classed('selected', site.site_id === state.selectedSite)
-      .classed('unavailable', status === 'unavailable');
+      .classed('selected', !state.compareMode && site.site_id === state.selectedSite)
+      .classed('compared', Boolean(compareColour))
+      .classed('unavailable', status === 'unavailable')
+      .classed('outside', status === 'outside')
+      .classed('within', status === 'within');
     group.select('.site-dot')
-      .attr('fill', STATUS_COLOURS[status]);
+      .attr('fill', compareColour || STATUS_COLOURS[status]);
   });
   data.matrix?.rows
     .classed('hovered', (site) => site.site_id === state.hoveredSite)
-    .classed('selected', (site) => state.compareMode ? state.comparedSites.has(site.site_id) : site.site_id === state.selectedSite);
+    .classed('selected', (site) => !state.compareMode && site.site_id === state.selectedSite)
+    .classed('compared', (site) => state.compareMode && state.comparedSites.has(site.site_id))
+    .style('--comparison-colour', (site) => comparisonColour(state, site.site_id) || 'transparent')
+    .style('display', (site) => state.compareMode && !state.comparedSites.has(site.site_id) ? 'none' : null);
+  const comparisonEmpty = document.querySelector('.comparison-matrix-empty');
+  if (comparisonEmpty) comparisonEmpty.hidden = !(state.compareMode && state.comparedSites.size === 0);
   data.temporalMap?.update();
   data.grid?.update();
   if (isGrid) {
@@ -1492,8 +1499,16 @@ function scrollMatrixToSite(siteId) {
 }
 
 function toggleComparedSite(data, id) {
-  if (state.comparedSites.has(id)) state.comparedSites.delete(id);
-  else if (state.comparedSites.size < 5) { let slot=0; while ([...state.comparedSites.values()].includes(slot)) slot++; state.comparedSites.set(id,slot); }
+  if (state.comparedSites.has(id)) {
+    state.comparedSites.delete(id);
+    if (state.selectedSite === id) state.selectedSite = null;
+  }
+  else if (state.comparedSites.size < 5) {
+    let slot=0;
+    while ([...state.comparedSites.values()].includes(slot)) slot++;
+    state.comparedSites.set(id,slot);
+    state.selectedSite = id;
+  }
   else { document.querySelector('.compare-sites').textContent = 'Maximum 5 sites — remove one first'; return; }
   updateLinkedViews(data);
   scrollMatrixToSite(id);

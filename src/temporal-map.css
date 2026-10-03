@@ -14,7 +14,8 @@
 .temporal-map-card-title { display:block; height:22px; padding:4px 6px 2px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; color:#233b32; font:600 11px/15px 'Manrope',system-ui,sans-serif; }
 .temporal-map-card svg { display:block; width:150px; height:72px; }
 .temporal-map-card .map-chart-y text,.temporal-map-card .map-chart-date { fill:#536860; font:11px system-ui,sans-serif; }
-.temporal-map-card.selected { border:2px solid #284f3d; }
+.temporal-map-card.compared { border:2px solid var(--comparison-colour); box-shadow:inset 0 0 0 2px color-mix(in srgb,var(--comparison-colour) 45%,transparent),0 0 0 5px color-mix(in srgb,var(--comparison-colour) 40%,transparent),0 0 14px var(--comparison-colour),0 0 24px color-mix(in srgb,var(--comparison-colour) 55%,transparent); }
+.temporal-map-card.selected { outline:3px solid #168AAD; outline-offset:2px; box-shadow:0 0 0 5px #168AAD55,0 0 14px #168AADCC,0 0 24px #168AAD77; }
 .temporal-map-card.hovered,.temporal-map-card:hover,.temporal-map-card:focus-visible { outline:2px solid #087dcc; outline-offset:1px; box-shadow:0 0 12px #1499f588; }
 .map-chart-baseline { stroke:#b5c6bc; }
 .map-chart-objective { stroke:#7a8e82; stroke-width:1; stroke-dasharray:3 3; }

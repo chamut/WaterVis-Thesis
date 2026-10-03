@@ -1,5 +1,6 @@
 import * as d3 from 'd3';
 import { sharedDomain, sensorSegments, pixelSample, placeCards } from './temporal-map-model.js';
+import { comparisonColour } from './visual-encodings.js';
 import './temporal-map.css';
 
 const WIDTH = 150;
@@ -70,10 +71,13 @@ export function createTemporalMap({ data, state, colours, temporalView, onHover,
   }
   function highlight() {
     for (const [id, { button }] of entries) {
-      const selected = id === state.selectedSite;
+      const selected = !state.compareMode && id === state.selectedSite;
       const hovered = id === state.hoveredSite;
+      const colour = comparisonColour(state, id);
       button.classList.toggle('selected', selected);
       button.classList.toggle('hovered', hovered);
+      button.classList.toggle('compared', Boolean(colour));
+      button.style.setProperty('--comparison-colour', colour || 'transparent');
       button.setAttribute('aria-pressed', String(selected));
       button.style.zIndex = hovered ? '4' : selected ? '3' : '1';
     }
