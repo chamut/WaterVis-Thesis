@@ -68,8 +68,10 @@
 .multi-state-legend .parameter-colours{background:linear-gradient(90deg,#168aad 0 20%,#e08b2c 20% 40%,#9b5de5 40% 60%,#d95d68 60% 80%,#2f9e67 80%)}
 .multi-state-legend .missing{background:#202522;border-color:#202522}
 .multi-overview-back{background:white;border:1px solid #168aad;border-radius:4px;color:#09688e;padding:7px 10px;margin-bottom:10px;cursor:pointer;font-weight:600}
-.lasagna-tooltip{position:fixed;z-index:2000;display:grid;gap:3px;width:max-content;max-width:min(310px,calc(100vw - 24px));padding:9px 11px;border:1px solid #526a60;border-radius:6px;background:#172a24;color:white;box-shadow:0 8px 24px #0005;font-size:11px;line-height:1.35;pointer-events:none}
-.lasagna-tooltip[hidden]{display:none}.lasagna-tooltip strong{font-size:12px}.lasagna-tooltip span{color:#d8e3de}.lasagna-tooltip b{width:max-content;padding:1px 5px;border-radius:3px;font-size:10px}.lasagna-tooltip .state-outside{background:#c1121f}.lasagna-tooltip .state-within{background:#edf4f0;color:#173a2c}.lasagna-tooltip .state-missing,.lasagna-tooltip .state-unknown{background:#050706;color:white;border:1px solid #839087}
+.lasagna-tooltip{position:fixed;z-index:2000;display:grid;gap:4px;width:max-content;max-width:min(240px,calc(100vw - 24px));padding:8px 10px;border:1px solid #526a60;border-radius:6px;background:#172a24;color:white;box-shadow:0 8px 24px #0005;font-size:11px;line-height:1.35;pointer-events:none}
+.lasagna-tooltip.detailed{max-width:min(290px,calc(100vw - 24px))}
+.lasagna-tooltip[hidden]{display:none}.lasagna-tooltip strong{font-size:12px}.lasagna-tooltip span{color:#d8e3de}.lasagna-tooltip em{color:#fff;font-style:normal;font-weight:700}
+.lasagna-tooltip b{width:max-content;padding:1px 5px;border-radius:3px;font-size:10px}.lasagna-tooltip .state-outside{background:#836AE1}.lasagna-tooltip .state-within{background:#FF8C00;color:#25180a}.lasagna-tooltip .state-missing,.lasagna-tooltip .state-unknown{background:#AEAEAF;color:#202522;border:1px solid #858586}
 .time-state{cursor:pointer}.time-state:focus{outline:none;stroke:white;stroke-width:1.5px}
 
 /* A shared cyan outline identifies hover; measurement and comparison colours stay intact. */
@@ -130,5 +132,4 @@
 .multi-state-legend .exceeds{background:#836AE1;border-color:#6544bd;box-shadow:inset 0 0 0 1px #fff,0 0 0 2px #836AE1}
 .multi-state-legend .data-colour{background:#FF8C00;border-color:#c26c00}
 .multi-state-legend .missing{background:#AEAEAF;border-color:#858586}
-.lasagna-tooltip .state-outside{background:#836AE1}.lasagna-tooltip .state-within{background:#FF8C00;color:#25180a}.lasagna-tooltip .state-missing,.lasagna-tooltip .state-unknown{background:#AEAEAF;color:#202522;border-color:#858586}
 .time-state.outside{stroke:#5c43aa;stroke-width:.7px}

@@ -29,14 +29,40 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
  lasagnaTooltip.hidden=true;
  document.body.append(lasagnaTooltip);
  const hideLasagnaTooltip=()=>{lasagnaTooltip.hidden=true};
- const placeLasagnaTooltip=(clientX,clientY)=>{
-  const gap=12,rect=lasagnaTooltip.getBoundingClientRect();
-  lasagnaTooltip.style.left=`${Math.min(window.innerWidth-rect.width-gap,Math.max(gap,clientX+gap))}px`;
-  lasagnaTooltip.style.top=`${Math.min(window.innerHeight-rect.height-gap,Math.max(gap,clientY+gap))}px`;
+ const placeLasagnaTooltip=(anchor,surface)=>{
+  const gap=8,rect=lasagnaTooltip.getBoundingClientRect(),area=surface.getBoundingClientRect();
+  const leftEdge=Math.max(gap,area.left+gap),rightEdge=Math.min(window.innerWidth-gap,area.right-gap);
+  const topEdge=Math.max(gap,area.top+gap),bottomEdge=Math.min(window.innerHeight-gap,area.bottom-gap);
+  let left=anchor.right+gap;
+  let top=anchor.top;
+  if(left+rect.width>rightEdge){
+   left=anchor.left-rect.width-gap;
+   if(left<leftEdge){
+    left=Math.max(leftEdge,Math.min(anchor.left,rightEdge-rect.width));
+    top=anchor.bottom+gap;
+    if(top+rect.height>bottomEdge)top=anchor.top-rect.height-gap;
+   }
+  }
+  lasagnaTooltip.style.left=`${Math.max(leftEdge,Math.min(left,rightEdge-rect.width))}px`;
+  lasagnaTooltip.style.top=`${Math.max(topEdge,Math.min(top,bottomEdge-rect.height))}px`;
  };
- const showLasagnaTooltip=(event,d,site,p,description)=>{
+ const showLasagnaTooltip=(event,site,p,summary,scope)=>{
+  lasagnaTooltip.replaceChildren();
+  lasagnaTooltip.classList.remove('detailed');
+  const heading=document.createElement('strong');heading.textContent=`${site.short_name} · ${p.short_label}`;
+  const coverage=document.createElement('span');coverage.textContent=summary.coverage;
+  const condition=document.createElement('span');condition.textContent=summary.condition;
+  const instruction=document.createElement('em');instruction.textContent=scope==='detail'?'Click to inspect the detailed chart':'Click to open the site overview';
+  lasagnaTooltip.append(heading,coverage,condition,instruction);
+  lasagnaTooltip.hidden=false;
+  const surface=scope==='detail'?document.querySelector('.detail-panel'):viewport;
+  const anchor=scope==='detail'?event.currentTarget:event.currentTarget.closest('.spatial-card');
+  placeLasagnaTooltip(anchor.getBoundingClientRect(),surface);
+ };
+ const showDetailedLasagnaTooltip=(event,d,site,p,description)=>{
   const status={outside:'Exceeds',within:'Does not exceed',missing:'No data',unknown:'No objective'}[d.status];
   lasagnaTooltip.replaceChildren();
+  lasagnaTooltip.classList.add('detailed');
   const heading=document.createElement('strong');heading.textContent=`${site.short_name} · ${p.short_label}`;
   const period=document.createElement('span');period.textContent=description.period;
   const stateLine=document.createElement('b');stateLine.className=`state-${d.status}`;stateLine.textContent=status;
@@ -45,8 +71,7 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
   const objective=document.createElement('span');objective.textContent=`Objective: ${description.bounds}`;
   lasagnaTooltip.append(heading,period,stateLine,values,observations,objective);
   lasagnaTooltip.hidden=false;
-  const target=event.currentTarget.getBoundingClientRect();
-  placeLasagnaTooltip(event.clientX||target.right,event.clientY||target.top);
+  placeLasagnaTooltip(event.currentTarget.getBoundingClientRect(),document.querySelector('.detail-panel'));
  };
  const mini=document.createElement('section');mini.className='shared-minimap';
  mini.innerHTML='<header><strong>Geographic context</strong><span>N ↑</span></header><svg tabindex="0" role="group" aria-label="Linked mini-map. Pan or zoom the geography. Click a site to select it."></svg><div class="mini-controls"><button data-action="in" aria-label="Mini-map zoom in">+</button><button data-action="out" aria-label="Mini-map zoom out">−</button><button data-action="reset">Reset</button></div><p>Dots show actual site locations. Click a dot to select its site.</p>';
@@ -150,14 +175,26 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
  }
  function drawGlyph(plot,site,code,view,scope="card"){
   const objective=data.availability.ers.thresholds[site.ers_segment]?.[code],p=data.availability.parameters.find(p=>p.code===code);
-  const button=document.createElement('button');button.className='spatial-glyph';button.setAttribute('aria-label',`${site.short_name}, ${p.label}, temporal threshold states; ${scope==='detail'?'open parameter detail':'open site overview'}`);button.onclick=e=>onSelect(site.site_id,scope==='detail'?code:null,e);plot.append(button);
+  const button=document.createElement('button');button.className='spatial-glyph';button.setAttribute('aria-label',`${site.short_name}, ${p.label}, temporal threshold states; ${scope==='detail'?'open parameter detail':'open site overview'}`);button.onclick=e=>{hideLasagnaTooltip();onSelect(site.site_id,scope==='detail'?code:null,e)};plot.append(button);
   const s=d3.select(button).append('svg').attr('viewBox','0 0 42 112'),start=+state.rangeStart,end=+state.rangeEnd+1,interval=state.selectedResolution==='yearly'?d3.timeYear:state.selectedResolution==='seasonal'?seasonInterval:d3.timeMonth;
   const edges=[start,...interval.range(interval.ceil(new Date(start+1)),new Date(end)).map(Number),end],bins=edges.slice(0,-1).map((a,i)=>({a,b:edges[i+1],values:[],sensor:0,spot:0}));
   const add=(r,date,source)=>{const t=+date;if(t<start||t>=end||!Number.isFinite(r.value))return;const index=d3.bisectRight(edges,t)-1,bin=bins[index];if(!bin)return;bin.values.push(...[r.value,r.min,r.max].filter(Number.isFinite));bin[source]++};
   view.continuous.filter(r=>r.site_id===site.site_id&&r.parameter_code===code).forEach(r=>add(r,r.dateValue,'sensor'));
   view.spot.filter(r=>r.site_id===site.site_id&&r.parameter_code===code).forEach(r=>add(r,r.datetimeValue,'spot'));
+  const hasObjective=objective&&(Number.isFinite(objective.lower)||Number.isFinite(objective.upper));
+  const available=bins.filter(bin=>bin.values.length).length;
+  const exceeds=hasObjective?bins.filter(bin=>bin.values.some(value=>(Number.isFinite(objective.lower)&&value<objective.lower)||(Number.isFinite(objective.upper)&&value>objective.upper))).length:0;
+  const periodName={monthly:'months',seasonal:'seasons',yearly:'years'}[state.selectedResolution]||'periods';
+  const years=state.rangeStart.getFullYear()===state.rangeEnd.getFullYear()?String(state.rangeStart.getFullYear()):`${state.rangeStart.getFullYear()}–${state.rangeEnd.getFullYear()}`;
+  const summary={coverage:`${state.selectedResolution} · ${years} · ${available}/${bins.length} ${periodName} with data`,condition:hasObjective?`${exceeds} ${periodName} exceed the objective`:'Objective unavailable'};
+  if(scope==='card'){
+   button.addEventListener('pointerenter',event=>showLasagnaTooltip(event,site,p,summary,scope));
+   button.addEventListener('pointerleave',hideLasagnaTooltip);
+   button.addEventListener('focus',event=>showLasagnaTooltip(event,site,p,summary,scope));
+   button.addEventListener('blur',hideLasagnaTooltip);
+  }
   const y=d3.scaleTime().domain([new Date(start),new Date(end)]).range([106,25]),groups=[];
-  for(const bin of bins){const status=!bin.values.length?'missing':!objective?'unknown':bin.values.some(v=>(Number.isFinite(objective.lower)&&v<objective.lower)||(Number.isFinite(objective.upper)&&v>objective.upper))?'outside':'within',pixel=Math.floor(y(bin.a)),last=groups.at(-1);if(last&&last.pixel===pixel){last.b=bin.b;last.values.push(...bin.values);last.sensor+=bin.sensor;last.spot+=bin.spot;last.count++;if(status==='outside'||last.status==='missing')last.status=status}else groups.push({...bin,status,pixel,count:1})}
+  for(const bin of bins){const status=!bin.values.length?'missing':!hasObjective?'unknown':bin.values.some(v=>(Number.isFinite(objective.lower)&&v<objective.lower)||(Number.isFinite(objective.upper)&&v>objective.upper))?'outside':'within',pixel=Math.floor(y(bin.a)),last=groups.at(-1);if(last&&last.pixel===pixel){last.b=bin.b;last.values.push(...bin.values);last.sensor+=bin.sensor;last.spot+=bin.spot;last.count++;if(status==='outside'||last.status==='missing')last.status=status}else groups.push({...bin,status,pixel,count:1})}
   s.append('rect').attr('x',5).attr('y',2).attr('width',32).attr('height',3).attr('fill',DATA_COLOUR);s.append('text').attr('x',21).attr('y',17).attr('text-anchor','middle').text(p.short_label);
   const fmt=d3.format('.4~g'),dateFmt=d3.timeFormat('%d %b %Y %H:%M'),bounds=objective?[Number.isFinite(objective.lower)?'≥ '+fmt(objective.lower):null,Number.isFinite(objective.upper)?'≤ '+fmt(objective.upper):null].filter(Boolean).join(' and '):'Unavailable';
   const description=d=>({
@@ -167,9 +204,12 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
    bounds,
   });
   const accessibleDescription=d=>{const info=description(d);return `${site.short_name} · ${p.short_label} · ${info.period} · ${{outside:'Exceeds',within:'Does not exceed',missing:'No data',unknown:'No objective'}[d.status]} · ${info.values} · ${info.observations} · Objective ${info.bounds}`};
-  s.selectAll('.time-state').data(groups).join('rect').attr('class',d=>`time-state ${d.status}`).attr('tabindex',0).attr('role','img').attr('aria-label',accessibleDescription).attr('x',5).attr('y',d=>y(d.b)).attr('width',32).attr('height',d=>Math.max(.5,y(d.a)-y(d.b)-(bins.length<=31?.4:0))).attr('fill',d=>d.status==='outside'?EXCEEDS_COLOUR:d.status==='within'?DATA_COLOUR:UNAVAILABLE_COLOUR)
-   .on('pointerenter pointermove',(event,d)=>showLasagnaTooltip(event,d,site,p,description(d))).on('pointerleave',hideLasagnaTooltip)
-   .on('focus',(event,d)=>showLasagnaTooltip(event,d,site,p,description(d))).on('blur',hideLasagnaTooltip);
+  const strips=s.selectAll('.time-state').data(groups).join('rect').attr('class',d=>`time-state ${d.status}`).attr('role','img').attr('aria-label',accessibleDescription).attr('x',5).attr('y',d=>y(d.b)).attr('width',32).attr('height',d=>Math.max(.5,y(d.a)-y(d.b)-(bins.length<=31?.4:0))).attr('fill',d=>d.status==='outside'?EXCEEDS_COLOUR:d.status==='within'?DATA_COLOUR:UNAVAILABLE_COLOUR);
+  if(scope==='detail')strips.attr('tabindex',0)
+   .on('pointerenter pointermove',(event,d)=>showDetailedLasagnaTooltip(event,d,site,p,description(d)))
+   .on('pointerleave',hideLasagnaTooltip)
+   .on('focus',(event,d)=>showDetailedLasagnaTooltip(event,d,site,p,description(d)))
+   .on('blur',hideLasagnaTooltip);
  }
  function appendSharedTimeAxis(plot){const axis=document.createElement('div');axis.className='shared-time-axis';axis.setAttribute('aria-label','Time runs from bottom to top');axis.innerHTML='<span aria-hidden="true">↑</span><b>TIME</b>';plot.append(axis)}
  function update(){
