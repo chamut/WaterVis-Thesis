@@ -379,7 +379,6 @@ function renderShell(data) {
             <p class="section-kicker">Temporal comparison</p>
             <h2 id="matrix-title">Sites × water-quality parameters</h2>
           </div>
-          <div class="chart-key"><span class="point-key"></span>Aggregated spot observations</div>
         </div>
         <div class="matrix-scroll" id="matrix-content" tabindex="0" aria-label="Scrollable small-multiple matrix">
           <div id="matrix"></div>
@@ -735,10 +734,6 @@ function updateTemporalSummary(data, message = null) {
   document.querySelectorAll('[data-resolution]').forEach((button) => {
     button.setAttribute('aria-pressed', String(button.dataset.resolution === state.selectedResolution));
   });
-  const chartKey = document.querySelector('.chart-key');
-  if (chartKey) {
-    chartKey.innerHTML = `<span class="point-key"></span>${resolution} mean of available spot observations`;
-  }
 }
 
 function refreshTemporalViews(data) {

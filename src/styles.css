@@ -223,9 +223,7 @@ h3 { margin-bottom: 6px; font-size: 22px; line-height: 1.15; }
 
 .matrix-panel { grid-area:matrix; display:flex; min-height:0; flex-direction:column; box-shadow:0 15px 40px rgba(35,68,57,.07); }
 .matrix-title-row { align-items:center; }
-.chart-key { display:flex; align-items:center; gap:7px; color:var(--muted); font-size:10px; }
 .line-key { width:24px; height:2px; background:var(--green); }
-.point-key { width:7px; height:7px; margin-left:10px; border-radius:50%; background:var(--data-colour); }
 .matrix-scroll { min-height:0; flex:1; overflow:auto; overscroll-behavior:contain; }
 #matrix { min-width:1085px; }
 .matrix-empty { padding:30px 20px; color:var(--muted); font-size:11px; }
@@ -305,7 +303,6 @@ footer { display:flex; justify-content:space-between; gap:24px; padding:18px 3px
   .map-stage,#map { min-height:0; }
   .panel-heading { align-items:flex-start; flex-direction:column; }
   .map-note { text-align:left; }
-  .chart-key { flex-wrap:wrap; }
   .dataset-ribbon { grid-template-columns:1fr; }
   .ribbon-facts { grid-template-columns:1fr 1fr; }
   .ribbon-facts div { padding:0 10px; }
