@@ -230,7 +230,7 @@ export function setupGuidance(viewMode) {
   welcome.innerHTML = `
     <p class="welcome-kicker">WaterVis · Prototype</p>
     <h2 id="welcome-title">Welcome to WaterVis</h2>
-    <p>WaterVis is a prototype using water-quality observations from the Goulburn Basin, 2015–2024. This version focuses on one basin.</p>
+    <p>WaterVis is a prototype visualisation tool for exploring water-quality data. It uses observations from the Goulburn Basin, 2015–2024, and currently focuses on this one basin.</p>
     <div class="welcome-views" aria-label="Three views">
       ${Object.values(VIEWS).map((item) => `<div><strong>${item.name}</strong><span>${item.summary}</span></div>`).join('')}
     </div>
