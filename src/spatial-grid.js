@@ -20,6 +20,10 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
  stage.innerHTML='<div class="spatial-viewport" tabindex="0" aria-label="Spatial grid. Drag or use arrow keys to pan; pinch to zoom."><div class="spatial-cards"></div></div><div class="spatial-navigation" aria-label="Grid navigation"><button data-action="in" aria-label="Zoom in">+</button><output></output><button data-action="out" aria-label="Zoom out">−</button><button data-action="reset">Reset</button><button data-action="left" aria-label="Pan left">←</button><button data-action="up" aria-label="Pan up">↑</button><button data-action="down" aria-label="Pan down">↓</button><button data-action="right" aria-label="Pan right">→</button></div><div class="spatial-status" role="status"></div><div class="map-tooltip" role="status"></div>';
  stage.classList.toggle('multi-spatial',multi);
  document.querySelector('.map-panel h2').textContent='Approximate geographic positions · N ↑';
+ const navigationHint=document.createElement('p');
+ navigationHint.className='grid-navigation-hint';
+ navigationHint.textContent='Drag to pan · Pinch or use + / − to zoom';
+ document.querySelector('.map-panel > .panel-heading').append(navigationHint);
  const viewport=stage.querySelector('.spatial-viewport'),layer=stage.querySelector('.spatial-cards');
  layer.addEventListener('pointerdown',event=>{if(event.target.closest('.spatial-card'))event.stopPropagation()});
  document.querySelector('.lasagna-tooltip')?.remove();
@@ -159,7 +163,7 @@ export function createSpatialGrid({data,state,colours,multi,allTemporal,onHover,
    if(x>=0&&x<=w&&y>=0&&y<=h)visible.add(id);
   }
   stage.querySelector('output').textContent=Math.round(camera.zoom*100)+'%';
-  if(!multi)stage.querySelector('.spatial-status').textContent=state.selectedSites.size?`${visible.size} of ${state.selectedSites.size} sites in view · Drag to pan · Pinch to zoom`:'No sites selected. Choose sites in the toolbar.';
+  if(!multi)stage.querySelector('.spatial-status').textContent=state.selectedSites.size?`${visible.size} of ${state.selectedSites.size} sites in view`:'No sites selected. Choose sites in the toolbar.';
   updateMini();
  }
  function drawTemporal(plot,site,code,view,domain){

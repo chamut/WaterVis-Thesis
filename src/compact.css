@@ -89,7 +89,7 @@ h1 { margin:0; font-size:18px; line-height:1.3; letter-spacing:-.025em; }
 .detail-panel h3 { font-size:20px; margin-top:10px; }
 .detail-reading { padding:12px 0; margin:12px 0; }
 .detail-reading strong { font-size:26px; }
-.detail-coordinate,.detail-status,.availability-list dt,.availability-list dd,.detail-reading em,.method-note,.detail-action-hint { font-size:12px; }
+.detail-coordinate,.detail-status,.availability-list dt,.availability-list dd,.detail-reading em,.detail-action-hint { font-size:12px; }
 .analysis-workspace.detail-above:not(.no-detail) { height:auto; grid-template-columns:1fr; grid-template-rows:auto 360px 340px; grid-template-areas:'detail' 'map' 'matrix'; }
 .detail-above .detail-panel { max-height:420px; border-left:0; border-bottom:1px solid var(--line); }
 footer { padding:7px 12px; gap:12px; border-top:1px solid var(--line); font-size:12px; flex-wrap:wrap; }

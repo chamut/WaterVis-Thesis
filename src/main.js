@@ -10,6 +10,7 @@ import { drawComparison } from './site-comparison.js';
 import { createTemporalMap } from './temporal-map.js';
 import { parameterAxisDomain, parseMeasurement, timeAxisFormat, timeAxisInterval } from './temporal-map-model.js';
 import { relatedSites } from './site-selection.js';
+import { setupGuidance } from './guidance.js';
 import {
   DATA_COLOUR,
   EXCEEDS_COLOUR,
@@ -18,6 +19,7 @@ import {
   comparisonColour,
 } from './visual-encodings.js';
 import './viewport-fit.css';
+import './guidance.css';
 
 // Emit the GeoJSON/vector worker as a production asset with the deployment base.
 maplibregl.setWorkerUrl(mapWorkerUrl);
@@ -388,12 +390,6 @@ function renderShell(data) {
       <aside class="panel detail-panel" aria-live="polite">
         <p class="section-kicker">Detailed inspection</p>
         <div id="site-detail"></div>
-        <div class="method-note">
-          <strong>How to read this</strong>
-          <p>Click a temporal plot to open its detailed axes. Hover the detailed chart to inspect individual observations.</p>
-          <p>Monthly, seasonal, and yearly values aggregate available spot observations. Empty periods remain missing.</p>
-          <p>ERS comparisons are provisional screening; DO saturation is estimated from paired temperature and site elevation.</p>
-        </div>
       </aside>
     </section>
 
@@ -556,9 +552,13 @@ function setupCompactWorkspace(data) {
   toolbar.append(relatedControl);
   relatedControl.hidden = isGrid;
   toolbar.append(mapDisplay);
-  const links = document.createElement('nav'); links.className = 'view-links'; links.setAttribute('aria-label', 'Views');
-  for (const [mode, path, label] of [['main','','Geographic map'],['grid','previews/spatial-grid-minimap-preview.html','Temporal grid'],['multi','previews/multiparameter-grid-matrix-preview.html','Multi-parameter grid']]) {
-    const link = document.createElement('a'); link.href = import.meta.env.BASE_URL + path; link.textContent = label; if (mode === viewMode) link.setAttribute('aria-current','page'); links.append(link);
+  const links = document.createElement('nav'); links.className = 'view-links'; links.setAttribute('aria-label', 'Views and help');
+  for (const [mode, path, label, help] of [
+    ['main','','Geographic map','Find sites on the map and inspect their observations.'],
+    ['grid','previews/spatial-grid-minimap-preview.html','Temporal grid','Compare one parameter over time across sites.'],
+    ['multi','previews/multiparameter-grid-matrix-preview.html','Multi-parameter grid','Scan threshold patterns for five parameters at each site.'],
+  ]) {
+    const link = document.createElement('a'); link.href = import.meta.env.BASE_URL + path; link.textContent = label; link.dataset.toolbarHelp = help; if (mode === viewMode) link.setAttribute('aria-current','page'); links.append(link);
   }
   toolbar.before(links);
   if (viewMode === 'multi') {
@@ -579,12 +579,11 @@ function setupCompactWorkspace(data) {
     app.classList.add('has-threshold-legend');
   }
   if (viewMode === 'grid') { document.querySelector('.analysis-workspace').classList.add('single-grid'); document.querySelector('.matrix-panel').hidden = true; }
-  if (isGrid) document.querySelector('.method-note').innerHTML = '<strong>How to read this</strong><p>Click a site or parameter for temporal detail. Turn on Compare sites to compare up to five sites. Values are means of available spot observations at the selected aggregation.</p><p>The mini-map dots retain actual geographic coordinates. The rectangle encloses the geographic locations of the site cards currently visible in the grid.</p>';
   const temporalLegend = document.createElement('p');
   temporalLegend.className = 'temporal-map-legend';
   temporalLegend.hidden = true;
   toolbar.append(temporalLegend);
-  setupToolbarHelp(toolbar);
+  setupToolbarHelp([toolbar, links]);
   document.querySelector('.parameter-bar').remove();
   document.querySelector('.masthead .eyebrow').remove();
   document.querySelector('.subtitle').textContent = 'Prototype · Goulburn Basin · 2015–2024';
@@ -671,7 +670,7 @@ function setupCompactWorkspace(data) {
   document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeMenus(event); });
 }
 
-function setupToolbarHelp(toolbar) {
+function setupToolbarHelp(containers) {
   const tooltip = document.createElement('div');
   tooltip.className = 'toolbar-help-tooltip';
   tooltip.id = 'toolbar-help-tooltip';
@@ -706,13 +705,15 @@ function setupToolbarHelp(toolbar) {
     activeTarget = null;
     tooltip.hidden = true;
   };
-  toolbar.addEventListener('pointerover', (event) => show(event.target.closest('[data-toolbar-help]')));
-  toolbar.addEventListener('pointerout', (event) => {
-    const target = event.target.closest('[data-toolbar-help]');
-    if (target && !target.contains(event.relatedTarget)) hide(target);
-  });
-  toolbar.addEventListener('focusin', (event) => show(event.target.closest('[data-toolbar-help]')));
-  toolbar.addEventListener('focusout', (event) => hide(event.target.closest('[data-toolbar-help]')));
+  for (const container of containers) {
+    container.addEventListener('pointerover', (event) => show(event.target.closest('[data-toolbar-help]')));
+    container.addEventListener('pointerout', (event) => {
+      const target = event.target.closest('[data-toolbar-help]');
+      if (target && !target.contains(event.relatedTarget)) hide(target);
+    });
+    container.addEventListener('focusin', (event) => show(event.target.closest('[data-toolbar-help]')));
+    container.addEventListener('focusout', (event) => hide(event.target.closest('[data-toolbar-help]')));
+  }
   window.addEventListener('scroll', () => hide(), { passive: true });
   window.addEventListener('resize', () => hide(), { passive: true });
 }
@@ -1614,6 +1615,7 @@ async function init() {
     createMatrix(data);
     updateTemporalSummary(data);
     updateLinkedViews(data);
+    setupGuidance(viewMode);
   } catch (error) {
     console.error(error);
     app.innerHTML = `
