@@ -6,6 +6,7 @@ import './styles.css';
 import './compact.css';
 import { createSidebarResize } from './sidebar-resize.js';
 import { createSpatialGrid } from './spatial-grid.js';
+import { SITE_ORDER_OPTIONS, compareSitesByOrder } from './site-order.js';
 import { drawComparison } from './site-comparison.js';
 import { createTemporalMap } from './temporal-map.js';
 import { parameterAxisDomain, parseMeasurement, timeAxisFormat, timeAxisInterval } from './temporal-map-model.js';
@@ -594,12 +595,7 @@ function setupCompactWorkspace(data) {
   app.append(snapshot);
   const sortControl = document.createElement('label');
   sortControl.className = 'site-sort-control';
-  sortControl.innerHTML = `Order sites <select id="site-sort">
-    <option value="south-north">Position: south → north</option>
-    <option value="north-south">Position: north → south</option>
-    <option value="elevation">Elevation: high → low</option>
-    <option value="name">Site name: A → Z</option>
-  </select>`;
+  sortControl.innerHTML = `Order sites <select id="site-sort">${SITE_ORDER_OPTIONS.map(([value,label])=>`<option value="${value}">${label}</option>`).join('')}</select>`;
   const matrixPanel = document.querySelector('.matrix-panel');
   matrixPanel.querySelector('.matrix-title-row').append(sortControl);
   const sortNote = document.createElement('p');
@@ -631,6 +627,7 @@ function setupCompactWorkspace(data) {
     state.siteSort = select.value;
     createMatrix(data);
     updateLinkedViews(data, { detail: false });
+    data.grid?.syncSort();
     document.querySelector('.matrix-scroll').scrollTop = 0;
   });
   const detail = document.querySelector('.detail-panel');
@@ -974,15 +971,7 @@ function createMap(data) {
 }
 
 function compareSites(a, b) {
-  const byName = () => d3.ascending(a.short_name, b.short_name) || d3.ascending(a.site_id, b.site_id);
-  if (state.siteSort === 'name') return byName();
-  const field = state.siteSort === 'elevation' ? 'elevation' : 'latitude';
-  const aValid = Number.isFinite(a[field]);
-  const bValid = Number.isFinite(b[field]);
-  if (aValid !== bValid) return aValid ? -1 : 1;
-  if (!aValid) return byName();
-  const direction = state.siteSort === 'south-north' ? 1 : -1;
-  return direction * (a[field] - b[field]) || byName();
+  return compareSitesByOrder(a,b,state.siteSort);
 }
 
 function createMatrix(data) {
@@ -1427,7 +1416,7 @@ function updateLinkedViews(data, { detail = true } = {}) {
     document.querySelector('.ers-legend-group').hidden = true;
     const legend = document.querySelector('.temporal-map-legend');
     legend.hidden = viewMode === 'multi';
-    if (viewMode === 'grid') legend.textContent = 'Shared value and time scales · points: aggregated spot observations';
+    if (viewMode === 'grid') legend.innerHTML = 'Shared value and time scales · aggregated spot observations <span class="temporal-point-key"><i class="within"></i>Does not exceed</span><span class="temporal-point-key"><i class="outside"></i>Exceeds</span><span class="temporal-point-key"><i class="unavailable"></i>No objective</span>';
   }
   if (detail) updateDetail(data);
 }
@@ -1596,6 +1585,7 @@ async function init() {
       allTemporal,
       onHover: (id) => setHoveredSite(data, id),
       onSelect: (siteId, parameterCode, event) => selectLinkedTarget(data, { siteId, parameterCode, event }),
+      onSortChange: () => { document.querySelector('#site-sort').value=state.siteSort; createMatrix(data); updateLinkedViews(data,{detail:false}); },
     });
     else data.temporalMap = createTemporalMap({
       data, state, colours: PARAMETER_COLOURS,

@@ -42,8 +42,8 @@
   #app .matrix-toggle { min-height:28px; }
   #app .chart-cell svg { width:100%; }
   #app .grid-workspace .map-panel > .panel-heading {
-    height:28px;
-    min-height:28px;
+    height:34px;
+    min-height:34px;
     padding:4px 9px;
   }
   #app .grid-workspace .map-panel > .panel-heading h2 {
@@ -62,5 +62,5 @@
     height:24px;
     font-size:15px;
   }
-  #app .grid-workspace .spatial-viewport { inset:28px 0 30px; }
+  #app .grid-workspace .spatial-viewport { inset:34px 0 30px; }
 }
