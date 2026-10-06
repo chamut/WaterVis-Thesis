@@ -11,7 +11,7 @@ const VIEWS = {
     ],
     steps: [
       ['.view-links a[aria-current="page"]', 'Choose a view', 'The three tabs offer a geographic map, a temporal grid, and a five-parameter threshold grid. Hover over a tab for a short description.'],
-      ['.time-menu > summary', 'Choose a time period', 'Change the date range and switch between monthly, seasonal, and yearly summaries.'],
+      ['.time-menu > summary', 'Choose a time period', 'Select months, seasons, or years. Periods without observations remain visible.'],
       ['.site-filter-trigger', 'Choose visible sites', 'Use Sites to choose which monitoring sites appear in this view. Select sites in the list, then choose Done.'],
       ['.parameter-menu > summary', 'Choose a parameter', 'Select the water-quality parameter used to colour site markers and draw temporal charts.'],
       ['.map-display-toggle', 'Change the map display', 'Show sites as condition markers or place small temporal charts at their locations.'],
@@ -32,7 +32,7 @@ const VIEWS = {
     ],
     steps: [
       ['.view-links a[aria-current="page"]', 'Choose a view', 'Switch between the geographic map and two spatial grids. Hover over a tab for its purpose.'],
-      ['.time-menu > summary', 'Choose a time period', 'Change the date range and the monthly, seasonal, or yearly aggregation for all charts.'],
+      ['.time-menu > summary', 'Choose a time period', 'Select months, seasons, or years for all charts; periods without observations remain visible.'],
       ['.site-filter-trigger', 'Choose visible sites', 'Use Sites to choose which monitoring sites appear in the grid and mini-map. Select sites in the list, then choose Done.'],
       ['.parameter-menu > summary', 'Choose a parameter', 'Select the water-quality parameter drawn in every site card.'],
       ['.spatial-navigation', 'Explore the site cards', 'Pan or zoom the grid to explore the site cards.'],
@@ -51,7 +51,7 @@ const VIEWS = {
     ],
     steps: [
       ['.view-links a[aria-current="page"]', 'Choose a view', 'Switch between the geographic map and two spatial grids. Hover over a tab for its purpose.'],
-      ['.time-menu > summary', 'Choose a time period', 'Change the date range and aggregation used by all five parameter strips.'],
+      ['.time-menu > summary', 'Choose a time period', 'Select months, seasons, or years for all five parameter strips; periods without observations remain visible.'],
       ['.site-filter-trigger', 'Choose visible sites', 'Use Sites to choose which monitoring sites appear in the grid and mini-map. Select sites in the list, then choose Done.'],
       ['.threshold-legend-bar', 'Read the threshold states', 'Orange means does not exceed, purple means exceeds, and grey means no data or no objective.'],
       ['.spatial-navigation', 'Explore the site cards', 'Pan or zoom the grid to explore five-parameter site cards.'],

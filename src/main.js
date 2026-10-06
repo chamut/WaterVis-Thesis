@@ -12,6 +12,7 @@ import { createTemporalMap } from './temporal-map.js';
 import { parameterAxisDomain, parseMeasurement, timeAxisFormat, timeAxisInterval } from './temporal-map-model.js';
 import { relatedSites } from './site-selection.js';
 import { setupGuidance } from './guidance.js';
+import { DATA_END, buildPeriods, periodContaining, periodLabel, periodStart } from './time-periods.js';
 import {
   DATA_COLOUR,
   EXCEEDS_COLOUR,
@@ -184,14 +185,7 @@ function classifyTemporalValue(data, siteId, parameterCode, value) {
 }
 
 function temporalBucket(date, resolution) {
-  if (resolution === 'yearly') return d3.timeYear.floor(date);
-  if (resolution === 'seasonal') {
-    const month = date.getMonth();
-    const startMonth = month < 2 ? 11 : month < 5 ? 2 : month < 8 ? 5 : month < 11 ? 8 : 11;
-    const year = month < 2 ? date.getFullYear() - 1 : date.getFullYear();
-    return new Date(year, startMonth, 1);
-  }
-  return d3.timeMonth.floor(date);
+  return periodStart(date, resolution);
 }
 
 function aggregateSpot(data, rows, resolution) {
@@ -299,12 +293,13 @@ function renderShell(data) {
         <button type="button" data-resolution="yearly" aria-label="Yearly aggregation" aria-pressed="false">Yearly</button>
       </div>
       <div class="date-range-controls">
-        <label>From<input type="date" id="range-start" min="2015-01-01" max="2024-12-31" value="${dateInputFormat(state.rangeStart)}"></label>
+        <label>From<select id="range-start" aria-label="First ${state.selectedResolution} period"></select></label>
         <span aria-hidden="true">→</span>
-        <label>To<input type="date" id="range-end" min="2015-01-01" max="2024-12-31" value="${dateInputFormat(state.rangeEnd)}"></label>
+        <label>To<select id="range-end" aria-label="Last ${state.selectedResolution} period"></select></label>
         <button type="button" class="range-latest" data-range-preset="latest-year" aria-label="Show latest year">Latest year</button>
         <button type="button" class="range-reset" aria-label="Show full period">Full period</button>
       </div>
+      <p class="period-availability-note">Site counts cover the selected sites and all parameters. No-data periods remain selectable; original timestamps are in detailed inspection.</p>
       <p class="temporal-summary" aria-live="polite">Monthly · 2015–2024</p>
     </section>
 
@@ -485,7 +480,7 @@ function setupCompactWorkspace(data) {
     return wrapper;
   }
   const timeMenu = menu('<span id="compact-period">Monthly · 2015–2024</span> ▾', document.querySelector('.temporal-controls'), 'time-menu');
-  timeMenu.querySelector('summary').dataset.toolbarHelp = 'Choose the date range and monthly, seasonal, or yearly aggregation.';
+  timeMenu.querySelector('summary').dataset.toolbarHelp = 'Choose months, seasons, or years; periods without data are marked.';
   const siteFilterControl = document.querySelector('.site-filter-control');
   siteFilterControl.querySelector('.site-filter-trigger').dataset.toolbarHelp = 'Choose which monitoring sites appear in the views.';
   toolbar.append(siteFilterControl);
@@ -724,11 +719,14 @@ function updateTemporalSummary(data, message = null) {
   }
   const resolution = resolutionLabel(state.selectedResolution);
   const fullPeriod = dateInputFormat(state.rangeStart) === '2015-01-01' && dateInputFormat(state.rangeEnd) === '2024-12-31';
-  const range = fullPeriod ? '2015–2024' : `${displayDateFormat(state.rangeStart)}–${displayDateFormat(state.rangeEnd)}`;
+  const startLabel = periodLabel(periodStart(state.rangeStart, state.selectedResolution), state.selectedResolution);
+  const endLabel = periodLabel(periodStart(state.rangeEnd, state.selectedResolution), state.selectedResolution);
+  const range = fullPeriod ? '2015–2024' : startLabel === endLabel ? startLabel : `${startLabel}–${endLabel}`;
   const period = document.querySelector('#compact-period');
   if (period) period.textContent = `${resolution} · ${range}`;
   const selectedCount = state.selectedSites.size;
-  summary.textContent = `${resolution} · ${range} · ${selectedCount} site${selectedCount === 1 ? '' : 's'}`;
+  const hasObservations = data.spot.some((row) => state.selectedSites.has(row.site_id) && Number.isFinite(row.value) && dateInSelectedRange(row.datetimeValue));
+  summary.textContent = `${resolution} · ${range} · ${selectedCount} site${selectedCount === 1 ? '' : 's'}${hasObservations ? '' : ' · No observations in this period'}`;
   document.querySelectorAll('[data-resolution]').forEach((button) => {
     button.setAttribute('aria-pressed', String(button.dataset.resolution === state.selectedResolution));
   });
@@ -738,51 +736,66 @@ function refreshTemporalViews(data) {
   for (const id of state.comparedSites.keys()) if (!state.selectedSites.has(id)) state.comparedSites.delete(id);
   if (!state.selectedSites.has(state.hoveredSite)) state.hoveredSite = null;
   data.temporalView = buildTemporalView(data);
+  data.updatePeriodOptions?.();
   createMatrix(data);
   updateTemporalSummary(data);
   updateLinkedViews(data);
 }
 
 function setupTemporalControls(data) {
+  const startInput = document.querySelector('#range-start');
+  const endInput = document.querySelector('#range-end');
+  let periods = [];
+  const renderPeriodOptions = () => {
+    periods = buildPeriods(state.selectedResolution, data.spot, state.selectedSites);
+    const startPeriod = periodContaining(periods, state.rangeStart);
+    const endPeriod = periodContaining(periods, state.rangeEnd);
+    for (const [input, selected] of [[startInput, startPeriod], [endInput, endPeriod]]) {
+      input.setAttribute('aria-label', `${input === startInput ? 'First' : 'Last'} ${state.selectedResolution} period`);
+      input.replaceChildren(...periods.map((period) => {
+        const option = document.createElement('option');
+        option.value = period.key;
+        option.textContent = `${period.label}${period.partial ? ' (partial)' : ''} · ${period.siteCount ? `${period.siteCount} site${period.siteCount === 1 ? '' : 's'}` : 'No data'}`;
+        return option;
+      }));
+      input.value = selected.key;
+    }
+  };
+  data.updatePeriodOptions = renderPeriodOptions;
+  renderPeriodOptions();
   const resolutionButtons = document.querySelectorAll('[data-resolution]');
   resolutionButtons.forEach((button) => button.addEventListener('click', () => {
     const nextResolution = button.dataset.resolution;
     if (nextResolution === state.selectedResolution) return;
     state.selectedResolution = nextResolution;
+    const nextPeriods = buildPeriods(nextResolution, data.spot, state.selectedSites);
+    state.rangeStart = periodContaining(nextPeriods, state.rangeStart).start;
+    state.rangeEnd = periodContaining(nextPeriods, state.rangeEnd).end;
     refreshTemporalViews(data);
   }));
 
-  const startInput = document.querySelector('#range-start');
-  const endInput = document.querySelector('#range-end');
   const applyRange = (changed) => {
-    if (!startInput.value || !endInput.value || !startInput.checkValidity() || !endInput.checkValidity()) { updateTemporalSummary(data, 'Choose valid dates from 2015 through 2024.'); return; }
-    let start = new Date(`${startInput.value}T00:00:00`);
-    let end = new Date(`${endInput.value}T23:59:59`);
-    if (start > end) {
-      if (changed === 'start') {
-        end = new Date(start);
-        end.setHours(23, 59, 59, 999);
-        endInput.value = startInput.value;
-      } else {
-        start = new Date(end);
-        start.setHours(0, 0, 0, 0);
-        startInput.value = endInput.value;
-      }
+    let startIndex = periods.findIndex((period) => period.key === startInput.value);
+    let endIndex = periods.findIndex((period) => period.key === endInput.value);
+    if (startIndex < 0 || endIndex < 0) return;
+    if (startIndex > endIndex) {
+      if (changed === 'start') endIndex = startIndex;
+      else startIndex = endIndex;
     }
-    state.rangeStart = start;
-    state.rangeEnd = end;
+    state.rangeStart = periods[startIndex].start;
+    state.rangeEnd = periods[endIndex].end;
     refreshTemporalViews(data);
   };
   startInput.addEventListener('change', () => applyRange('start'));
   endInput.addEventListener('change', () => applyRange('end'));
   document.querySelector('.range-reset').addEventListener('click', () => {
-    startInput.value = '2015-01-01';
-    endInput.value = '2024-12-31';
+    startInput.value = periods[0].key;
+    endInput.value = periods.at(-1).key;
     applyRange('reset');
   });
   document.querySelector('[data-range-preset="latest-year"]').addEventListener('click', () => {
-    startInput.value = '2024-01-01';
-    endInput.value = '2024-12-31';
+    startInput.value = periodContaining(periods, new Date(2024, 0, 1)).key;
+    endInput.value = periodContaining(periods, DATA_END).key;
     applyRange('preset');
   });
 }
@@ -1159,16 +1172,27 @@ function detailPointHtml(observation, parameter) {
     ? `<span>Measured ${formatValue(observation.rawValue)} ${observation.raw_unit}${Number.isFinite(observation.temperature) ? ` · ${formatValue(observation.temperature)} °C` : ''}</span>`
     : '';
   const sample = `<span>${observation.observationCount || 1} spot observation${observation.observationCount === 1 ? '' : 's'} aggregated</span>`;
-  return `<strong>${formatValue(observation.value)} ${parameter.unit}</strong><time>${dateText}</time><span>${source}</span>${raw}${sample}<em class="${observation.ers_point_status}">${formatStatus(observation.ers_point_status)}</em>`;
+  const observationDates = observation.originalDates || [];
+  const displayedDates = observationDates.slice(0, 3).map((sampleDate) => d3.timeFormat('%d %b %Y · %H:%M')(sampleDate));
+  const dates = observationDates.length
+    ? `<span>Observed: ${displayedDates.join('; ')}${observationDates.length > displayedDates.length ? `; +${observationDates.length - displayedDates.length} more below` : ''}</span>`
+    : '';
+  return `<strong>${formatValue(observation.value)} ${parameter.unit}</strong><time>${dateText}</time><span>${source}</span>${dates}${raw}${sample}<em class="${observation.ers_point_status}">${formatStatus(observation.ers_point_status)}</em>`;
 }
 
 function drawDetailChart(data, site, parameter, record) {
   const container = document.querySelector('#detail-chart');
   if (!container) return;
   const { daily, spot } = getCellSeries(data, site.site_id, parameter.code);
+  const originalDatesByPeriod = d3.group(
+    data.spot.filter((row) => row.site_id === site.site_id && row.parameter_code === parameter.code && Number.isFinite(row.value) && dateInSelectedRange(row.datetimeValue)),
+    (row) => +temporalBucket(row.datetimeValue, state.selectedResolution),
+  );
   const observations = [
     ...daily.map((row) => ({ ...row, date: row.dateValue })),
-    ...spot.map((row) => ({ ...row, date: row.datetimeValue })),
+    ...spot.map((row) => ({ ...row, date: row.datetimeValue,
+      originalDates: (originalDatesByPeriod.get(+temporalBucket(row.datetimeValue, state.selectedResolution)) || [])
+        .map((sourceRow) => sourceRow.datetimeValue).sort((a, b) => a - b) })),
   ].sort((a, b) => d3.ascending(a.date, b.date));
   if (!observations.length) {
     container.innerHTML = '<p class="detail-no-data">No usable observations are available for this plot.</p>';
@@ -1328,6 +1352,7 @@ function updateDetail(data) {
   const hasObjectiveRange = Number.isFinite(assessment?.objective?.lower) && Number.isFinite(assessment?.objective?.upper);
   const status = assessment?.status || 'unavailable';
   const showPlot = state.detailMode === 'plot';
+  const rawObservations = showPlot ? data.spot.filter((row) => row.site_id === site.site_id && row.parameter_code === parameter.code && Number.isFinite(row.value) && dateInSelectedRange(row.datetimeValue)) : [];
   const boundaryNote = site.insideBoundary ? '' : ' · Outside displayed basin polygon';
   detail.innerHTML = `
     <div class="detail-status"><span class="condition-pill ${status}">${formatAnnualStatus(status)}</span><span>Site ${site.site_id}</span></div>
@@ -1347,6 +1372,7 @@ function updateDetail(data) {
       <div class="detail-plot-heading"><strong>Temporal detail</strong><span>${displayDateFormat(state.rangeStart)}–${displayDateFormat(state.rangeEnd)} · hover to inspect</span></div>
       <div id="detail-chart"></div>
       <div class="detail-chart-key"><span><i class="spot"></i>${resolutionLabel(state.selectedResolution)} spot mean</span><span><i class="objective${hasObjectiveRange ? ' range' : ''}"></i>ERS ${hasObjectiveRange ? 'objective range' : 'upper objective'}</span></div>
+      <details class="raw-observation-dates"><summary>Original observation dates (${rawObservations.length})</summary><ol>${rawObservations.sort((a, b) => a.datetimeValue - b.datetimeValue).map((row) => `<li>${d3.timeFormat('%d %b %Y · %H:%M')(row.datetimeValue)} · ${formatValue(row.value)} ${parameter.unit}</li>`).join('')}</ol></details>
     </section>` : '<p class="detail-action-hint">Click a matrix plot to open its detailed temporal inspection here.</p>'}
   `;
   if (viewMode === 'multi' && showPlot) {

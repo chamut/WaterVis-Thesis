@@ -2,7 +2,7 @@
 :root { --paper:#fff; --line:#dce5df; --ink:#233b32; --muted:#677c73; }
 body { background:#fff; }
 #app { width:100%; margin:0; padding:0; }
-.masthead { min-height:48px; margin:0; padding:10px 16px; align-items:center; border-bottom:1px solid var(--line); }
+.masthead { min-height:48px; margin:0; padding:10px 16px; align-items:center; border-bottom:1px solid var(--line); background:#e7f0e6; }
 .masthead > div:first-child { display:flex; align-items:center; gap:16px; }
 h1 { margin:0; font-size:18px; line-height:1.3; letter-spacing:-.025em; }
 .subtitle { font-size:12px; }
@@ -29,7 +29,7 @@ h1 { margin:0; font-size:18px; line-height:1.3; letter-spacing:-.025em; }
 .temporal-controls h2 { font-size:16px; }
 .date-range-controls { flex-wrap:wrap; }
 .date-range-controls label { font-size:12px; }
-.date-range-controls input { font-size:12px; }
+.date-range-controls select { font-size:12px; }
 .resolution-buttons button { flex:1; font-size:14px; }
 .range-latest,.range-reset,.temporal-summary { font-size:12px; }
 .parameter-buttons { display:flex; flex-direction:column; }
@@ -135,7 +135,7 @@ footer { padding:7px 12px; gap:12px; border-top:1px solid var(--line); font-size
   .detail-panel { max-height:600px; border-left:0; }
   .map-panel > .panel-heading { max-width:52%; }
   .map-panel h2 { font-size:12px; }
-  .date-range-controls input { font-size:16px; }
+  .date-range-controls select { font-size:16px; }
   .threshold-legend-bar { gap:8px 12px; }
   .threshold-legend-heading { width:100%; }
   .threshold-time-direction { padding-right:10px; }
