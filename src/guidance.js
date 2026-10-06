@@ -5,7 +5,7 @@ const VIEWS = {
     name: 'Geographic map',
     summary: 'Find sites and inspect their observations.',
     guidance: [
-      'Marker colour shows the latest complete selected year’s provisional ERS condition for the chosen parameter. Hover for a value; click a site for detail.',
+      'Annual ERS colours use the latest complete selected year’s required statistic. Selected period colours compare that period’s mean with the fixed segment objective; this is exploratory, not annual ERS.',
       'Switch between Markers and Temporal charts. Compare sites selects up to five; Related sites keeps sites on the same named watercourse first, then nearby sites.',
       'The Sites × water-quality parameters panel compares sites and parameters. Click a plot to open detailed temporal axes, then hover the detail chart to inspect observations. Select Show panel if it is minimized.',
     ],
@@ -14,6 +14,7 @@ const VIEWS = {
       ['.time-menu > summary', 'Choose a time period', 'Select months, seasons, or years. Periods without observations remain visible.'],
       ['.site-filter-trigger', 'Choose visible sites', 'Use Sites to choose which monitoring sites appear in this view. Select sites in the list, then choose Done.'],
       ['.parameter-menu > summary', 'Choose a parameter', 'Select the water-quality parameter used to colour site markers and draw temporal charts.'],
+      ['.map-time-menu > summary', 'Explore map time', 'Open Map time to switch from Annual ERS to Selected period. Choose a month, season, or year, or play the timeline to watch marker colours change. Grey means no data or objective.'],
       ['.map-display-toggle', 'Change the map display', 'Show sites as condition markers or place small temporal charts at their locations.'],
       ['.site-marker', 'Select a site', 'Click the highlighted map marker to open Detailed inspection, or choose Next to continue.', true],
       ['.compare-sites', 'Compare sites', 'Turn this on, then select up to five sites to see them together in one chart.'],

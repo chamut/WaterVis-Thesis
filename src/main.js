@@ -49,6 +49,8 @@ const state = {
   rangeStart: new Date('2015-01-01T00:00:00'),
   rangeEnd: new Date('2024-12-31T23:59:59'),
   selectedSites: new Set(),
+  mapTimeMode: 'annual',
+  mapFrameKey: null,
 };
 
 const app = document.querySelector('#app');
@@ -343,7 +345,7 @@ function renderShell(data) {
             <div class="ers-info-section">
               <strong>Time, aggregation, and ERS</strong>
               <p class="ers-segment-note"><b>The ERS objective does not change each month or year.</b> It is fixed for the site's river segment and parameter in this prototype. What changes is the observed data used for comparison.</p>
-              <p class="ers-segment-note">Monthly, seasonal, and yearly charts show the mean of available spot observations in each interval. Marker colour uses the required ERS statistic from the latest complete calendar year inside the selected range; a partial-year range therefore has no annual marker assessment.</p>
+              <p class="ers-segment-note">Monthly, seasonal, and yearly charts show the mean of available spot observations in each interval. In Annual ERS mode, marker colour uses the required statistic from the latest complete calendar year inside the selected range; a partial-year range therefore has no annual marker assessment. In Selected period mode, marker colour compares that period’s mean with the fixed segment objective. This comparison is exploratory, not an annual ERS assessment.</p>
             </div>
           </section>
         </div>
@@ -460,6 +462,7 @@ function renderShell(data) {
   setupCompactWorkspace(data);
   setupTemporalControls(data);
   setupSiteFilter(data);
+  if (!isGrid) setupMapTimeline(data);
 }
 
 function setupCompactWorkspace(data) {
@@ -496,7 +499,7 @@ function setupCompactWorkspace(data) {
   mapDisplay.setAttribute('role', 'group');
   mapDisplay.setAttribute('aria-label', 'Map display');
   mapDisplay.innerHTML = '<button type="button" data-map-display="markers" aria-pressed="true">Markers</button><button type="button" data-map-display="temporal" aria-pressed="false">Temporal charts</button>';
-  mapDisplay.querySelector('[data-map-display="markers"]').dataset.toolbarHelp = 'Show sites as ERS status markers.';
+  mapDisplay.querySelector('[data-map-display="markers"]').dataset.toolbarHelp = 'Show markers coloured by the selected map time mode.';
   mapDisplay.querySelector('[data-map-display="temporal"]').dataset.toolbarHelp = 'Show a small temporal chart at each site.';
   mapDisplay.addEventListener('click', (event) => {
     const mode = event.target.dataset.mapDisplay;
@@ -737,6 +740,7 @@ function refreshTemporalViews(data) {
   if (!state.selectedSites.has(state.hoveredSite)) state.hoveredSite = null;
   data.temporalView = buildTemporalView(data);
   data.updatePeriodOptions?.();
+  data.mapTimeline?.update();
   createMatrix(data);
   updateTemporalSummary(data);
   updateLinkedViews(data);
@@ -798,6 +802,122 @@ function setupTemporalControls(data) {
     endInput.value = periodContaining(periods, DATA_END).key;
     applyRange('preset');
   });
+}
+
+function setupMapTimeline(data) {
+  const menu = document.createElement('details');
+  menu.className = 'compact-menu map-time-menu';
+  const summary = document.createElement('summary');
+  summary.textContent = 'Map time · Annual ERS ▾';
+  summary.dataset.toolbarHelp = 'Choose annual ERS or animate selected periods on the map.';
+  const popover = document.createElement('div');
+  popover.className = 'compact-popover map-time-popover';
+  const bar = document.createElement('section');
+  bar.className = 'timeline-preview-bar';
+  bar.setAttribute('aria-label', 'Map time controls');
+  bar.innerHTML = `
+    <strong>Map time</strong>
+    <div class="timeline-preview-modes" role="group" aria-label="Map colour mode">
+      <button type="button" data-preview-mode="annual" aria-pressed="true">Annual ERS</button>
+      <button type="button" data-preview-mode="period" aria-pressed="false">Selected period</button>
+    </div>
+    <button type="button" class="timeline-preview-play" aria-label="Play timeline">▶ Play</button>
+    <input class="timeline-preview-slider" type="range" min="0" max="0" value="0" aria-label="Timeline frame">
+    <select class="timeline-preview-select" aria-label="Selected map period"></select>
+    <span class="timeline-preview-caption" aria-live="polite"></span>`;
+  const dockHint = document.createElement('p');
+  dockHint.className = 'timeline-dock-hint';
+  dockHint.textContent = 'The timeline is pinned below the map. Use Annual ERS there to close it.';
+  dockHint.hidden = true;
+  popover.append(bar, dockHint);
+  menu.append(summary, popover);
+  const toolbar = document.querySelector('.compact-toolbar');
+  toolbar.insertBefore(menu, toolbar.querySelector('.map-display-toggle'));
+  const select = bar.querySelector('select');
+  const slider = bar.querySelector('input');
+  const play = bar.querySelector('.timeline-preview-play');
+  let periods = [];
+  let timer = null;
+  let statuses = new Map();
+  let restoreMatrixAfterPlayback = false;
+  function pause() {
+    if (timer !== null) clearInterval(timer);
+    timer = null;
+    play.textContent = '▶ Play';
+    play.setAttribute('aria-label', 'Play timeline');
+    if (restoreMatrixAfterPlayback && state.matrixCollapsed) document.querySelector('.matrix-toggle').click();
+    restoreMatrixAfterPlayback = false;
+  }
+  function selectFrame(index) {
+    const frame = periods[Math.max(0, Math.min(periods.length - 1, index))];
+    if (!frame) return;
+    state.mapFrameKey = frame.key;
+    select.value = frame.key;
+    slider.value = String(periods.indexOf(frame));
+    const grouped = d3.group(data.spot.filter((row) => row.datetimeValue >= frame.start && row.datetimeValue <= frame.end && Number.isFinite(row.value) && row.parameter_code === state.selectedParameter), (row) => row.site_id);
+    statuses = new Map([...grouped].map(([siteId, rows]) => [siteId, classifyTemporalValue(data, siteId, state.selectedParameter, d3.mean(rows, (row) => row.value))]));
+    const count = [...grouped.keys()].filter((siteId) => state.selectedSites.has(siteId)).length;
+    const showingPeriod = state.mapTimeMode === 'period';
+    bar.querySelector('.timeline-preview-caption').textContent = state.mapTimeMode === 'annual'
+      ? 'Marker colour: latest complete selected year’s annual ERS statistic. Full temporal charts remain below.'
+      : `${frame.label}${frame.partial ? ' (partial)' : ''} · ${count ? `${count} sites with observations` : 'No observations in selected sites'} · Period mean vs segment objective (exploratory).`;
+    summary.textContent = `Map time · ${state.mapTimeMode === 'annual' ? 'Annual ERS' : frame.label} ▾`;
+    bar.querySelectorAll('[data-preview-mode]').forEach((button) => button.setAttribute('aria-pressed', String(button.dataset.previewMode === state.mapTimeMode)));
+    bar.classList.toggle('period-mode', showingPeriod);
+    dockHint.hidden = !showingPeriod;
+    if (showingPeriod && !bar.classList.contains('timeline-docked')) {
+      bar.classList.add('timeline-docked');
+      document.querySelector('.map-panel').append(bar);
+      menu.open = false;
+    } else if (!showingPeriod && bar.classList.contains('timeline-docked')) {
+      bar.classList.remove('timeline-docked');
+      popover.append(bar);
+    }
+    bar.querySelector('.timeline-preview-play').disabled = state.mapTimeMode !== 'period';
+    bar.querySelector('.timeline-preview-slider').disabled = state.mapTimeMode !== 'period';
+    select.disabled = state.mapTimeMode !== 'period';
+    document.querySelector('.map-tooltip')?.classList.remove('visible');
+    updateLinkedViews(data, { detail: false });
+  }
+  function update() {
+    pause();
+    const available = buildPeriods(state.selectedResolution, data.spot, state.selectedSites);
+    periods = available.filter((period) => period.end >= state.rangeStart && period.start <= state.rangeEnd);
+    if (!periods.length) return;
+    const current = periods.find((period) => period.key === state.mapFrameKey) || periods.at(-1);
+    select.replaceChildren(...periods.map((period) => {
+      const option = document.createElement('option');
+      option.value = period.key;
+      option.textContent = `${period.label}${period.partial ? ' (partial)' : ''} · ${period.siteCount ? `${period.siteCount} sites` : 'No data'}`;
+      return option;
+    }));
+    slider.max = String(periods.length - 1);
+    selectFrame(periods.indexOf(current));
+  }
+  bar.querySelectorAll('[data-preview-mode]').forEach((button) => button.addEventListener('click', () => {
+    state.mapTimeMode = button.dataset.previewMode;
+    if (state.mapTimeMode === 'annual') pause();
+    selectFrame(Number(slider.value));
+  }));
+  select.addEventListener('change', () => { pause(); selectFrame(periods.findIndex((period) => period.key === select.value)); });
+  slider.addEventListener('input', () => { pause(); selectFrame(Number(slider.value)); });
+  play.addEventListener('click', () => {
+    if (timer !== null) { pause(); return; }
+    if (!state.matrixCollapsed) {
+      document.querySelector('.matrix-toggle').click();
+      restoreMatrixAfterPlayback = true;
+    }
+    if (Number(slider.value) >= periods.length - 1) selectFrame(0);
+    play.textContent = 'Ⅱ Pause';
+    play.setAttribute('aria-label', 'Pause timeline');
+    timer = setInterval(() => {
+      const next = Number(slider.value) + 1;
+      if (next >= periods.length) { pause(); return; }
+      selectFrame(next);
+    }, 850);
+  });
+  data.mapTimeline = { update, status: (siteId) => statuses.get(siteId) || 'unavailable', frame: () => periods.find((period) => period.key === state.mapFrameKey) };
+  update();
 }
 
 function setupSiteFilter(data) {
@@ -1415,7 +1535,8 @@ function updateLinkedViews(data, { detail = true } = {}) {
     element.hidden = state.mapDisplayMode === 'temporal' || !state.selectedSites.has(site.site_id);
     const group = d3.select(element);
     const assessment = latestAnnualAssessment(data, site.site_id, parameter);
-    const status = assessment.status;
+    const status = !isGrid && state.mapTimeMode === 'period'
+      ? data.mapTimeline?.status(site.site_id) || 'unavailable' : assessment.status;
     const compareColour = comparisonColour(state, site.site_id);
     element.style.setProperty('--comparison-colour', compareColour || 'transparent');
     group
@@ -1438,6 +1559,10 @@ function updateLinkedViews(data, { detail = true } = {}) {
   if (comparisonEmpty) comparisonEmpty.hidden = !(state.compareMode && state.comparedSites.size === 0);
   data.temporalMap?.update();
   data.grid?.update();
+  if (!isGrid) {
+    const info = document.querySelector('.ers-legend-group .ers-info');
+    if (info) info.hidden = state.mapTimeMode === 'period';
+  }
   if (isGrid) {
     document.querySelector('.ers-legend-group').hidden = true;
     const legend = document.querySelector('.temporal-map-legend');
@@ -1562,13 +1687,16 @@ function positionTooltip(data, site, event) {
   const latest = (data.temporalView?.latestByCell || data.latestByCell).get(cellKey(site.site_id, state.selectedParameter));
   const parameter = getParameter(data, state.selectedParameter);
   const assessment = latestAnnualAssessment(data, site.site_id, state.selectedParameter);
-  const status = assessment.status;
+  const previewFrame = !isGrid && state.mapTimeMode === 'period' ? data.mapTimeline?.frame() : null;
+  const previewRows = previewFrame ? data.spot.filter((row) => row.site_id === site.site_id && row.parameter_code === state.selectedParameter && row.datetimeValue >= previewFrame.start && row.datetimeValue <= previewFrame.end && Number.isFinite(row.value)) : [];
+  const status = previewFrame ? data.mapTimeline.status(site.site_id) : assessment.status;
+  const displayedValue = previewFrame ? d3.mean(previewRows, (row) => row.value) : latest?.value;
   tooltip.innerHTML = `
     <strong>${site.short_name}</strong>
-    <span>${parameter.short_label}: ${latest ? `${formatValue(latest.value)} ${latest.unit}` : 'No data'}</span>
-    <time>${latest ? formatObservationTime(latest) : 'No observation timestamp'}</time>
+    <span>${parameter.short_label}: ${Number.isFinite(displayedValue) ? `${formatValue(displayedValue)} ${parameter.unit}` : 'No data'}</span>
+    <time>${previewFrame ? `${previewFrame.label} mean · ${previewRows.length} observation${previewRows.length === 1 ? '' : 's'}` : latest ? formatObservationTime(latest) : 'No observation timestamp'}</time>
     <span>${site.ers_segment}${site.insideBoundary ? '' : ' · Outside displayed basin polygon'}</span>
-    <em class="${status}">${assessment.year ? `${assessment.year} · ${formatAnnualStatus(status)}` : formatAnnualStatus(status)}</em>`;
+    <em class="${status}">${previewFrame ? status === 'unavailable' ? 'No data / objective' : status === 'outside' ? 'Period mean exceeds objective' : 'Period mean does not exceed' : assessment.year ? `${assessment.year} · ${formatAnnualStatus(status)}` : formatAnnualStatus(status)}</em>`;
   const x = Math.min(event.clientX - bounds.left + 14, bounds.width - 210);
   const y = Math.max(event.clientY - bounds.top - 16, 16);
   tooltip.style.transform = `translate(${x}px, ${y}px)`;
